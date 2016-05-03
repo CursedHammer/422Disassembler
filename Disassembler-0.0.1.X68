@@ -1,6 +1,6 @@
 *-----------------------------------------------------------
 * Title      : 68k Disassembler
-* Written by : Brandon Authier (Hblkr, Jack Eldridge, Marijn
+* Written by : Brandon Authier (Hblkr, Jack Scott Eldridge, Marijn
 * Date       : 2 May 2016
 * Description: An inverse assembler that will convert a memory
 *              image of instructions and data back to the display.
@@ -117,6 +117,7 @@ ILLEGAL  DC.B  '1000    DATA    $WXYZ',CR,LF,0
 ENDL     DC.B  CR,LF,0
 
         END        START        ; last line of source
+
 
 
 
