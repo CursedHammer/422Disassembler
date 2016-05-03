@@ -1,6 +1,7 @@
 *-----------------------------------------------------------
 * Title      : Testing Code
-* Written by : Marijn Burger, Jack Eldridge, Brandon Authier
+* Written by : Brandon Authier (Hblkr), Jack S. Eldridge
+*              (JackScottie), Marijn Burger (marijnburger)
 * Date       : 2 May 2016
 * Description: Testing code for the inverse assembler, testing
 *              various combinations of op codes and effective
@@ -50,6 +51,8 @@ START:                  ; first instruction of program
 * Put variables and constants here
 
     END    START        ; last line of source
+
+
 
 *~Font name~Courier New~
 *~Font size~10~
