@@ -2,7 +2,7 @@
 * Title      : 68k Disassembler
 * Written by : Brandon Authier (Hblkr), Jack S. Eldridge
 *              (JackScottie), Marijn Burger (marijnburger)
-* Date       : 2 May 2016
+* Date       : 3 May 2016
 * Description: An inverse assembler that will convert a memory
 *              image of instructions and data back to the display.
 *              The following will be decoded:
@@ -47,7 +47,7 @@
 
 START   ORG        $1000
 
-        JSR         WELCOME
+        JSR         IO_WELCOME      ; Run welcome subroutine
         BRA         QUIT
 
 *---------- Utility Subroutines ----------------------------
@@ -68,10 +68,10 @@ QUIT    STOP        #$3000          ; Stop the program
 
 *---------- Subroutine Files -------------------------------
 
-    INCLUDE 'io-0.1.X68'            ; not married to these file names,
+        INCLUDE 'IO-0.1.X68'        ; not married to these file names,
                                     ; this can be changed
-    INCLUDE 'opcodes-0.1.X68'
-    INCLUDE 'ea-0.1.X68'
+        INCLUDE 'OpCodes-0.1.X68'
+        INCLUDE 'EA-0.1.X68'
    
 *---------- Halt Simulator ---------------------------------
 
