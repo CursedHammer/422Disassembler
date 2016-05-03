@@ -1,0 +1,150 @@
+00001000 Starting Address
+Assembler used: EASy68K Editor/Assembler v5.15.04
+Created On: 5/2/2016 5:41:23 PM
+
+00000000                             1  *-----------------------------------------------------------
+00000000                             2  * Title      : 68k Disassembler
+00000000                             3  * Written by : Brandon Authier (Hblkr)
+00000000                             4  * Date       : 2 May 2016
+00000000                             5  * Description: An inverse assembler that will convert a memory
+00000000                             6  *              image of instructions and data back to the display.
+00000000                             7  *              The following will be decoded:
+00000000                             8  *
+00000000                             9  *              Addressing Modes
+00000000                            10  *
+00000000                            11  *                Data Register Direct
+00000000                            12  *                Address Register Direct
+00000000                            13  *                Address Register Indirect
+00000000                            14  *                Immediate Data
+00000000                            15  *                Address Register Indirect with Post Increment
+00000000                            16  *                Address Register Indirect with Pre Decremet
+00000000                            17  *                Absolute Long Address
+00000000                            18  *                Absolute Word Address
+00000000                            19  *
+00000000                            20  *              Instructions
+00000000                            21  *
+00000000                            22  *                NOP
+00000000                            23  *                MOVE
+00000000                            24  *                MOVEQ
+00000000                            25  *                MOVEM
+00000000                            26  *                ADD
+00000000                            27  *                ADDA
+00000000                            28  *                ADDI
+00000000                            29  *                SUB
+00000000                            30  *                MULS
+00000000                            31  *                DIVU
+00000000                            32  *                LEA
+00000000                            33  *                CLR
+00000000                            34  *                AND
+00000000                            35  *                LSL
+00000000                            36  *                ASR
+00000000                            37  *                ROL
+00000000                            38  *                CMP
+00000000                            39  *                Bcc (BCC, BGT, BLE)
+00000000                            40  *                JSR
+00000000                            41  *                RTS
+00000000                            42  *
+00000000                            43  * VERSION: 0.1 - Initial Skeleton
+00000000                            44  *
+00000000                            45  *-----------------------------------------------------------
+00000000                            46  
+00000000                            47  *----------- Deginitions Used for Code ---------------------
+00000000                            48  
+00000000  =00000000                 49  PRTSTRCRLF    EQU    0               ; Trap function to print string + CRLF
+00000000  =00000001                 50  PRTSTR  EQU   1                      ; Trap function to print string
+00000000  =00000002                 51  READHEX EQU   2                      ; Read String
+00000000                            52  
+00000000  =0000000D                 53  CR      EQU   $0D
+00000000  =0000000A                 54  LF      EQU   $0A
+00000000                            55  
+00001000                            56          ORG        $1000
+00001000                            57  
+00001000                            58  *---------- Code For Output --------------------------------
+00001000                            59  
+00001000                            60  *       Print Welcome Message
+00001000                            61  *       --------------------- 
+00001000  43F9 00001054             62  START   LEA         INTRO,A1         ; Loads message into A1
+00001006  103C 000E                 63          MOVE.B      #14,D0           ; Moves the TRACK 14 into D0
+0000100A  4E4F                      64          TRAP        #15              ; Displays Intro Message 
+0000100C  6100 0022                 65          BSR         NEW_LINE         ; Call Subroutine
+00001010                            66  
+00001010                            67  *       Prompt for Start Address
+00001010                            68  *       ------------------------        
+00001010  43F9 0000107C             69          LEA         PROMPT1,A1       ; Loads message into A1
+00001016  103C 000E                 70          MOVE.B      #14,D0           ; Moves the TRACK 14 into D0
+0000101A  4E4F                      71          TRAP        #15              ; Displays StartAddr Message 
+0000101C                            72          
+0000101C                            73  *       Read the Start Address
+0000101C                            74  *       ----------------------
+0000101C  227C 000010F4             75          MOVEA.L     #STARTADDR,A1    ; Pointer to store the sentence
+00001022  103C 0002                 76          MOVE.B      #READHEX,D0      ; Set up readstring function
+00001026  4E4F                      77          TRAP        #15              ; Get string from keyboard
+00001028  0C44 0000                 78          CMPI.W      #0,D4            ; length = 0?
+0000102C  6700 001E                 79          BEQ         QUIT
+00001030                            80  
+00001030                            81  *---------- Subroutines ------------------------------------
+00001030                            82  
+00001030                            83  NEW_LINE:
+00001030  43F9 0000138C             84          LEA         ENDL,A1         ; Loads message into A1
+00001036  103C 000E                 85          MOVE.B      #14,D0          ; Moves the TRACK 14 into D0
+0000103A  4E4F                      86          TRAP        #15             ; Displays New line
+0000103C  4E75                      87          RTS
+0000103E                            88  
+0000103E                            89  BAD_INSTRUCTION:
+0000103E  43F9 00001374             90          LEA         ILLEGAL,A1      ; Loads message into A1
+00001044  103C 000E                 91          MOVE.B      #14,D0          ; Moves the TRACK 14 into D0
+00001048  4E4F                      92          TRAP        #15             ; Displays Bad Instruction Message
+0000104A  4E75                      93          RTS
+0000104C                            94   
+0000104C  4E72 3000                 95  QUIT    STOP        #$3000          ; Stop the program
+00001050                            96     
+00001050                            97  *---------- Halt Simulater ---------------------------------
+00001050                            98  
+00001050  FFFF FFFF                 99          SIMHALT                     ; halt simulator
+00001054                           100          
+00001054                           101  
+00001054                           102  *---------- Variables and Constants ------------------------
+00001054                           103  
+00001054= 57 45 4C 43 4F 4D ...    104  INTRO     DC.B  'WELCOME!',CR,LF,'This is a 68K disassembler.',CR,LF,0
+0000107C= 50 6C 65 61 73 65 ...    105  PROMPT1   DC.B  'Please enter the starting address to be read (hex): 0x',0
+000010B3= 50 6C 65 61 73 65 ...    106  PROMPT2   DC.B  'Please enter the ending address to be read (hex): 0x',0
+000010E8                           107  
+000010E8= 0D 0A 0D 0A 00           108  MESSAGE3  DC.B  CR,LF,'',CR,LF,0
+000010ED= 0D 0A 00                 109  MESSAGE4  DC.B  '',CR,LF,0
+000010F0= 0D 0A 00                 110  MESSAGE5  DC.B  '',CR,LF,0
+000010F3                           111  
+000010F4                           112  STARTADDR DS.L  80                  ; Var for starting address
+00001234                           113  ENDADDR   DS.L  80                  ; Var for ending address
+00001374                           114  
+00001374= 31 30 30 30 20 20 ...    115  ILLEGAL  DC.B  '1000    DATA    $WXYZ',CR,LF,0
+0000138C                           116  
+0000138C= 0D 0A 00                 117  ENDL     DC.B  CR,LF,0
+0000138F                           118  
+0000138F                           119          END        START        ; last line of source
+
+No errors detected
+No warnings generated
+
+
+SYMBOL TABLE INFORMATION
+Symbol-name         Value
+-------------------------
+BAD_INSTRUCTION     103E
+CR                  D
+ENDADDR             1234
+ENDL                138C
+ILLEGAL             1374
+INTRO               1054
+LF                  A
+MESSAGE3            10E8
+MESSAGE4            10ED
+MESSAGE5            10F0
+NEW_LINE            1030
+PROMPT1             107C
+PROMPT2             10B3
+PRTSTR              1
+PRTSTRCRLF          0
+QUIT                104C
+READHEX             2
+START               1000
+STARTADDR           10F4
