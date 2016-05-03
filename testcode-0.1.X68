@@ -5,6 +5,42 @@
 * Description: Testing code for the inverse assembler, testing
 *              various combinations of op codes and effective
 *              addressing modes.
+*
+*              Addressing Modes
+*
+*                Data Register Direct
+*                Address Register Direct
+*                Address Register Indirect
+*                Immediate Data
+*                Address Register Indirect with Post Increment
+*                Address Register Indirect with Pre Decremet
+*                Absolute Long Address
+*                Absolute Word Address
+*
+*              Instructions
+*
+*                NOP
+*                MOVE
+*                MOVEQ
+*                MOVEM
+*                ADD
+*                ADDA
+*                ADDI
+*                SUB
+*                MULS
+*                DIVU
+*                LEA
+*                CLR
+*                AND
+*                LSL
+*                ASR
+*                ROL
+*                CMP
+*                Bcc (BCC, BGT, BLE)
+*                JSR
+*                RTS
+*
+* VERSION: 0.1 - Initial Skeleton
 *-----------------------------------------------------------
     ORG    $1000
 START:                  ; first instruction of program
