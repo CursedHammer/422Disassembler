@@ -79,7 +79,7 @@ START   LEA         INTRO,A1         ; Loads message into A1
         CMPI.W      #0,D4            ; length = 0?
         BEQ         QUIT
 
-*---------- Subroutines ------------------------------------
+*---------- Utility Subroutines ----------------------------
 
 NEW_LINE:
         LEA         ENDL,A1         ; Loads message into A1
@@ -94,11 +94,14 @@ BAD_INSTRUCTION:
         RTS
  
 QUIT    STOP        #$3000          ; Stop the program
-   
-*---------- Halt Simulater ---------------------------------
 
-        SIMHALT                     ; halt simulator
-        
+*---------- Subroutine Files -------------------------------
+
+
+   
+*---------- Halt Simulator ---------------------------------
+
+        SIMHALT                     ; halt simulator        
 
 *---------- Variables and Constants ------------------------
 
