@@ -40,7 +40,7 @@
 *                JSR
 *                RTS
 *
-* VERSION: 0.1 - Initial Skeleton
+* VERSION: 0.2 - Initial List
 *-----------------------------------------------------------
     ORG    $1000
 START:                  ; first instruction of program
