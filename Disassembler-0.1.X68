@@ -1,6 +1,7 @@
 *-----------------------------------------------------------
 * Title      : 68k Disassembler
-* Written by : Brandon Authier (Hblkr), Jack S. Eldridge, Marijn
+* Written by : Brandon Authier (Hblkr), Jack S. Eldridge
+*              (JackScottie), Marijn Burger (marijnburger)
 * Date       : 2 May 2016
 * Description: An inverse assembler that will convert a memory
 *              image of instructions and data back to the display.
@@ -44,7 +45,7 @@
 *
 *-----------------------------------------------------------
 
-*----------- Deginitions Used for Code ---------------------
+*----------- Definitions Used for Code ---------------------
 
 PRTSTRCRLF    EQU    0               ; Trap function to print string + CRLF
 PRTSTR  EQU   1                      ; Trap function to print string
@@ -117,6 +118,7 @@ ILLEGAL  DC.B  '1000    DATA    $WXYZ',CR,LF,0
 ENDL     DC.B  CR,LF,0
 
         END        START        ; last line of source
+
 
 
 
