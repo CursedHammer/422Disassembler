@@ -44,9 +44,10 @@
 * VERSION: 0.2 - Initial Skeleton v2
 *
 *-----------------------------------------------------------
-
-START   ORG        $1000
-
+STACK   EQU         $7000           ; Largest location in memory...will need to 
+                                    ; change this based on memory range for code to read
+START   ORG         $1000
+        LEA         STACK, SP       ; SP is stored in A7
         JSR         IO_WELCOME      ; Run welcome subroutine
         BRA         QUIT
 
@@ -84,6 +85,7 @@ ENDADDR   DS.L  80                  ; Var for ending address
 
 *---------- End --------------------------------------------
         END        START        ; last line of source
+
 
 
 
