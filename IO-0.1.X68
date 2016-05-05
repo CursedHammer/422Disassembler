@@ -22,7 +22,7 @@ LF      EQU   $0A
 * Prints welcome messages and gathers initial parameters
 *-----------------------------------------------------------
 IO_WELCOME:
-        MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
+        MOVEM.W     A0-A6/D0-D7, -(SP) ; Save registers
         
 *       Print Welcome Message
 *       --------------------- 
@@ -46,13 +46,14 @@ IO_WELCOME:
         BEQ         QUIT             ; @histamineblkr: there is a limit to the offset
                                      ; allowed with a Bcc statement...proposed
                                      ; implementation below using JSR so that we aren't limited
+                                     
 *       BEQ         IO_WELCOME_QUIT
 *IO_WELCOME_QUIT:
 *       JSR         QUIT  
        
         *@histamineblkr: I think you continue working from here
         
-        MOVEM.W (SP)+, A0-A7/D0-D7   ; Restore registers
+        MOVEM.W (SP)+, A0-A6/D0-D7   ; Restore registers
         RTS                          ; Exit subroutine
 
 *---------- Variables and Constants ------------------------
@@ -68,6 +69,7 @@ MESSAGE5  DC.B  '',CR,LF,0
 ILLEGAL  DC.B  '1000    DATA    $WXYZ',CR,LF,0
 
 ENDL     DC.B  CR,LF,0
+
 
 
 *~Font name~Courier New~
