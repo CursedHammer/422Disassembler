@@ -1,0 +1,182 @@
+00001000 Starting Address
+Assembler used: EASy68K Editor/Assembler v5.15.04
+Created On: 5/5/16 1:35:57 PM
+
+00000000                             1  *-----------------------------------------------------------
+00000000                             2  * Title      : 68k Disassembler
+00000000                             3  * Written by : Brandon Authier (Hblkr), Jack S. Eldridge
+00000000                             4  *              (JackScottie), Marijn Burger (marijnburger)
+00000000                             5  * Date       : 3 May 2016
+00000000                             6  * Description: An inverse assembler that will convert a memory
+00000000                             7  *              image of instructions and data back to the display.
+00000000                             8  *              The following will be decoded:
+00000000                             9  *
+00000000                            10  *              Addressing Modes
+00000000                            11  *
+00000000                            12  *                Data Register Direct
+00000000                            13  *                Address Register Direct
+00000000                            14  *                Address Register Indirect
+00000000                            15  *                Immediate Data
+00000000                            16  *                Address Register Indirect with Post Increment
+00000000                            17  *                Address Register Indirect with Pre Decremet
+00000000                            18  *                Absolute Long Address
+00000000                            19  *                Absolute Word Address
+00000000                            20  *
+00000000                            21  *              Instructions
+00000000                            22  *
+00000000                            23  *                NOP
+00000000                            24  *                MOVE
+00000000                            25  *                MOVEQ
+00000000                            26  *                MOVEM
+00000000                            27  *                ADD
+00000000                            28  *                ADDA
+00000000                            29  *                ADDI
+00000000                            30  *                SUB
+00000000                            31  *                MULS
+00000000                            32  *                DIVU
+00000000                            33  *                LEA
+00000000                            34  *                CLR
+00000000                            35  *                AND
+00000000                            36  *                LSL
+00000000                            37  *                ASR
+00000000                            38  *                ROL
+00000000                            39  *                CMP
+00000000                            40  *                Bcc (BCC, BGT, BLE)
+00000000                            41  *                JSR
+00000000                            42  *                RTS
+00000000                            43  *
+00000000                            44  * VERSION: 0.2 - Initial Skeleton v2
+00000000                            45  *
+00000000                            46  *-----------------------------------------------------------
+00000000  =00007000                 47  STACK   EQU         $7000           ; Largest location in memory...will need to 
+00000000                            48                                      ; change this based on memory range for code to read
+00001000                            49  START   ORG         $1000
+00001000  4FF8 7000                 50          LEA         STACK, SP       ; SP is stored in A7
+00001004  4EB9 0000102E             51          JSR         IO_WELCOME      ; Run welcome subroutine
+0000100A  6000 001E                 52          BRA         QUIT
+0000100E                            53  
+0000100E                            54  *---------- Utility Subroutines ----------------------------
+0000100E                            55  
+0000100E                            56  NEW_LINE:
+0000100E  43F9 0000111B             57          LEA         ENDL,A1         ; Loads message into A1
+00001014  103C 000E                 58          MOVE.B      #14,D0          ; Moves the TRACK 14 into D0
+00001018  4E4F                      59          TRAP        #15             ; Displays New line
+0000101A  4E75                      60          RTS
+0000101C                            61  
+0000101C                            62  BAD_INSTRUCTION:
+0000101C  43F9 00001103             63          LEA         ILLEGAL,A1      ; Loads message into A1
+00001022  103C 000E                 64          MOVE.B      #14,D0          ; Moves the TRACK 14 into D0
+00001026  4E4F                      65          TRAP        #15             ; Displays Bad Instruction Message
+00001028  4E75                      66          RTS
+0000102A                            67   
+0000102A  4E72 3000                 68  QUIT    STOP        #$3000          ; Stop the program
+0000102E                            69  
+0000102E                            70  *---------- Subroutine Files -------------------------------
+0000102E                            71  
+0000102E                            72          INCLUDE 'IO-0.1.X68'        ; not married to these file names,
+0000102E                            73  
+0000102E                            74  
+0000102E  =00000000                 75  PRTSTRCRLF    EQU    0               ; Trap function to print string + CRLF
+0000102E  =00000001                 76  PRTSTR  EQU   1                      ; Trap function to print string
+0000102E  =00000002                 77  READHEX EQU   2                      ; Read String
+0000102E                            78  
+0000102E  =0000000D                 79  CR      EQU   $0D
+0000102E  =0000000A                 80  LF      EQU   $0A
+0000102E                            81  
+0000102E                            82  
+0000102E                            83  IO_WELCOME:
+0000102E  48A7 FFFE                 84          MOVEM.W     A0-A6/D0-D7, -(SP) ; Save registers
+00001032                            85          
+00001032  43F9 00001064             86          LEA         INTRO,A1         ; Loads message into A1
+00001038  103C 000E                 87          MOVE.B      #14,D0           ; Moves the TRACK 14 into D0
+0000103C  4E4F                      88          TRAP        #15              ; Displays Intro Message 
+0000103E  61CE                      89          BSR         NEW_LINE         ; Call Subroutine
+00001040                            90  
+00001040  43F9 0000108C             91          LEA         PROMPT1,A1       ; Loads message into A1
+00001046  103C 000E                 92          MOVE.B      #14,D0           ; Moves the TRACK 14 into D0
+0000104A  4E4F                      93          TRAP        #15              ; Displays StartAddr Message 
+0000104C                            94          
+0000104C  227C 00001122             95          MOVEA.L     #STARTADDR,A1    ; Pointer to store the sentence
+00001052  103C 0002                 96          MOVE.B      #READHEX,D0      ; Set up readstring function
+00001056  4E4F                      97          TRAP        #15              ; Get string from keyboard
+00001058  0C44 0000                 98          CMPI.W      #0,D4            ; length = 0?
+0000105C  67CC                      99          BEQ         QUIT             ; @histamineblkr: there is a limit to the offset
+0000105E                           100                                       ; allowed with a Bcc statement...proposed
+0000105E                           101                                       ; implementation below using JSR so that we aren't limited
+0000105E                           102                                       
+0000105E                           103         
+0000105E                           104          *@histamineblkr: I think you continue working from here
+0000105E                           105          
+0000105E  4C9F 7FFF                106          MOVEM.W (SP)+, A0-A6/D0-D7   ; Restore registers
+00001062  4E75                     107          RTS                          ; Exit subroutine
+00001064                           108  
+00001064                           109  
+00001064= 57 45 4C 43 4F 4D ...    110  INTRO     DC.B  'WELCOME!',CR,LF,'This is a 68K disassembler.',CR,LF,0
+0000108C= 50 6C 65 61 73 65 ...    111  PROMPT1   DC.B  'Please enter the starting address to be read (hex): 0x',0
+000010C3= 50 6C 65 61 73 65 ...    112  PROMPT2   DC.B  'Please enter the ending address to be read (hex): 0x',0
+000010F8                           113  
+000010F8= 0D 0A 0D 0A 00           114  MESSAGE3  DC.B  CR,LF,'',CR,LF,0
+000010FD= 0D 0A 00                 115  MESSAGE4  DC.B  '',CR,LF,0
+00001100= 0D 0A 00                 116  MESSAGE5  DC.B  '',CR,LF,0
+00001103                           117  
+00001103= 31 30 30 30 20 20 ...    118  ILLEGAL  DC.B  '1000    DATA    $WXYZ',CR,LF,0
+0000111B                           119  
+0000111B= 0D 0A 00                 120  ENDL     DC.B  CR,LF,0
+0000111E                           121  
+0000111E                           122  
+0000111E                           123  
+0000111E                           124  -------------------- end include --------------------
+0000111E                           125                                      ; this can be changed
+0000111E                           126          INCLUDE 'OpCodes-0.1.X68'
+0000111E                           127  
+0000111E                           128  
+0000111E                           129  
+0000111E                           130  
+0000111E                           131  -------------------- end include --------------------
+0000111E                           132          INCLUDE 'EA-0.1.X68'
+0000111E                           133  
+0000111E                           134  
+0000111E                           135  
+0000111E                           136  
+0000111E                           137  -------------------- end include --------------------
+0000111E                           138     
+0000111E                           139  *---------- Halt Simulator ---------------------------------
+0000111E                           140  
+0000111E  FFFF FFFF                141          SIMHALT                     ; halt simulator        
+00001122                           142  
+00001122                           143  *---------- Variables and Constants ------------------------
+00001122                           144  
+00001122                           145  STARTADDR DS.L  80                  ; Var for starting address
+00001262                           146  ENDADDR   DS.L  80                  ; Var for ending address
+000013A2                           147  
+000013A2                           148  *---------- End --------------------------------------------
+000013A2                           149          END        START        ; last line of source
+
+No errors detected
+No warnings generated
+
+
+SYMBOL TABLE INFORMATION
+Symbol-name         Value
+-------------------------
+BAD_INSTRUCTION     101C
+CR                  D
+ENDADDR             1262
+ENDL                111B
+ILLEGAL             1103
+INTRO               1064
+IO_WELCOME          102E
+LF                  A
+MESSAGE3            10F8
+MESSAGE4            10FD
+MESSAGE5            1100
+NEW_LINE            100E
+PROMPT1             108C
+PROMPT2             10C3
+PRTSTR              1
+PRTSTRCRLF          0
+QUIT                102A
+READHEX             2
+STACK               7000
+START               1000
+STARTADDR           1122
