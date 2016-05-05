@@ -4,25 +4,33 @@
 * Date       : 5-4-2016
 * Description: getting a feel for opcode checking
 *-----------------------------------------------------------
+STACK       EQU $7000
     ORG    $1000
+
 START:                  ; first instruction of program
 
 * Put program code here
-    
+
+
+    LEA     STACK, SP
+   
     MOVE.W      #$4E71, $2000  *4E71 = 0100 1110 0111 0001 = NOP
     
-    MOVE.W      $2000, A7  
+    MOVE.W      $2000, A6  
 
 GETOPCODE
-    BRA         NOPCHECK        *Check if opcode is just a NOP
+    JSR         NOPCHECK        *Check if opcode is just a NOP
+    BRA         DONE
  
- 
-NOPCHECK    MOVE.W  #$4E71, D3
-            CMP.W   A7, D3
+NOPCHECK    MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
+            MOVE.W  #$4E71, D3
+            CMP.W   A6, D3
             BNE     DONE
             LEA MESSAGE, A1
             MOVE.B  #14, D0
             TRAP    #15
+            MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
+            RTS                          ; Exit subroutine
 
 DONE        MOVE.B      #9, D0
             TRAP        #15
@@ -36,6 +44,7 @@ MESSAGE DC.B    'NOP',CR,LF, 0
 * Put variables and constants here
 
     END    START        ; last line of source
+
 
 *~Font name~Courier New~
 *~Font size~10~
