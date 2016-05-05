@@ -1,0 +1,66 @@
+00001000 Starting Address
+Assembler used: EASy68K Editor/Assembler v5.15.04
+Created On: 5/5/2016 12:46:45 PM
+
+00000000                             1  *-----------------------------------------------------------
+00000000                             2  * Title      : NOP check
+00000000                             3  * Written by : Jack Eldridge
+00000000                             4  * Date       : 5-4-2016
+00000000                             5  * Description: getting a feel for opcode checking
+00000000                             6  *-----------------------------------------------------------
+00000000  =00007000                  7  STACK       EQU $7000
+00001000                             8      ORG    $1000
+00001000                             9  
+00001000                            10  START:                  ; first instruction of program
+00001000                            11  
+00001000                            12  * Put program code here
+00001000                            13  
+00001000                            14  
+00001000  4FF8 7000                 15      LEA     STACK, SP
+00001004                            16     
+00001004  31FC 4E71 2000            17      MOVE.W      #$4E71, $2000  *4E71 = 0100 1110 0111 0001 = NOP
+0000100A                            18      
+0000100A  3C78 2000                 19      MOVE.W      $2000, A6  
+0000100E                            20  
+0000100E                            21  GETOPCODE
+0000100E  4EB9 00001018             22      JSR         NOPCHECK        *Check if opcode is just a NOP
+00001014  6000 0022                 23      BRA         DONE
+00001018                            24   
+00001018  48A7 FFFF                 25  NOPCHECK    MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
+0000101C  363C 4E71                 26              MOVE.W  #$4E71, D3
+00001020  B64E                      27              CMP.W   A6, D3
+00001022  6600 0014                 28              BNE     DONE
+00001026  43F9 0000103E             29              LEA MESSAGE, A1
+0000102C  103C 000E                 30              MOVE.B  #14, D0
+00001030  4E4F                      31              TRAP    #15
+00001032  4C9F FFFF                 32              MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
+00001036  4E75                      33              RTS                          ; Exit subroutine
+00001038                            34  
+00001038  103C 0009                 35  DONE        MOVE.B      #9, D0
+0000103C  4E4F                      36              TRAP        #15
+0000103E                            37  
+0000103E  =0000000D                 38  CR  EQU     $0D 
+0000103E  =0000000A                 39  LF  EQU     $0A
+0000103E= 4E 4F 50 0D 0A 00         40  MESSAGE DC.B    'NOP',CR,LF, 0                 
+00001044                            41  
+00001044  FFFF FFFF                 42      SIMHALT             ; halt simulator
+00001048                            43  
+00001048                            44  * Put variables and constants here
+00001048                            45  
+00001048                            46      END    START        ; last line of source
+
+No errors detected
+No warnings generated
+
+
+SYMBOL TABLE INFORMATION
+Symbol-name         Value
+-------------------------
+CR                  D
+DONE                1038
+GETOPCODE           100E
+LF                  A
+MESSAGE             103E
+NOPCHECK            1018
+STACK               7000
+START               1000
