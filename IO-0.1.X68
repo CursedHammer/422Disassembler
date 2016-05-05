@@ -52,7 +52,7 @@ IO_WELCOME:
        
         *@histamineblkr: I think you continue working from here
         
-        MOVEM.W (SP)+, A3/D1         ; Restore registers
+        MOVEM.W (SP)+, A0-A7/D0-D7   ; Restore registers
         RTS                          ; Exit subroutine
 
 *---------- Variables and Constants ------------------------
@@ -68,6 +68,7 @@ MESSAGE5  DC.B  '',CR,LF,0
 ILLEGAL  DC.B  '1000    DATA    $WXYZ',CR,LF,0
 
 ENDL     DC.B  CR,LF,0
+
 
 *~Font name~Courier New~
 *~Font size~10~
