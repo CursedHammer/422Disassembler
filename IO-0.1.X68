@@ -1,7 +1,7 @@
 *-----------------------------------------------------------
 * Title      : I/O Subroutines
 * Written by : Brandon Authier (Hblkr), Jack S. Eldridge
-*              (JackScottie), Marijn Burger (marijnburger
+*              (JackScottie), Marijn Burger (marijnburger)
 * Date       : 3 May 2016
 * Description: Support file containing the I/O subroutines
 *              for the disassembler.
