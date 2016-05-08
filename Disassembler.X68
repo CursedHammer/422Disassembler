@@ -69,10 +69,10 @@ QUIT    STOP        #$3000          ; Stop the program
 
 *---------- Subroutine Files -------------------------------
 
-        INCLUDE 'IO-0.1.X68'        ; not married to these file names,
-                                    ; this can be changed
-        INCLUDE 'OpCodes-0.1.X68'
-        INCLUDE 'EA-0.1.X68'
+        INCLUDE 'IO.X68'
+        INCLUDE 'JumpTable.X68'
+        INCLUDE 'OpCodes.X68'
+        INCLUDE 'EA.X68'
    
 *---------- Halt Simulator ---------------------------------
 
@@ -85,6 +85,7 @@ ENDADDR   DS.L  80                  ; Var for ending address
 
 *---------- End --------------------------------------------
         END        START        ; last line of source
+
 
 
 
