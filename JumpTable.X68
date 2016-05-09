@@ -1,7 +1,7 @@
 *-----------------------------------------------------------
-* Title      : I/O Subroutines
+* Title      : JumpTable
 * Written by : Brandon Authier (Hblkr), Jack S. Eldridge
-*              (JackScottie), Marijn Burger (marijnburger
+*              (JackScottie), Marijn Burger (marijnburger)
 * Date       : 7 May 2016
 * Description: Support file containing the jump table logic.
 *-----------------------------------------------------------
@@ -14,10 +14,12 @@
 * Executes jump table logic to find the correct opcode subroutine
 *-----------------------------------------------------------
 
+********** The following is largely taken verbatim from canvas *********
+
 * System equates
 
 stack   EQU     $A000
-example EQU     %1101111001100001  ; I made up bits 0 to 11      
+example EQU     %1101111001100001   ; I made up bits 0 to 11      
 shift   EQU     12                  ; Shift 12 bits 
 
 * Program starts here
@@ -28,10 +30,10 @@ start   LEA     stack,SP            ; Load the SP
         CLR.L   D0                  ; Zero it
         MOVE.W  #example,D0         ; We'll play with it here
         MOVE.B  #shift,D1           ; Shift 12 bits to the right  
-        LSR.W   D1,D0               ; Move the bits
-
-        MULU    #6,D0               ; Form offset
-        JSR     0(A0,D0)            ; Jump indirect with index                
+        LSR.W   D1,D0               ; Move the bits (moves highest 4 bits to lowest 4 positions,
+                                    ; and the rest are zeroed out)
+        MULU    #6,D0               ; Form offset (move 6 bytes in memory for every 'JMP' command)
+        JSR     0(A0,D0)            ; Jump indirect with index, i.e. jump to 'table' + displacement                
 
 table   JMP    code0000
         JMP    code0001

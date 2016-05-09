@@ -1,7 +1,7 @@
 *-----------------------------------------------------------
 * Title      : Effective Addressing Subroutines
 * Written by : Brandon Authier (Hblkr), Jack S. Eldridge
-*              (JackScottie), Marijn Burger (marijnburger
+*              (JackScottie), Marijn Burger (marijnburger)
 * Date       : 3 May 2016
 * Description: Support file containing the effective
 *              addressing subroutines for the disassembler.
@@ -16,6 +16,7 @@
 *-----------------------------------------------------------
 
 *----------- Variables and Constants -----------------------
+
 *~Font name~Courier New~
 *~Font size~10~
 *~Tab type~1~
