@@ -23,16 +23,16 @@ shift   EQU     12                   * Shift 12 bits
 * Program starts here
 
         ORG     $400
-start   LEA     stack,SP        *Load the SP
-        LEA     table,A0    *Index into the table
+start   LEA     stack,SP            ; Load the SP
+        LEA     table,A0        *Index into the table
         CLR.L   D0              *Zero it
         MOVE.W  #example,D0     *We'll play with it here
         MOVE.B  #shift,D1       *Shift 12 bits to the right  
         LSR.W   D1,D0           *Move the bits
 
 
-               MULU         #6,D0       *Form offset     
-               JSR          0(A0,D0)   *Jump indirect with index                
+        MULU    #6,D0           *Form offset     
+        JSR     0(A0,D0)    *Jump indirect with index                
 
 table   JMP    code0000
         JMP    code0001
