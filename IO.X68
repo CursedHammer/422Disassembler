@@ -9,9 +9,9 @@
 
 *----------- Definitions Used for Code ---------------------
 
-PRTSTRCRLF    EQU    0               ; Trap function to print string + CRLF
-PRTSTR  EQU   1                      ; Trap function to print string
-READHEX EQU   2                      ; Read String
+PRTSTRCRLF    EQU    0              ; Trap function to print string + CRLF
+PRTSTR  EQU   1                     ; Trap function to print string
+READHEX EQU   2                     ; Read String
 
 CR      EQU   $0D
 LF      EQU   $0A
@@ -26,26 +26,26 @@ IO_WELCOME:
         
 *       Print Welcome Message
 *       --------------------- 
-        LEA         INTRO,A1         ; Loads message into A1
-        MOVE.B      #14,D0           ; Moves the TRACK 14 into D0
-        TRAP        #15              ; Displays Intro Message 
-        BSR         NEW_LINE         ; Call Subroutine
+        LEA         INTRO,A1        ; Loads message into A1
+        MOVE.B      #14,D0          ; Moves the TRACK 14 into D0
+        TRAP        #15             ; Displays Intro Message 
+        BSR         NEW_LINE        ; Call Subroutine
 
 *       Prompt for Start Address
 *       ------------------------        
-        LEA         PROMPT1,A1       ; Loads message into A1
-        MOVE.B      #14,D0           ; Moves the TRACK 14 into D0
-        TRAP        #15              ; Displays StartAddr Message 
+        LEA         PROMPT1,A1      ; Loads message into A1
+        MOVE.B      #14,D0          ; Moves the TRACK 14 into D0
+        TRAP        #15             ; Displays StartAddr Message 
         
 *       Read the Start Address
 *       ----------------------
-        MOVEA.L     #STARTADDR,A1    ; Pointer to store the sentence
-        MOVE.B      #READHEX,D0      ; Set up readstring function
-        TRAP        #15              ; Get string from keyboard
-        CMPI.W      #0,D4            ; length = 0?
-        BEQ         QUIT             ; @histamineblkr: there is a limit to the offset
-                                     ; allowed with a Bcc statement...proposed
-                                     ; implementation below using JSR so that we aren't limited
+        MOVEA.L     #STARTADDR,A1   ; Pointer to store the sentence
+        MOVE.B      #READHEX,D0     ; Set up readstring function
+        TRAP        #15             ; Get string from keyboard
+        CMPI.W      #0,D4           ; length = 0?
+        BEQ         QUIT            ; @histamineblkr: there is a limit to the offset
+                                    ; allowed with a Bcc statement...proposed
+                                    ; implementation below using JSR so that we aren't limited
                                      
 *       BEQ         IO_WELCOME_QUIT
 *IO_WELCOME_QUIT:
@@ -53,8 +53,8 @@ IO_WELCOME:
        
         *@histamineblkr: I think you continue working from here
         
-        MOVEM.W (SP)+, A0-A6/D0-D7   ; Restore registers
-        RTS                          ; Exit subroutine
+        MOVEM.W (SP)+, A0-A6/D0-D7  ; Restore registers
+        RTS                         ; Exit subroutine
 
 *---------- Variables and Constants ------------------------
 
@@ -69,6 +69,7 @@ MESSAGE5  DC.B  '',CR,LF,0
 ILLEGAL  DC.B  '1000    DATA    $WXYZ',CR,LF,0
 
 ENDL     DC.B  CR,LF,0
+
 
 
 
