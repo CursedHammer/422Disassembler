@@ -9,12 +9,12 @@
 
 *----------- Definitions Used for Code ---------------------
 
-PRTSTRCRLF    EQU    0              ; Trap function to print string + CRLF
-PRTSTR  EQU   1                     ; Trap function to print string
-READHEX EQU   2                     ; Read String
+PRTSTRCRLF EQU      0               ; Trap function to print string + CRLF
+PRTSTR  EQU         1               ; Trap function to print string
+READHEX EQU         2               ; Read String
 
-CR      EQU   $0D
-LF      EQU   $0A
+CR      EQU         $0D
+LF      EQU         $0A
 
 *---------- Subroutines: -----------------------------------
 
@@ -53,22 +53,22 @@ IO_WELCOME:
        
         *@histamineblkr: I think you continue working from here
         
-        MOVEM.W (SP)+, A0-A6/D0-D7  ; Restore registers
+        MOVEM.W     (SP)+, A0-A6/D0-D7 ; Restore registers
         RTS                         ; Exit subroutine
 
 *---------- Variables and Constants ------------------------
 
-INTRO     DC.B  'WELCOME!',CR,LF,'This is a 68K disassembler.',CR,LF,0
-PROMPT1   DC.B  'Please enter the starting address to be read (hex): 0x',0
-PROMPT2   DC.B  'Please enter the ending address to be read (hex): 0x',0
+INTRO   DC.B        'WELCOME!',CR,LF,'This is a 68K disassembler.',CR,LF,0
+PROMPT1 DC.B        'Please enter the starting address to be read (hex): 0x',0
+PROMPT2 DC.B        'Please enter the ending address to be read (hex): 0x',0
 
-MESSAGE3  DC.B  CR,LF,'',CR,LF,0
-MESSAGE4  DC.B  '',CR,LF,0
-MESSAGE5  DC.B  '',CR,LF,0
+MESSAGE3 DC.B       CR,LF,'',CR,LF,0
+MESSAGE4 DC.B       '',CR,LF,0
+MESSAGE5 DC.B       '',CR,LF,0
 
-ILLEGAL  DC.B  '1000    DATA    $WXYZ',CR,LF,0
+ILLEGAL DC.B        '1000    DATA    $WXYZ',CR,LF,0
 
-ENDL     DC.B  CR,LF,0
+ENDL    DC.B        CR,LF,0
 
 
 
