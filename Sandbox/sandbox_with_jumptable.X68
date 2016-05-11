@@ -18,7 +18,10 @@ START:                  ; first instruction of program
 *example EQU     %0010101001000100    ; MOVEA.L   D4, A5 = 0010 1010 0100 0100
 *example EQU     %0010101000000100    ; MOVE.L   D4, D5 = 0010 1010 0000 0100
 *example EQU     %0011101000000100    ; MOVE.W   D4, D5 = 0011 1010 0000 0100
-example EQU     %0011101001000100    ; MOVEA.W   D4, D5 = 0011 1010 0100 0100
+*example EQU     %0011101001000100    ; MOVEA.W   D4, D5 = 0011 1010 0100 0100
+*example EQU     %0000011000000101       ; 0000 0110 0000 0101 = ADDI.B D5, D7
+*example EQU     %0000011001000101       ; 0000 0110 0100 0101 = ADDI.W D5, D7
+example EQU     %0000011010000101       ; 0000 0110 1000 0101 = ADDI.L D5, D7
 shift   EQU     12                  ; Shift 12 bits 
 
 * Program starts here
@@ -33,7 +36,7 @@ shift   EQU     12                  ; Shift 12 bits
         MULU    #6,D0               ; Form offset (move 6 bytes in memory for every 'JMP' command)
         JSR     0(A0,D0)            ; Jump indirect with index, i.e. jump to 'table' + displacement                
 
-table   JMP     code0000
+table   JMP     code0000        ; ADDI.B, ADDI.W, or ADDI.L
         JMP     code0001        ; MOVE.B
         JMP     code0010        ; MOVEA.L or MOVE.L
         JMP     code0011        ; MOVEA.W or MOVE.W
@@ -52,7 +55,7 @@ table   JMP     code0000
        
 *The following subroutines will get filled in as you decode the instructions . For *now, just exit gracefully.
 
-code0000 STOP  #$2700
+code0000 JSR   ADDI_BorADDI_WorADDI_L
 code0001 JSR   ISMOVEB
          JSR   DONE
 code0010 JSR   MOVEA_LorMOVE_L        ; MOVEA.L or MOVE.L
@@ -70,6 +73,37 @@ code1100 STOP  #$2700
 code1101 STOP  #$2700
 code1110 STOP  #$2700
 code1111 STOP  #$2700
+
+*****************************ADDI_BorADDI_WorADDI_L ************************************
+ADDI_BorADDI_WorADDI_L     LEA     STACK,SP            ; Load the SP
+                    LEA     tableADDI_BorADDI_WorADDI_L,A0            ; Index into the table
+                    CLR.L   D0                  ; Zero it
+                    MOVE.W  #example,D0         ; We'll play with it here
+                    MOVE.B  #7,D1           ; Shift 7 bits left 
+                    ASL.W   D1,D0            
+                    MOVE.B  #13,D1           
+                    ASR.W   D1,D0             
+  
+                    
+                    MULU    #6,D0               ; Form offset (move 6 bytes in memory for every 'JMP' command)
+                    JSR     0(A0,D0)            ; Jump indirect with index, i.e. jump to 'table' + displacement                
+
+tableADDI_BorADDI_WorADDI_L    JMP     ADDIBcode00
+                               JMP     ADDIWcode01
+                               JMP     ADDILcode10
+
+                          
+ADDIBcode00        JSR     ISADDIB
+                    JSR    DONE
+ADDIWcode01        JSR     ISADDIW
+                    JSR    DONE
+ADDILcode10        JSR     ISADDIL
+                    JSR    DONE
+
+*****************************END ADDI_BorADDI_WorADDI_L ************************************
+
+
+
 
 *****************************MOVEA_LorMOVE_L ************************************
 MOVEA_LorMOVE_L     LEA     STACK,SP            ; Load the SP
@@ -153,12 +187,6 @@ MOVEWcode111     JSR     ISMOVEW
                 JSR    DONE
 *****************************END MOVEA_WorMOVE_W ************************************
 
-
-
-
-* Put program code here
-*    LEA     STACK, SP
-*   
 *    MOVE.W      #$4E71, $2000  *4E71 = 0100 1110 0111 0001 = NOP
 *    MOVE.W      #$3A04, $2010   *3A47 = 0011 1010 0000 0100 = MOVE.W D4, D1 (first bits are same for movea)
 *    MOVE.W      #$2A04, $2020   *2A47 = 0010 1010 0000 0100 = MOVE.L D4, D1
@@ -169,49 +197,7 @@ MOVEWcode111     JSR     ISMOVEW
 *    
 *    MOVE.W      #$FFFF, $2070   *test, should have no result
 *    MOVE.W      #$0000, $2080   *test, should have no result     
-*   
-*   *NOP
-*    MOVE.W      $2000, A6  
-*    JSR         GETOPCODE
-* 
-*  *MOVE 
-*    MOVE.W      $2010, A6 
-*    JSR         GETOPCODE 
-*    MOVE.W      $2020, A6 
-*    JSR         GETOPCODE 
-*    MOVE.W      $2030, A6 
-*    JSR         GETOPCODE 
-*
-*   *ADDI
-*    MOVE.W      $2040, A6 
-*    JSR         GETOPCODE 
-*    MOVE.W      $2050, A6 
-*    JSR         GETOPCODE 
-*    MOVE.W      $2060, A6 
-*    JSR         GETOPCODE 
-*    
-*   *TEST
-*    MOVE.W      $2070, A6 
-*    JSR         GETOPCODE 
-*    MOVE.W      $2080, A6 
-*    JSR         GETOPCODE     
-* 
-*    JSR         DONE
 
-GETOPCODE   MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
-            JSR         NOPCHECK        *Check if opcode is just a NOP
-            JSR         MOVECHECK       *Check if opcode is MOVE
-            JSR         ADDICHECK       *Check if opcode is ADDI
-            MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
-            RTS                          ; Exit subroutine
-
-********************************NOP****************************** 
-NOPCHECK    MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
-            MOVE.W  #$4E71, D3
-            CMP.W   A6, D3
-            BEQ     ISNOP   *OPCODE is NOP
-            MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
-            RTS                          ; Exit subroutine
 
 ISNOP       MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
             LEA MESSAGENOP, A1         *OPCODE is MOVE.W so display NOP message
@@ -219,37 +205,6 @@ ISNOP       MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
             TRAP    #15
             MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
             RTS                          ; Exit subroutine
-
-***************END NOP**************************************************
-                        
-***************************************MOVE**************************************            
-MOVECHECK   MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
-            JSR     TESTMOVEW
-            JSR     TESTMOVEL
-            JSR     TESTMOVEB
-
-            MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
-            RTS                          ; Exit subroutine
-
-TESTMOVEW   MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
-            MOVE.W  #$0, D6
-            MOVE.W  A6, D4      *copy of A6 to D4
-            MOVE.W  #$3000, D3
-            SUB.W   D3, D4      subtract 3000(D3) from copy of what was in A6 (D4)
-            CMP.W   D6, D4      *BHS taken if D4 is greater than or = to 0 (D6)
-            BHS     MAYBEMOVEW
-            MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
-            RTS                          ; Exit subroutine
-
-MAYBEMOVEW   MOVE.W #$4000, D3
-             MOVE.W  #$F000, D6
-             MOVE.W A6, D4          *copy of A6 to D4
-             SUB.W   D3, D4      subtract D4 from 4000(D3)
-             CMP.W   D6, D4      *BHS taken if D3 is greater than or = to 0(D6)
-
-             BHS     ISMOVEW         *OPCODE is MOVE.W 0011  so 3xxx
-             MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
-             RTS                          ; Exit subroutine
          
 ISMOVEW     MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
             LEA MESSAGEMOVEW, A1         *OPCODE is MOVE.W so display NOP message
@@ -266,25 +221,6 @@ ISMOVEAW    MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
    
             MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
             RTS                          ; Exit subroutine
-
-TESTMOVEL   MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
-            MOVE.W  #$0, D6
-            MOVE.W  A6, D4      *copy of A6 to D4
-            MOVE.W  #$2000, D3
-            SUB.W   D3, D4      subtract 3000 from copy of what was in A6
-            CMP.W   D6, D4      *compare subtraction result to 0
-            BHS     MAYBEMOVEL
-            MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
-            RTS                          ; Exit subroutine           
-
-MAYBEMOVEL   MOVE.W #$3000, D3
-             MOVE.W  #$F000, D6
-             MOVE.W A6, D4          *copy of A6 to D4
-             SUB.W   D3, D4      subtract 3000 from copy of what was in A6
-             CMP.W   D6, D4      *compare subtraction result to 0
-             BHS     ISMOVEL        *OPCODE is MOVE.L 0010 so 2xxx
-             MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
-             RTS                          ; Exit subroutine
             
 ISMOVEL     MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
             LEA MESSAGEMOVEL, A1         *OPCODE is MOVE.L so display NOP message
@@ -301,26 +237,7 @@ ISMOVEAL     MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
             
             MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
             RTS                          ; Exit subroutine
-                     
-TESTMOVEB   MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
-            MOVE.W  #$0, D6
-            MOVE.W  A6, D4      *copy of A6 to D4
-            MOVE.W  #$1000, D3
-            SUB.W   D3, D4      subtract 3000 from copy of what was in A6
-            CMP.W   D6, D4      *compare subtraction result to 0
-            BHS     MAYBEMOVEB
-            MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
-            RTS                          ; Exit subroutine
-            
-MAYBEMOVEB   MOVE.W     #$2000, D3
-             MOVE.W     #$F000, D6
-             MOVE.W     A6, D4          *copy of A6 to D4
-             SUB.W      D3, D4      subtract 3000 from copy of what was in A6
-             CMP.W      D6, D4      *compare subtraction result to 0
-             BHS        ISMOVEB        *OPCODE is MOVE.B 0001 so 1xxx
-             MOVEM.W    (SP)+,  A0-A7/D0-D7         ; Restore registers
-             RTS                          ; Exit subroutine
-             
+       
 ISMOVEB     MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
             LEA MESSAGEMOVEB, A1         *OPCODE is MOVE.B so display MOVEB message
             MOVE.B  #14, D0
@@ -328,37 +245,6 @@ ISMOVEB     MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
             
             MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
             RTS                          ; Exit subroutine
-***********************END MOVE ****************************************
-
-************************ADDI*********************************
-
-ADDICHECK   MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
-            JSR     TESTADDIW
-            JSR     TESTADDIL
-            JSR     TESTADDIB
-
-            MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
-            RTS                          ; Exit subroutine
-
-TESTADDIW   MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
-            MOVE.W  #$F000, D6 * was #$0
-            MOVE.W  A6, D4      *copy of A6 to D4
-            MOVE.W  #$0640, D3
-            SUB.W   D3, D4      subtract 3000(D3) from copy of what was in A6 (D4)
-            CMP.W   D6, D4      *BHS taken if D4 is greater than or = to 0 (D6)
-            BLO     MAYBEADDIW
-            MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
-            RTS                          ; Exit subroutine
-
-MAYBEADDIW   MOVE.W #$064F, D3
-             MOVE.W  #$F000, D6
-             MOVE.W A6, D4          *copy of A6 to D4
-             SUB.W   D3, D4      subtract D4 from 4000(D3)
-             CMP.W   D6, D4      *BHS taken if D3 is greater than or = to 0(D6)
-
-             BHS     ISADDIW         *OPCODE is MOVE.W 0011  so 3xxx
-             MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
-             RTS                          ; Exit subroutine
          
 ISADDIW     LEA MESSAGEADDIW, A1         *OPCODE is MOVE.W so display NOP message
             MOVE.B  #14, D0
@@ -366,25 +252,6 @@ ISADDIW     LEA MESSAGEADDIW, A1         *OPCODE is MOVE.W so display NOP messag
             
             MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
             RTS                          ; Exit subroutine
-
-TESTADDIL   MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
-            MOVE.W  #$F000, D6
-            MOVE.W  A6, D4      *copy of A6 to D4
-            MOVE.W  #$0680, D3
-            SUB.W   D3, D4      subtract 3000 from copy of what was in A6
-            CMP.W   D6, D4      *compare subtraction result to 0
-            BLO     MAYBEADDIL
-            MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
-            RTS                          ; Exit subroutine           
-
-MAYBEADDIL   MOVE.W #$068F, D3
-             MOVE.W  #$F000, D6
-             MOVE.W A6, D4          *copy of A6 to D4
-             SUB.W   D3, D4      subtract 3000 from copy of what was in A6
-             CMP.W   D6, D4      *compare subtraction result to 0
-             BHS     ISADDIL        *OPCODE is MOVE.L 0010 so 2xxx
-             MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
-             RTS                          ; Exit subroutine
             
 ISADDIL     LEA MESSAGEADDIL, A1         *OPCODE is MOVE.L so display NOP message
             MOVE.B  #14, D0
@@ -392,35 +259,14 @@ ISADDIL     LEA MESSAGEADDIL, A1         *OPCODE is MOVE.L so display NOP messag
             
             MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
             RTS                          ; Exit subroutine
-                     
-TESTADDIB   MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
-            MOVE.W  #$F000, D6
-            MOVE.W  A6, D4      *copy of A6 to D4
-            MOVE.W  #$0600, D3
-            SUB.W   D3, D4      subtract 3000 from copy of what was in A6
-            CMP.W   D6, D4      *compare subtraction result to 0
-            BLO     MAYBEADDIB
-            MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
-            RTS                          ; Exit subroutine
-            
-MAYBEADDIB   MOVE.W     #$063F, D3
-             MOVE.W     #$F000, D6
-             MOVE.W     A6, D4          *copy of A6 to D4
-             SUB.W      D3, D4      subtract 3000 from copy of what was in A6
-             CMP.W      D6, D4      *compare subtraction result to 0
-             BHS        ISADDIB        *OPCODE is MOVE.B 0001 so 1xxx
-             MOVEM.W    (SP)+,  A0-A7/D0-D7         ; Restore registers
-             RTS                          ; Exit subroutine
-             
+                
 ISADDIB     LEA MESSAGEADDIB, A1         *OPCODE is MOVE.L so display NOP message
             MOVE.B  #14, D0
             TRAP    #15
             
             MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
             RTS                          ; Exit subroutine
-
-**********************END ADDI***************************************                               
-
+                      
 DONE        MOVE.B      #9, D0
             TRAP        #15
 
