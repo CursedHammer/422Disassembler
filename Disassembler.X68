@@ -70,7 +70,6 @@ QUIT    STOP        #$3000          ; Stop the program
 *---------- Subroutine Files -------------------------------
 
         INCLUDE 'IO.X68'
-        INCLUDE 'JumpTable.X68'
         INCLUDE 'OpCodes.X68'
         INCLUDE 'EA.X68'
    
@@ -85,6 +84,7 @@ ENDADDR   DS.L  80                  ; Var for ending address
 
 *---------- End --------------------------------------------
         END        START        ; last line of source
+
 
 
 
