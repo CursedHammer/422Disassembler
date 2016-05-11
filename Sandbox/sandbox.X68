@@ -15,7 +15,7 @@ START:                  ; first instruction of program
     MOVE.W      #$4E71, $2000  *4E71 = 0100 1110 0111 0001 = NOP
     MOVE.W      #$3A04, $2010   *3A47 = 0011 1010 0000 0100 = MOVE.W D4, D1
     MOVE.W      #$2A04, $2020   *2A47 = 0010 1010 0000 0100 = MOVE.L D4, D1
-    MOVE.W      #$1A04, $2030   *1A47 = 0010 1010 0000 0100 = MOVE.B D4, D1
+    MOVE.W      #$1A04, $2030   *1A47 = 0001 1010 0000 0100 = MOVE.B D4, D1
     MOVE.W      #$0605, $2040   *0605 = 0000 0110 0000 0101 = ADDI.B D5, D7
     MOVE.W      #$0645, $2050   *0605 = 0000 0110 0000 0101 = ADDI.W D5, D7
     MOVE.W      #$0685, $2060   *0605 = 0000 0110 0000 0101 = ADDI.L D5, D7
@@ -274,6 +274,7 @@ MESSAGEADDIB DC.B    'ADDI.B',CR,LF, 0
 * Put variables and constants here
 
     END    START        ; last line of source
+
 
 
 

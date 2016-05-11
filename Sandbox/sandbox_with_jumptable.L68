@@ -1,0 +1,402 @@
+00001000 Starting Address
+Assembler used: EASy68K Editor/Assembler v5.15.04
+Created On: 5/11/2016 12:41:12 PM
+
+00000000                             1  *-----------------------------------------------------------
+00000000                             2  * Title      : NOP check
+00000000                             3  * Written by : Jack Eldridge
+00000000                             4  * Date       : 5-4-2016
+00000000                             5  * Description: getting a feel for opcode checking
+00000000                             6  *-----------------------------------------------------------
+00000000  =00007000                  7  STACK       EQU $7000
+00001000                             8      ORG    $1000
+00001000                             9  
+00001000                            10  
+00001000                            11  
+00001000                            12  START:                  ; first instruction of program
+00001000                            13  * Jump table code
+00001000                            14  
+00001000                            15  *stack   EQU     $A000
+00001000  =00001A04                 16  example EQU     %0001101000000100 ; MOVE.B D4, D1 = 0001 1010 0000 0100 
+00001000                            17  *example EQU     %0100111001110001   ; NOP  = 0100 1110 0111 0001
+00001000                            18  *example EQU     %0011101001000100    ; MOVEA.W   D4, A5 = 0011 1010 0100 0100
+00001000  =0000000C                 19  shift   EQU     12                  ; Shift 12 bits 
+00001000                            20  
+00001000                            21  * Program starts here
+00001000                            22  
+00001000  4FF8 7000                 23          LEA     STACK,SP            ; Load the SP
+00001004  41F9 0000101E             24          LEA     table,A0            ; Index into the table
+0000100A  4280                      25          CLR.L   D0                  ; Zero it
+0000100C  303C 1A04                 26          MOVE.W  #example,D0         ; We'll play with it here
+00001010  123C 000C                 27          MOVE.B  #shift,D1           ; Shift 12 bits to the right  
+00001014  E268                      28          LSR.W   D1,D0               ; Move the bits (moves highest 4 bits to lowest 4 positions,
+00001016                            29                                      ; and the rest are zeroed out)
+00001016  C0FC 0006                 30          MULU    #6,D0               ; Form offset (move 6 bytes in memory for every 'JMP' command)
+0000101A  4EB0 0000                 31          JSR     0(A0,D0)            ; Jump indirect with index, i.e. jump to 'table' + displacement                
+0000101E                            32  
+0000101E  4EF9 0000107E             33  table   JMP     code0000
+00001024  4EF9 00001082             34          JMP     code0001
+0000102A  4EF9 0000108E             35          JMP     code0010        
+00001030  4EF9 00001092             36          JMP     code0011        ; MOVEA.W or MOVE.W
+00001036  4EF9 00001096             37          JMP     code0100        ; NOP
+0000103C  4EF9 000010A2             38          JMP     code0101
+00001042  4EF9 000010A6             39          JMP     code0110
+00001048  4EF9 000010AA             40          JMP     code0111
+0000104E  4EF9 000010AE             41          JMP     code1000
+00001054  4EF9 000010B2             42          JMP     code1001
+0000105A  4EF9 000010B6             43          JMP     code1010
+00001060  4EF9 000010BA             44          JMP     code1011
+00001066  4EF9 000010BE             45          JMP     code1100
+0000106C  4EF9 000010C2             46          JMP     code1101
+00001072  4EF9 000010C6             47          JMP     code1110
+00001078  4EF9 000010CA             48          JMP     code1111
+0000107E                            49         
+0000107E                            50  *The following subroutines will get filled in as you decode the instructions . For *now, just exit gracefully.
+0000107E                            51  
+0000107E  4E72 2700                 52  code0000 STOP  #$2700
+00001082  4EB9 000011F0             53  code0001 JSR   ISMOVEB
+00001088  4EB9 000012F0             54           JSR   DONE
+0000108E  4E72 2700                 55  code0010 STOP  #$2700
+00001092  4E72 2700                 56  code0011 STOP  #$2700
+00001096  4EB9 000010FE             57  code0100 JSR    ISNOP
+0000109C  4EB9 000012F0             58           JSR    DONE
+000010A2  4E72 2700                 59  code0101 STOP  #$2700
+000010A6  4E72 2700                 60  code0110 STOP  #$2700
+000010AA  4E72 2700                 61  code0111 STOP  #$2700
+000010AE  4E72 2700                 62  code1000 STOP  #$2700
+000010B2  4E72 2700                 63  code1001 STOP  #$2700
+000010B6  4E72 2700                 64  code1010 STOP  #$2700
+000010BA  4E72 2700                 65  code1011 STOP  #$2700
+000010BE  4E72 2700                 66  code1100 STOP  #$2700
+000010C2  4E72 2700                 67  code1101 STOP  #$2700
+000010C6  4E72 2700                 68  code1110 STOP  #$2700
+000010CA  4E72 2700                 69  code1111 STOP  #$2700
+000010CE                            70  
+000010CE                            71  * Put program code here
+000010CE                            72  *    LEA     STACK, SP
+000010CE                            73  *   
+000010CE                            74  *    MOVE.W      #$4E71, $2000  *4E71 = 0100 1110 0111 0001 = NOP
+000010CE                            75  *    MOVE.W      #$3A04, $2010   *3A47 = 0011 1010 0000 0100 = MOVE.W D4, D1 (first bits are same for movea)
+000010CE                            76  *    MOVE.W      #$2A04, $2020   *2A47 = 0010 1010 0000 0100 = MOVE.L D4, D1
+000010CE                            77  *    MOVE.W      #$1A04, $2030   *1A47 = 0010 1010 0000 0100 = MOVE.B D4, D1
+000010CE                            78  *    MOVE.W      #$0605, $2040   *0605 = 0000 0110 0000 0101 = ADDI.B D5, D7
+000010CE                            79  *    MOVE.W      #$0645, $2050   *0605 = 0000 0110 0000 0101 = ADDI.W D5, D7
+000010CE                            80  *    MOVE.W      #$0685, $2060   *0605 = 0000 0110 0000 0101 = ADDI.L D5, D7
+000010CE                            81  *    
+000010CE                            82  *    MOVE.W      #$FFFF, $2070   *test, should have no result
+000010CE                            83  *    MOVE.W      #$0000, $2080   *test, should have no result     
+000010CE                            84  *   
+000010CE                            85  *   *NOP
+000010CE                            86  *    MOVE.W      $2000, A6  
+000010CE                            87  *    JSR         GETOPCODE
+000010CE                            88  * 
+000010CE                            89  *  *MOVE 
+000010CE                            90  *    MOVE.W      $2010, A6 
+000010CE                            91  *    JSR         GETOPCODE 
+000010CE                            92  *    MOVE.W      $2020, A6 
+000010CE                            93  *    JSR         GETOPCODE 
+000010CE                            94  *    MOVE.W      $2030, A6 
+000010CE                            95  *    JSR         GETOPCODE 
+000010CE                            96  *
+000010CE                            97  *   *ADDI
+000010CE                            98  *    MOVE.W      $2040, A6 
+000010CE                            99  *    JSR         GETOPCODE 
+000010CE                           100  *    MOVE.W      $2050, A6 
+000010CE                           101  *    JSR         GETOPCODE 
+000010CE                           102  *    MOVE.W      $2060, A6 
+000010CE                           103  *    JSR         GETOPCODE 
+000010CE                           104  *    
+000010CE                           105  *   *TEST
+000010CE                           106  *    MOVE.W      $2070, A6 
+000010CE                           107  *    JSR         GETOPCODE 
+000010CE                           108  *    MOVE.W      $2080, A6 
+000010CE                           109  *    JSR         GETOPCODE     
+000010CE                           110  * 
+000010CE                           111  *    JSR         DONE
+000010CE                           112  
+000010CE  48A7 FFFF                113  GETOPCODE   MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
+000010D2  4EB9 000010EA            114              JSR         NOPCHECK        *Check if opcode is just a NOP
+000010D8  4EB9 00001114            115              JSR         MOVECHECK       *Check if opcode is MOVE
+000010DE  4EB9 00001202            116              JSR         ADDICHECK       *Check if opcode is ADDI
+000010E4  4C9F FFFF                117              MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
+000010E8  4E75                     118              RTS                          ; Exit subroutine
+000010EA                           119  
+000010EA                           120  ********************************NOP****************************** 
+000010EA  48A7 FFFF                121  NOPCHECK    MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
+000010EE  363C 4E71                122              MOVE.W  #$4E71, D3
+000010F2  B64E                     123              CMP.W   A6, D3
+000010F4  6700 0008                124              BEQ     ISNOP   *OPCODE is NOP
+000010F8  4C9F FFFF                125              MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
+000010FC  4E75                     126              RTS                          ; Exit subroutine
+000010FE                           127  
+000010FE  48A7 FFFF                128  ISNOP       MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
+00001102  43F9 000012F6            129              LEA MESSAGENOP, A1         *OPCODE is MOVE.W so display NOP message
+00001108  103C 000E                130              MOVE.B  #14, D0
+0000110C  4E4F                     131              TRAP    #15
+0000110E  4C9F FFFF                132              MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
+00001112  4E75                     133              RTS                          ; Exit subroutine
+00001114                           134  
+00001114                           135  ***************END NOP**************************************************
+00001114                           136                          
+00001114                           137  ***************************************MOVE**************************************            
+00001114  48A7 FFFF                138  MOVECHECK   MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
+00001118  4EB9 00001130            139              JSR     TESTMOVEW
+0000111E  4EB9 00001176            140              JSR     TESTMOVEL
+00001124  4EB9 000011BC            141              JSR     TESTMOVEB
+0000112A                           142  
+0000112A  4C9F FFFF                143              MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
+0000112E  4E75                     144              RTS                          ; Exit subroutine
+00001130                           145  
+00001130  48A7 FFFF                146  TESTMOVEW   MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
+00001134  3C3C 0000                147              MOVE.W  #$0, D6
+00001138  380E                     148              MOVE.W  A6, D4      *copy of A6 to D4
+0000113A  363C 3000                149              MOVE.W  #$3000, D3
+0000113E  9843                     150              SUB.W   D3, D4      subtract 3000(D3) from copy of what was in A6 (D4)
+00001140  B846                     151              CMP.W   D6, D4      *BHS taken if D4 is greater than or = to 0 (D6)
+00001142  6400 0008                152              BHS     MAYBEMOVEW
+00001146  4C9F FFFF                153              MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
+0000114A  4E75                     154              RTS                          ; Exit subroutine
+0000114C                           155  
+0000114C  363C 4000                156  MAYBEMOVEW   MOVE.W #$4000, D3
+00001150  3C3C F000                157               MOVE.W  #$F000, D6
+00001154  380E                     158               MOVE.W A6, D4          *copy of A6 to D4
+00001156  9843                     159               SUB.W   D3, D4      subtract D4 from 4000(D3)
+00001158  B846                     160               CMP.W   D6, D4      *BHS taken if D3 is greater than or = to 0(D6)
+0000115A                           161  
+0000115A  6400 0008                162               BHS     ISMOVEW         *OPCODE is MOVE.W 0011  so 3xxx
+0000115E  4C9F FFFF                163               MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
+00001162  4E75                     164               RTS                          ; Exit subroutine
+00001164                           165           
+00001164  43F9 000012FC            166  ISMOVEW     LEA MESSAGEMOVEW, A1         *OPCODE is MOVE.W so display NOP message
+0000116A  103C 000E                167              MOVE.B  #14, D0
+0000116E  4E4F                     168              TRAP    #15
+00001170                           169              
+00001170  4C9F FFFF                170              MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
+00001174  4E75                     171              RTS                          ; Exit subroutine
+00001176                           172  
+00001176  48A7 FFFF                173  TESTMOVEL   MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
+0000117A  3C3C 0000                174              MOVE.W  #$0, D6
+0000117E  380E                     175              MOVE.W  A6, D4      *copy of A6 to D4
+00001180  363C 2000                176              MOVE.W  #$2000, D3
+00001184  9843                     177              SUB.W   D3, D4      subtract 3000 from copy of what was in A6
+00001186  B846                     178              CMP.W   D6, D4      *compare subtraction result to 0
+00001188  6400 0008                179              BHS     MAYBEMOVEL
+0000118C  4C9F FFFF                180              MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
+00001190  4E75                     181              RTS                          ; Exit subroutine           
+00001192                           182  
+00001192  363C 3000                183  MAYBEMOVEL   MOVE.W #$3000, D3
+00001196  3C3C F000                184               MOVE.W  #$F000, D6
+0000119A  380E                     185               MOVE.W A6, D4          *copy of A6 to D4
+0000119C  9843                     186               SUB.W   D3, D4      subtract 3000 from copy of what was in A6
+0000119E  B846                     187               CMP.W   D6, D4      *compare subtraction result to 0
+000011A0  6400 0008                188               BHS     ISMOVEL        *OPCODE is MOVE.L 0010 so 2xxx
+000011A4  4C9F FFFF                189               MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
+000011A8  4E75                     190               RTS                          ; Exit subroutine
+000011AA                           191              
+000011AA  43F9 00001305            192  ISMOVEL     LEA MESSAGEMOVEL, A1         *OPCODE is MOVE.L so display NOP message
+000011B0  103C 000E                193              MOVE.B  #14, D0
+000011B4  4E4F                     194              TRAP    #15
+000011B6                           195              
+000011B6  4C9F FFFF                196              MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
+000011BA  4E75                     197              RTS                          ; Exit subroutine
+000011BC                           198                       
+000011BC  48A7 FFFF                199  TESTMOVEB   MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
+000011C0  3C3C 0000                200              MOVE.W  #$0, D6
+000011C4  380E                     201              MOVE.W  A6, D4      *copy of A6 to D4
+000011C6  363C 1000                202              MOVE.W  #$1000, D3
+000011CA  9843                     203              SUB.W   D3, D4      subtract 3000 from copy of what was in A6
+000011CC  B846                     204              CMP.W   D6, D4      *compare subtraction result to 0
+000011CE  6400 0008                205              BHS     MAYBEMOVEB
+000011D2  4C9F FFFF                206              MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
+000011D6  4E75                     207              RTS                          ; Exit subroutine
+000011D8                           208              
+000011D8  363C 2000                209  MAYBEMOVEB   MOVE.W     #$2000, D3
+000011DC  3C3C F000                210               MOVE.W     #$F000, D6
+000011E0  380E                     211               MOVE.W     A6, D4          *copy of A6 to D4
+000011E2  9843                     212               SUB.W      D3, D4      subtract 3000 from copy of what was in A6
+000011E4  B846                     213               CMP.W      D6, D4      *compare subtraction result to 0
+000011E6  6400 0008                214               BHS        ISMOVEB        *OPCODE is MOVE.B 0001 so 1xxx
+000011EA  4C9F FFFF                215               MOVEM.W    (SP)+,  A0-A7/D0-D7         ; Restore registers
+000011EE  4E75                     216               RTS                          ; Exit subroutine
+000011F0                           217               
+000011F0  43F9 0000130E            218  ISMOVEB     LEA MESSAGEMOVEB, A1         *OPCODE is MOVE.L so display NOP message
+000011F6  103C 000E                219              MOVE.B  #14, D0
+000011FA  4E4F                     220              TRAP    #15
+000011FC                           221              
+000011FC  4C9F FFFF                222              MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
+00001200  4E75                     223              RTS                          ; Exit subroutine
+00001202                           224  ***********************END MOVE ****************************************
+00001202                           225  
+00001202                           226  ************************ADDI*********************************
+00001202                           227  
+00001202  48A7 FFFF                228  ADDICHECK   MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
+00001206  4EB9 0000121E            229              JSR     TESTADDIW
+0000120C  4EB9 00001264            230              JSR     TESTADDIL
+00001212  4EB9 000012AA            231              JSR     TESTADDIB
+00001218                           232  
+00001218  4C9F FFFF                233              MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
+0000121C  4E75                     234              RTS                          ; Exit subroutine
+0000121E                           235  
+0000121E  48A7 FFFF                236  TESTADDIW   MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
+00001222  3C3C F000                237              MOVE.W  #$F000, D6 * was #$0
+00001226  380E                     238              MOVE.W  A6, D4      *copy of A6 to D4
+00001228  363C 0640                239              MOVE.W  #$0640, D3
+0000122C  9843                     240              SUB.W   D3, D4      subtract 3000(D3) from copy of what was in A6 (D4)
+0000122E  B846                     241              CMP.W   D6, D4      *BHS taken if D4 is greater than or = to 0 (D6)
+00001230  6500 0008                242              BLO     MAYBEADDIW
+00001234  4C9F FFFF                243              MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
+00001238  4E75                     244              RTS                          ; Exit subroutine
+0000123A                           245  
+0000123A  363C 064F                246  MAYBEADDIW   MOVE.W #$064F, D3
+0000123E  3C3C F000                247               MOVE.W  #$F000, D6
+00001242  380E                     248               MOVE.W A6, D4          *copy of A6 to D4
+00001244  9843                     249               SUB.W   D3, D4      subtract D4 from 4000(D3)
+00001246  B846                     250               CMP.W   D6, D4      *BHS taken if D3 is greater than or = to 0(D6)
+00001248                           251  
+00001248  6400 0008                252               BHS     ISADDIW         *OPCODE is MOVE.W 0011  so 3xxx
+0000124C  4C9F FFFF                253               MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
+00001250  4E75                     254               RTS                          ; Exit subroutine
+00001252                           255           
+00001252  43F9 00001317            256  ISADDIW     LEA MESSAGEADDIW, A1         *OPCODE is MOVE.W so display NOP message
+00001258  103C 000E                257              MOVE.B  #14, D0
+0000125C  4E4F                     258              TRAP    #15
+0000125E                           259              
+0000125E  4C9F FFFF                260              MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
+00001262  4E75                     261              RTS                          ; Exit subroutine
+00001264                           262  
+00001264  48A7 FFFF                263  TESTADDIL   MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
+00001268  3C3C F000                264              MOVE.W  #$F000, D6
+0000126C  380E                     265              MOVE.W  A6, D4      *copy of A6 to D4
+0000126E  363C 0680                266              MOVE.W  #$0680, D3
+00001272  9843                     267              SUB.W   D3, D4      subtract 3000 from copy of what was in A6
+00001274  B846                     268              CMP.W   D6, D4      *compare subtraction result to 0
+00001276  6500 0008                269              BLO     MAYBEADDIL
+0000127A  4C9F FFFF                270              MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
+0000127E  4E75                     271              RTS                          ; Exit subroutine           
+00001280                           272  
+00001280  363C 068F                273  MAYBEADDIL   MOVE.W #$068F, D3
+00001284  3C3C F000                274               MOVE.W  #$F000, D6
+00001288  380E                     275               MOVE.W A6, D4          *copy of A6 to D4
+0000128A  9843                     276               SUB.W   D3, D4      subtract 3000 from copy of what was in A6
+0000128C  B846                     277               CMP.W   D6, D4      *compare subtraction result to 0
+0000128E  6400 0008                278               BHS     ISADDIL        *OPCODE is MOVE.L 0010 so 2xxx
+00001292  4C9F FFFF                279               MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
+00001296  4E75                     280               RTS                          ; Exit subroutine
+00001298                           281              
+00001298  43F9 00001320            282  ISADDIL     LEA MESSAGEADDIL, A1         *OPCODE is MOVE.L so display NOP message
+0000129E  103C 000E                283              MOVE.B  #14, D0
+000012A2  4E4F                     284              TRAP    #15
+000012A4                           285              
+000012A4  4C9F FFFF                286              MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
+000012A8  4E75                     287              RTS                          ; Exit subroutine
+000012AA                           288                       
+000012AA  48A7 FFFF                289  TESTADDIB   MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
+000012AE  3C3C F000                290              MOVE.W  #$F000, D6
+000012B2  380E                     291              MOVE.W  A6, D4      *copy of A6 to D4
+000012B4  363C 0600                292              MOVE.W  #$0600, D3
+000012B8  9843                     293              SUB.W   D3, D4      subtract 3000 from copy of what was in A6
+000012BA  B846                     294              CMP.W   D6, D4      *compare subtraction result to 0
+000012BC  6500 0008                295              BLO     MAYBEADDIB
+000012C0  4C9F FFFF                296              MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
+000012C4  4E75                     297              RTS                          ; Exit subroutine
+000012C6                           298              
+000012C6  363C 063F                299  MAYBEADDIB   MOVE.W     #$063F, D3
+000012CA  3C3C F000                300               MOVE.W     #$F000, D6
+000012CE  380E                     301               MOVE.W     A6, D4          *copy of A6 to D4
+000012D0  9843                     302               SUB.W      D3, D4      subtract 3000 from copy of what was in A6
+000012D2  B846                     303               CMP.W      D6, D4      *compare subtraction result to 0
+000012D4  6400 0008                304               BHS        ISADDIB        *OPCODE is MOVE.B 0001 so 1xxx
+000012D8  4C9F FFFF                305               MOVEM.W    (SP)+,  A0-A7/D0-D7         ; Restore registers
+000012DC  4E75                     306               RTS                          ; Exit subroutine
+000012DE                           307               
+000012DE  43F9 00001329            308  ISADDIB     LEA MESSAGEADDIB, A1         *OPCODE is MOVE.L so display NOP message
+000012E4  103C 000E                309              MOVE.B  #14, D0
+000012E8  4E4F                     310              TRAP    #15
+000012EA                           311              
+000012EA  4C9F FFFF                312              MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
+000012EE  4E75                     313              RTS                          ; Exit subroutine
+000012F0                           314  
+000012F0                           315  **********************END ADDI***************************************                               
+000012F0                           316  
+000012F0  103C 0009                317  DONE        MOVE.B      #9, D0
+000012F4  4E4F                     318              TRAP        #15
+000012F6                           319  
+000012F6  =0000000D                320  CR  EQU     $0D 
+000012F6  =0000000A                321  LF  EQU     $0A
+000012F6= 4E 4F 50 0D 0A 00        322  MESSAGENOP DC.B    'NOP',CR,LF, 0    
+000012FC                           323      
+000012FC= 4D 4F 56 45 2E 57 ...    324  MESSAGEMOVEW DC.B    'MOVE.W',CR,LF, 0    
+00001305= 4D 4F 56 45 2E 4C ...    325  MESSAGEMOVEL DC.B    'MOVE.L',CR,LF, 0 
+0000130E= 4D 4F 56 45 2E 42 ...    326  MESSAGEMOVEB DC.B    'MOVE.B',CR,LF, 0       
+00001317                           327  
+00001317= 41 44 44 49 2E 57 ...    328  MESSAGEADDIW DC.B    'ADDI.W',CR,LF, 0    
+00001320= 41 44 44 49 2E 4C ...    329  MESSAGEADDIL DC.B    'ADDI.L',CR,LF, 0 
+00001329= 41 44 44 49 2E 42 ...    330  MESSAGEADDIB DC.B    'ADDI.B',CR,LF, 0 
+00001332                           331  
+00001332  FFFF FFFF                332      SIMHALT             ; halt simulator
+00001336                           333  
+00001336                           334  * Put variables and constants here
+00001336                           335  
+00001336                           336      END    START        ; last line of source
+
+No errors detected
+No warnings generated
+
+
+SYMBOL TABLE INFORMATION
+Symbol-name         Value
+-------------------------
+ADDICHECK           1202
+CODE0000            107E
+CODE0001            1082
+CODE0010            108E
+CODE0011            1092
+CODE0100            1096
+CODE0101            10A2
+CODE0110            10A6
+CODE0111            10AA
+CODE1000            10AE
+CODE1001            10B2
+CODE1010            10B6
+CODE1011            10BA
+CODE1100            10BE
+CODE1101            10C2
+CODE1110            10C6
+CODE1111            10CA
+CR                  D
+DONE                12F0
+EXAMPLE             1A04
+GETOPCODE           10CE
+ISADDIB             12DE
+ISADDIL             1298
+ISADDIW             1252
+ISMOVEB             11F0
+ISMOVEL             11AA
+ISMOVEW             1164
+ISNOP               10FE
+LF                  A
+MAYBEADDIB          12C6
+MAYBEADDIL          1280
+MAYBEADDIW          123A
+MAYBEMOVEB          11D8
+MAYBEMOVEL          1192
+MAYBEMOVEW          114C
+MESSAGEADDIB        1329
+MESSAGEADDIL        1320
+MESSAGEADDIW        1317
+MESSAGEMOVEB        130E
+MESSAGEMOVEL        1305
+MESSAGEMOVEW        12FC
+MESSAGENOP          12F6
+MOVECHECK           1114
+NOPCHECK            10EA
+SHIFT               C
+STACK               7000
+START               1000
+TABLE               101E
+TESTADDIB           12AA
+TESTADDIL           1264
+TESTADDIW           121E
+TESTMOVEB           11BC
+TESTMOVEL           1176
+TESTMOVEW           1130

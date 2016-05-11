@@ -13,8 +13,9 @@ START:                  ; first instruction of program
 * Jump table code
 
 *stack   EQU     $A000
-example EQU     %0010101000000100 ; MOVE.B D4, D1
-*example EQU     %0100111001110001   ; NOP %0100 1110 0111 0001
+example EQU     %0001101000000100 ; MOVE.B D4, D1 = 0001 1010 0000 0100 
+*example EQU     %0100111001110001   ; NOP  = 0100 1110 0111 0001
+*example EQU     %0011101001000100    ; MOVEA.W   D4, A5 = 0011 1010 0100 0100
 shift   EQU     12                  ; Shift 12 bits 
 
 * Program starts here
@@ -31,9 +32,9 @@ shift   EQU     12                  ; Shift 12 bits
 
 table   JMP     code0000
         JMP     code0001
-        JMP     code0010
-        JMP     code0011
-        JMP     code0100
+        JMP     code0010        
+        JMP     code0011        ; MOVEA.W or MOVE.W
+        JMP     code0100        ; NOP
         JMP     code0101
         JMP     code0110
         JMP     code0111
@@ -49,9 +50,9 @@ table   JMP     code0000
 *The following subroutines will get filled in as you decode the instructions . For *now, just exit gracefully.
 
 code0000 STOP  #$2700
-code0001 STOP  #$2700
-code0010 JSR   ISMOVEB
+code0001 JSR   ISMOVEB
          JSR   DONE
+code0010 STOP  #$2700
 code0011 STOP  #$2700
 code0100 JSR    ISNOP
          JSR    DONE
@@ -333,6 +334,7 @@ MESSAGEADDIB DC.B    'ADDI.B',CR,LF, 0
 * Put variables and constants here
 
     END    START        ; last line of source
+
 
 
 
