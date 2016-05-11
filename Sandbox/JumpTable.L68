@@ -1,0 +1,112 @@
+00000400 Starting Address
+Assembler used: EASy68K Editor/Assembler v5.15.04
+Created On: 5/11/2016 12:05:29 PM
+
+00000000                             1  *-----------------------------------------------------------
+00000000                             2  * Title      : JumpTable
+00000000                             3  * Written by : Brandon Authier (Hblkr), Jack S. Eldridge
+00000000                             4  *              (JackScottie), Marijn Burger (marijnburger)
+00000000                             5  * Date       : 7 May 2016
+00000000                             6  * Description: Support file containing the jump table logic.
+00000000                             7  *-----------------------------------------------------------
+00000000                             8  
+00000000                             9  *----------- Definitions Used for Code ---------------------
+00000000                            10  
+00000000                            11  *---------- Subroutines: -----------------------------------
+00000000                            12  
+00000000                            13  *---------- Jump -------------------------------------------
+00000000                            14  * Executes jump table logic to find the correct opcode subroutine
+00000000                            15  *-----------------------------------------------------------
+00000000                            16  
+00000000                            17  ********** The following is largely taken verbatim from canvas *********
+00000000                            18  
+00000000                            19  * System equates
+00000000                            20  
+00000000  =0000A000                 21  stack   EQU     $A000
+00000000  =0000DE61                 22  example EQU     %1101111001100001   ; I made up bits 0 to 11      
+00000000  =0000000C                 23  shift   EQU     12                  ; Shift 12 bits 
+00000000                            24  
+00000000                            25  * Program starts here
+00000000                            26  
+00000400                            27          ORG     $400
+00000400  4FF9 0000A000             28  start   LEA     stack,SP            ; Load the SP
+00000406  41F9 00000420             29          LEA     table,A0            ; Index into the table
+0000040C  4280                      30          CLR.L   D0                  ; Zero it
+0000040E  303C DE61                 31          MOVE.W  #example,D0         ; We'll play with it here
+00000412  123C 000C                 32          MOVE.B  #shift,D1           ; Shift 12 bits to the right  
+00000416  E268                      33          LSR.W   D1,D0               ; Move the bits (moves highest 4 bits to lowest 4 positions,
+00000418                            34                                      ; and the rest are zeroed out)
+00000418  C0FC 0006                 35          MULU    #6,D0               ; Form offset (move 6 bytes in memory for every 'JMP' command)
+0000041C  4EB0 0000                 36          JSR     0(A0,D0)            ; Jump indirect with index, i.e. jump to 'table' + displacement                
+00000420                            37  
+00000420  4EF9 00000480             38  table   JMP    code0000
+00000426  4EF9 00000484             39          JMP    code0001
+0000042C  4EF9 00000488             40          JMP    code0010
+00000432  4EF9 0000048C             41          JMP    code0011
+00000438  4EF9 00000490             42          JMP    code0100
+0000043E  4EF9 00000494             43          JMP    code0101
+00000444  4EF9 00000498             44          JMP    code0110
+0000044A  4EF9 0000049C             45          JMP    code0111
+00000450  4EF9 000004A0             46          JMP    code1000
+00000456  4EF9 000004A4             47          JMP    code1001
+0000045C  4EF9 000004A8             48          JMP    code1010
+00000462  4EF9 000004AC             49          JMP    code1011
+00000468  4EF9 000004AE             50          JMP    code1100
+0000046E  4EF9 000004B2             51          JMP    code1101
+00000474  4EF9 000004B6             52          JMP    code1110
+0000047A  4EF9 000004BA             53          JMP    code1111
+00000480                            54         
+00000480                            55  * The following subroutines will get filled in as you decode the instructions . For *now, just exit gracefully.
+00000480                            56  
+00000480  4E72 2700                 57  code0000 STOP  #$2700
+00000484  4E72 2700                 58  code0001 STOP  #$2700
+00000488  4E72 2700                 59  code0010 STOP  #$2700
+0000048C  4E72 2700                 60  code0011 STOP  #$2700
+00000490  4E72 2700                 61  code0100 STOP  #$2700
+00000494  4E72 2700                 62  code0101 STOP  #$2700
+00000498  4E72 2700                 63  code0110 STOP  #$2700
+0000049C  4E72 2700                 64  code0111 STOP  #$2700
+000004A0  4E72 2700                 65  code1000 STOP  #$2700
+000004A4  4E72 2700                 66  code1001 STOP  #$2700
+000004A8  4E72 2700                 67  code1010 STOP  #$2700
+000004AC                            68  
+000004AC                            69  * Next we put in the next level of decoding. I just stuck this BRA
+000004AC                            70  * instruction here so it would look different. If this was your real
+000004AC                            71  * code, you would decode to the next level. Perhaps this would be
+000004AC                            72  * another jump table to the 8 possible op-codes at the next level.
+000004AC                            73   
+000004AC  60FE                      74  code1011 BRA   code1011
+000004AE  4E72 2700                 75  code1100 STOP  #$2700
+000004B2  4E72 2700                 76  code1101 STOP  #$2700
+000004B6  4E72 2700                 77  code1110 STOP  #$2700
+000004BA  4E72 2700                 78  code1111 STOP  #$2700
+000004BE                            79           END   $400 
+
+No errors detected
+No warnings generated
+
+
+SYMBOL TABLE INFORMATION
+Symbol-name         Value
+-------------------------
+CODE0000            480
+CODE0001            484
+CODE0010            488
+CODE0011            48C
+CODE0100            490
+CODE0101            494
+CODE0110            498
+CODE0111            49C
+CODE1000            4A0
+CODE1001            4A4
+CODE1010            4A8
+CODE1011            4AC
+CODE1100            4AE
+CODE1101            4B2
+CODE1110            4B6
+CODE1111            4BA
+EXAMPLE             DE61
+SHIFT               C
+STACK               A000
+START               400
+TABLE               420
