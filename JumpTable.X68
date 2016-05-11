@@ -52,7 +52,7 @@ table   JMP    code0000
         JMP    code1110
         JMP    code1111
        
-*The following subroutines will get filled in as you decode the instructions . For *now, just exit gracefully.
+* The following subroutines will get filled in as you decode the instructions . For *now, just exit gracefully.
 
 code0000 STOP  #$2700
 code0001 STOP  #$2700
