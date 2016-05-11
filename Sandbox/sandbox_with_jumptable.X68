@@ -16,7 +16,9 @@ START:                  ; first instruction of program
 *example EQU     %0001101000000100 ; MOVE.B D4, D1 = 0001 1010 0000 0100 
 *example EQU     %0100111001110001   ; NOP  = 0100 1110 0111 0001
 *example EQU     %0010101001000100    ; MOVEA.L   D4, A5 = 0010 1010 0100 0100
-example EQU     %0010101000000100    ; MOVE.L   D4, D5 = 0010 1010 0000 0100
+*example EQU     %0010101000000100    ; MOVE.L   D4, D5 = 0010 1010 0000 0100
+*example EQU     %0011101000000100    ; MOVE.W   D4, D5 = 0011 1010 0000 0100
+example EQU     %0011101001000100    ; MOVEA.W   D4, D5 = 0011 1010 0100 0100
 shift   EQU     12                  ; Shift 12 bits 
 
 * Program starts here
@@ -54,7 +56,7 @@ code0000 STOP  #$2700
 code0001 JSR   ISMOVEB
          JSR   DONE
 code0010 JSR   MOVEA_LorMOVE_L        ; MOVEA.L or MOVE.L
-code0011 STOP  #$2700
+code0011 JSR  MOVEA_WorMOVE_W        ; MOVEA.W or MOVE.W
 code0100 JSR    ISNOP
          JSR    DONE
 code0101 STOP  #$2700
@@ -69,6 +71,7 @@ code1101 STOP  #$2700
 code1110 STOP  #$2700
 code1111 STOP  #$2700
 
+*****************************MOVEA_LorMOVE_L ************************************
 MOVEA_LorMOVE_L     LEA     STACK,SP            ; Load the SP
                     LEA     tableMOVEA_LorMOVE_L,A0            ; Index into the table
                     CLR.L   D0                  ; Zero it
@@ -107,6 +110,49 @@ MOVEcode110     JSR     ISMOVEL
                 JSR    DONE
 MOVEcode111     JSR     ISMOVEL 
                 JSR    DONE
+*****************************END MOVEA_LorMOVE_L ************************************
+
+*****************************MOVEA_WorMOVE_W ************************************
+MOVEA_WorMOVE_W     LEA     STACK,SP            ; Load the SP
+                    LEA     tableMOVEA_WorMOVE_W,A0            ; Index into the table
+                    CLR.L   D0                  ; Zero it
+                    MOVE.W  #example,D0         ; We'll play with it here
+                    MOVE.B  #7,D1           ; Shift 7 bits left 
+                    ASL.W   D1,D0            ; 0011 1010 0100 0100 to 0010 0000 0000 0000
+                    MOVE.B  #13,D1           ; Shift 13 bits right
+                    ASR.W   D1,D0             ; 0010 0000 0000 0000 to 0000 0000 0000 0001
+  
+                    
+                    MULU    #6,D0               ; Form offset (move 6 bytes in memory for every 'JMP' command)
+                    JSR     0(A0,D0)            ; Jump indirect with index, i.e. jump to 'table' + displacement                
+
+tableMOVEA_WorMOVE_W    JMP     MOVEWcode000
+                        JMP     MOVEAWcode001
+                        JMP     MOVEWcode010
+                        JMP     MOVEWcode011
+                        JMP     MOVEWcode100
+                        JMP     MOVEWcode101
+                        JMP     MOVEWcode110
+                        JMP     MOVEWcode111
+                          
+MOVEWcode000     JSR     ISMOVEW
+                JSR    DONE
+MOVEAWcode001    JSR     ISMOVEAW
+                JSR    DONE
+MOVEWcode010     JSR     ISMOVEW
+                JSR    DONE
+MOVEWcode011     JSR     ISMOVEW
+                JSR    DONE
+MOVEWcode100     JSR     ISMOVEW
+                JSR    DONE
+MOVEWcode101     JSR     ISMOVEW
+                JSR    DONE
+MOVEWcode110     JSR     ISMOVEW
+                JSR    DONE
+MOVEWcode111     JSR     ISMOVEW 
+                JSR    DONE
+*****************************END MOVEA_WorMOVE_W ************************************
+
 
 
 
@@ -205,10 +251,19 @@ MAYBEMOVEW   MOVE.W #$4000, D3
              MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
              RTS                          ; Exit subroutine
          
-ISMOVEW     LEA MESSAGEMOVEW, A1         *OPCODE is MOVE.W so display NOP message
+ISMOVEW     MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
+            LEA MESSAGEMOVEW, A1         *OPCODE is MOVE.W so display NOP message
             MOVE.B  #14, D0
             TRAP    #15
+   
+            MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
+            RTS                          ; Exit subroutine
             
+ISMOVEAW    MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
+            LEA MESSAGEMOVEAW, A1         *OPCODE is MOVE.W so display NOP message
+            MOVE.B  #14, D0
+            TRAP    #15
+   
             MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
             RTS                          ; Exit subroutine
 
@@ -382,6 +437,7 @@ MESSAGEADDIL DC.B    'ADDI.L',CR,LF, 0
 MESSAGEADDIB DC.B    'ADDI.B',CR,LF, 0 
 
 MESSAGEMOVEAL DC.B    'MOVEA.L',CR,LF, 0 
+MESSAGEMOVEAW DC.B    'MOVEA.W',CR,LF, 0 
 
     SIMHALT             ; halt simulator
 
