@@ -8,9 +8,49 @@
 *              addressing modes.
 *
 * VERSION: 0.2 - Initial List
+*
+*              Addressing Modes
+*
+*                Data Register Direct
+*                Address Register Direct
+*                Address Register Indirect
+*                Immediate Data
+*                Address Register Indirect with Post Increment
+*                Address Register Indirect with Pre Decremet
+*                Absolute Long Address
+*                Absolute Word Address
+*
+*              Instructions
+*
+*                NOP
+*                MOVE
+*                MOVEA
+*                MOVEQ
+*                MOVEM
+*                ADD
+*                ADDA
+*                ADDI
+*                ADDQ
+*                SUB
+*                MULS
+*                DIVU
+*                LEA
+*                CLR
+*                AND
+*                OR
+*                LSL
+*                LSR
+*                ASR
+*                ASL
+*                ROL
+*                ROR
+*                CMP
+*                Bcc (BCC, BGT, BLE)
+*                JSR
+*                RTS
+*
 *-----------------------------------------------------------
-    ORG    $1000
-START:                  ; first instruction of program
+START:  ORG    $1000                ; first instruction of program
 
 *Addressing Modes
 *
@@ -25,32 +65,40 @@ START:                  ; first instruction of program
 *
 *Instructions
 *
-*  NOP
-*  MOVE
-*  MOVEQ
-*  MOVEM
-*  ADD
-*  ADDA
-*  ADDI
-*  SUB
-*  MULS
-*  DIVU
-*  LEA
-*  CLR
-*  AND
-*  LSL
-*  ASR
-*  ROL
-*  CMP
-*  Bcc (BCC, BGT, BLE)
-*  JSR
-*  RTS
+*   NOP
+*   MOVE
+*   MOVEA
+*   MOVEQ
+*   MOVEM
+*   ADD
+*   ADDA
+*   ADDI
+*   ADDQ
+*   SUB
+*   MULS
+*   DIVU
+*   LEA
+*   CLR
+*   AND
+*   OR
+*   LSL
+*   LSR
+*   ASR
+*   ASL
+*   ROL
+*   ROR
+*   CMP
+*   Bcc (BCC, BGT, BLE)
+*   JSR
+*   RTS 
 
     SIMHALT             ; halt simulator
 
 * Put variables and constants here
 
     END    START        ; last line of source
+
+
 
 
 

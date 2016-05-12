@@ -22,20 +22,26 @@
 *
 *                NOP
 *                MOVE
+*                MOVEA
 *                MOVEQ
 *                MOVEM
 *                ADD
 *                ADDA
 *                ADDI
+*                ADDQ
 *                SUB
 *                MULS
 *                DIVU
 *                LEA
 *                CLR
 *                AND
+*                OR
 *                LSL
+*                LSR
 *                ASR
+*                ASL
 *                ROL
+*                ROR
 *                CMP
 *                Bcc (BCC, BGT, BLE)
 *                JSR
