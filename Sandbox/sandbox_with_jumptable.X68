@@ -25,7 +25,10 @@ START:                  ; first instruction of program
 *example EQU     %0100100111010101      ; 0100 1001 1101 0101 = LEA D5, (A5)
 *example EQU     %0100111001110101  ; RTS  = 0100 1110 0111 0101
 *example EQU     %0100001010000111  ; CLR.L  = 0100 0010 1000 0111
-example EQU     %0100111010010110  ; JSR (A6)  = 0100 1110 1001 0110
+*example EQU     %0100001000000111  ; CLR.B  = 0100 0010 0000 0111
+example EQU     %0100001001000111  ; CLR.W  = 0100 0010 0100 0111
+
+*example EQU     %0100111010010110  ; JSR (A6)  = 0100 1110 1001 0110
 
 shift   EQU     12                  ; Shift 12 bits 
 
@@ -79,6 +82,34 @@ code1101 STOP  #$2700
 code1110 STOP  #$2700
 code1111 STOP  #$2700
 
+*****************************someCLR ************************************
+someCLR     LEA     STACK,SP            ; Load the SP
+                    LEA     tableSomeCLR, A0            ; Index into the table
+                    CLR.L   D0                  ; Zero it
+                    MOVE.W  #example,D0         ; We'll play with it here
+                    MOVE.B  #8,D1           ; Shift 9 bits left 
+                    ASL.W   D1,D0            
+                    MOVE.B  #shift,D1           ; Shift 12 bits to the right  
+                    LSR.W   D1,D0               ; Move the bits (moves highest 4 bits to lowest 4 positions,
+                                    ; and the rest are zeroed out)           
+                    MOVE.B  #2,D1           ; Shift 2 bits right
+                    ASR.W   D1,D0 
+                    
+                    MULU    #6,D0               ; Form offset (move 6 bytes in memory for every 'JMP' command)
+                    JSR     0(A0,D0)            ; Jump indirect with index, i.e. jump to 'table' + displacement                
+
+tableSomeCLR        JMP     CLRcode00   *CLR.B
+                    JMP     CLRcode01   *CLR.W                                      
+                    JMP     CLRcode10   *CLR.L
+
+CLRcode00   JSR     ISCLRB
+            JSR     DONE
+CLRcode01   JSR     ISCLRW  
+            JSR     DONE                                 
+CLRcode10   JSR     ISCLRL  
+            JSR     DONE                    
+
+*****************************END someCLR ************************************
 
 *****************************NOPorCLRorRTSorJSR ************************************
 NOPorCLRorRTSorJSR     LEA     STACK,SP            ; Load the SP
@@ -127,7 +158,7 @@ NOPcommand          JSR     ISNOP
                     JSR     DONE                                                                  
 JSRorCLRcode0000     STOP  #$2700
 JSRorCLRcode0001     STOP  #$2700
-JSRorCLRcode0010    JSR      ISCLR
+JSRorCLRcode0010    JSR      someCLR
                     JSR     DONE
 JSRorCLRcode0011     STOP  #$2700
 JSRorCLRcode0100     STOP  #$2700
@@ -348,6 +379,30 @@ MOVEWcode111     JSR     ISMOVEW
                 JSR    DONE
 *****************************END MOVEA_WorMOVE_W ************************************
 
+ISCLRB    MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
+            LEA MESSAGECLRB, A1         *OPCODE is CLR.B
+            MOVE.B  #14, D0
+            TRAP    #15
+   
+            MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
+            RTS
+
+ISCLRW    MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
+            LEA MESSAGECLRW, A1         *OPCODE is CLR.B
+            MOVE.B  #14, D0
+            TRAP    #15
+   
+            MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
+            RTS
+
+ISCLRL    MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
+            LEA MESSAGECLRL, A1         *OPCODE is CLR.B
+            MOVE.B  #14, D0
+            TRAP    #15
+   
+            MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
+            RTS
+            
 ISMOVEML    MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
             LEA MESSAGEMOVEML, A1         *OPCODE is MOVE.L so display MOVE.L message
             MOVE.B  #14, D0
@@ -492,6 +547,10 @@ MESSAGECLR DC.B    'CLR',CR,LF, 0
 MESSAGERTS DC.B    'RTS',CR,LF, 0
 
 MESSAGELEA DC.B    'LEA',CR,LF, 0
+
+MESSAGECLRB DC.B    'CLR.B',CR,LF, 0 
+MESSAGECLRW DC.B    'CLR.W',CR,LF, 0
+MESSAGECLRL DC.B    'CLR.L',CR,LF, 0
 
     SIMHALT             ; halt simulator
 
