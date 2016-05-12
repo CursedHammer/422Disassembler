@@ -62,9 +62,8 @@ START:  ORG    $1000                ; first instruction of program
 *  Immediate Data
 *  Absolute Long Address
 *  Absolute Word Address
-*
-*Instructions
 
+*-------Instructions----------------------------------------
 *--NOP------------------------------------------------------
 NOP     NOP
 *--MOVE-----------------------------------------------------
@@ -236,10 +235,12 @@ MOVEAL  MOVEA.L     D0, A0
         MOVEA.L     -(A1), A0
         MOVEA.L     #$ABCD1234, A0
         MOVEA.L     $2000, A0
-        MOVEA.L     $FFFC2000, A0
-*   
-*   MOVEQ
-*   MOVEM
+        MOVEA.L     $FFFC2000, A0 
+*--MOVEQ----------------------------------------------------
+MOVEQ   MOVEQ       #-3, D0
+*--MOVEM----------------------------------------------------
+MOVEMW
+MOVEML
 *   ADD
 *   ADDA
 *   ADDI
