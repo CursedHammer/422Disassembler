@@ -212,8 +212,32 @@ MOVEL   MOVE.L      D0, D1
         MOVE.L      $FFFC2000, -(A0)
         MOVE.L      $FFFC2000, $2000
         MOVE.L      $FFFC2000, $FFFC2000
-
-*   MOVEA
+*--MOVEA----------------------------------------------------
+MOVEAB  MOVEA.B     D0, A0
+        MOVEA.B     A1, A0
+        MOVEA.B     (A1), A0
+        MOVEA.B     (A1)+, A0
+        MOVEA.B     -(A1), A0
+        MOVEA.B     #$AB, A0
+        MOVEA.B     $2000, A0
+        MOVEA.B     $FFFC2000, A0
+MOVEAW  MOVEA.W     D0, A0
+        MOVEA.W     A1, A0
+        MOVEA.W     (A1), A0
+        MOVEA.W     (A1)+, A0
+        MOVEA.W     -(A1), A0
+        MOVEA.W     #$ABCD, A0
+        MOVEA.W     $2000, A0
+        MOVEA.W     $FFFC2000, A0
+MOVEAL  MOVEA.L     D0, A0
+        MOVEA.L     A1, A0
+        MOVEA.L     (A1), A0
+        MOVEA.L     (A1)+, A0
+        MOVEA.L     -(A1), A0
+        MOVEA.L     #$ABCD1234, A0
+        MOVEA.L     $2000, A0
+        MOVEA.L     $FFFC2000, A0
+*   
 *   MOVEQ
 *   MOVEM
 *   ADD
