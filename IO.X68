@@ -62,6 +62,8 @@ INTRO     DC.B  'WELCOME!',CR,LF,'This is a 68K disassembler.',CR,LF,0
 PROMPT1   DC.B  'Please enter the starting address to be read (hex): 0x',0
 PROMPT2   DC.B  'Please enter the ending address to be read (hex): 0x',0
 
+BUFFER    DS.B    80                 ; input string for starting address
+
 MESSAGE3  DC.B  CR,LF,'',CR,LF,0
 MESSAGE4  DC.B  '',CR,LF,0
 MESSAGE5  DC.B  '',CR,LF,0
@@ -69,6 +71,7 @@ MESSAGE5  DC.B  '',CR,LF,0
 ILLEGAL  DC.B  '1000    DATA    $WXYZ',CR,LF,0
 
 ENDL     DC.B  CR,LF,0
+
 
 
 
