@@ -22,7 +22,7 @@ LF      EQU         $0A
 * Prints welcome messages and gathers initial parameters
 *-----------------------------------------------------------
 IO_WELCOME:
-        MOVEM.W     A0-A6/D0-D7, -(SP) ; Save registers
+        MOVEM.L     A0-A6/D0-D7, -(SP) ; Save registers
         
 *       Print Welcome Message
 *       --------------------- 
@@ -53,7 +53,7 @@ IO_WELCOME:
        
         *@histamineblkr: I think you continue working from here
         
-        MOVEM.W     (SP)+, A0-A6/D0-D7 ; Restore registers
+        MOVEM.L     (SP)+, A0-A6/D0-D7 ; Restore registers
         RTS                         ; Exit subroutine
 
 *---------- Variables and Constants ------------------------
@@ -69,6 +69,7 @@ MESSAGE5 DC.B       '',CR,LF,0
 ILLEGAL DC.B        '1000    DATA    $WXYZ',CR,LF,0
 
 ENDL    DC.B        CR,LF,0
+
 
 
 
