@@ -239,9 +239,27 @@ MOVEAL  MOVEA.L     D0, A0
 *--MOVEQ----------------------------------------------------
 MOVEQ   MOVEQ       #-3, D0
 *--MOVEM----------------------------------------------------
-MOVEMW
-MOVEML
-*   ADD
+TESTSTACK EQU       $7000           ; printed out as errors in output
+        LEA         TESTSTACK, SP   ; SP is stored in A7
+MOVEMW  MOVEM.W     A0-A6/D0-D7, (SP)
+        MOVEM.W     A0-A6/D0-D7, -(SP)
+        MOVEM.W     A1-A5/D3        ; test different registers...add more here?
+        MOVEM.W     A0-A6/D0-D7, $2000
+        MOVEM.W     A0-A6/D0-D7, $FFFC2000
+        MOVEM.W     (SP) , A0-A6/D0-D7
+        MOVEM.W     (SP)+, A0-A6/D0-D7
+        MOVEM.W     $2000, A0-A6/D0-D7
+        MOVEM.W     $FFFC2000, A0-A6/D0-D7
+MOVEML  MOVEM.L     A0-A6/D0-D7, (SP)
+        MOVEM.L     A0-A6/D0-D7, -(SP)
+        MOVEM.L     A1-A5/D3        ; test different registers...add more here?
+        MOVEM.L     A0-A6/D0-D7, $2000
+        MOVEM.L     A0-A6/D0-D7, $FFFC2000
+        MOVEM.L     (SP) , A0-A6/D0-D7
+        MOVEM.L     (SP)+, A0-A6/D0-D7
+        MOVEM.L     $2000, A0-A6/D0-D7
+        MOVEM.L     $FFFC2000, A0-A6/D0-D7
+*--ADD------------------------------------------------------
 *   ADDA
 *   ADDI
 *   ADDQ
