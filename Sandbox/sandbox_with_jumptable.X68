@@ -26,8 +26,8 @@ START:                  ; first instruction of program
 *example EQU     %0100111001110101  ; RTS  = 0100 1110 0111 0101
 *example EQU     %0100001010000111  ; CLR.L  = 0100 0010 1000 0111
 *example EQU     %0100001000000111  ; CLR.B  = 0100 0010 0000 0111
-example EQU     %0100001001000111  ; CLR.W  = 0100 0010 0100 0111
-
+*example EQU     %0100001001000111  ; CLR.W  = 0100 0010 0100 0111
+example EQU     %0111111011111111   ;   MOVEQ.L #%11111111, D7 = 0111 1110 1111 1111
 *example EQU     %0100111010010110  ; JSR (A6)  = 0100 1110 1001 0110
 
 shift   EQU     12                  ; Shift 12 bits 
@@ -51,7 +51,7 @@ table   JMP     code0000        ; ADDI.B, ADDI.W, or ADDI.L
         JMP     code0100        ; NOP or MOVEM.W or MOVEM.L or LEA or CLR.B or CLR.W or CLR.L or JSR or RTS
         JMP     code0101
         JMP     code0110
-        JMP     code0111
+        JMP     code0111        ; MOVEQ.L
         JMP     code1000
         JMP     code1001
         JMP     code1010
@@ -72,7 +72,7 @@ code0100 JSR    NOP_MOVEM_LEA_JSR_CLR_RTS
          JSR    DONE
 code0101 STOP  #$2700
 code0110 STOP  #$2700
-code0111 STOP  #$2700
+code0111 JSR    ISMOVEQL
 code1000 STOP  #$2700
 code1001 STOP  #$2700
 code1010 STOP  #$2700
@@ -379,6 +379,14 @@ MOVEWcode111     JSR     ISMOVEW
                 JSR    DONE
 *****************************END MOVEA_WorMOVE_W ************************************
 
+ISMOVEQL    MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
+            LEA MESSAGEMOVEQL, A1         *OPCODE is CLR.B
+            MOVE.B  #14, D0
+            TRAP    #15
+   
+            MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
+            RTS
+
 ISCLRB    MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
             LEA MESSAGECLRB, A1         *OPCODE is CLR.B
             MOVE.B  #14, D0
@@ -552,11 +560,14 @@ MESSAGECLRB DC.B    'CLR.B',CR,LF, 0
 MESSAGECLRW DC.B    'CLR.W',CR,LF, 0
 MESSAGECLRL DC.B    'CLR.L',CR,LF, 0
 
+MESSAGEMOVEQL DC.B    'MOVEQ.L',CR,LF, 0
+
     SIMHALT             ; halt simulator
 
 * Put variables and constants here
 
     END    START        ; last line of source
+
 
 
 
