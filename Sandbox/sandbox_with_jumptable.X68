@@ -66,7 +66,17 @@ START:                  ; first instruction of program
 *example EQU     %1100100010000011 ; AND.L D3, D4 = 1100 100 010 000 011
 *example EQU     %1100011110000100 ; AND.L D4, D3 = 1100 011 110 000 100
 
-example EQU     %1100100111000011 ; MULS.W D3, D4 = 1100 100 111 000 011
+*example EQU     %1100100111000011 ; MULS.W D3, D4 = 1100 100 111 000 011
+
+*example EQU     %0100110000000011 ; MULS.L D3, D4 = 01001 1 0000 000 011
+
+*example EQU     %0100100010010100 ; MOVEM.W (A4), (D16A6) = 0100 1000 10 010 100
+*example EQU     %0100110010101110 ; MOVEM.W (D16A6), (A4) = 0100 1100 10 101 110
+
+*example EQU     %0100100011010100 ; MOVEM.L (A4), (D16A6) = 0100 1000 11 010 100
+example EQU     %0100110011101110 ; MOVEM.L (D16A6), (A4) = 0100 1100 11 101 110
+
+
 
 shift   EQU     12                 ; Shift 12 bits 
 
@@ -86,7 +96,7 @@ table   JMP     code0000        ; ADDI.B, ADDI.W, or ADDI.L
         JMP     code0001        ; MOVE.B
         JMP     code0010        ; MOVEA.L or MOVE.L
         JMP     code0011        ; MOVEA.W or MOVE.W
-        JMP     code0100        ; NOP or MOVEM.W or MOVEM.L or LEA or CLR.B or CLR.W or CLR.L or JSR or RTS
+        JMP     code0100        ; NOP or MOVEM.W or MOVEM.L or LEA or CLR.B or CLR.W or CLR.L or JSR or RTS or MULS.W
         JMP     code0101        ; ADDQ.B or ADDQ.W or ADDQ.L
         JMP     code0110
         JMP     code0111        ; MOVEQ.L
@@ -427,19 +437,20 @@ someMOVEM     LEA     STACK,SP            ; Load the SP
                     MOVE.B  #shift,D1           ; Shift 12 bits to the right  
                     LSR.W   D1,D0               ; Move the bits (moves highest 4 bits to lowest 4 positions,
                                     ; and the rest are zeroed out)           
-  
+                    MOVE.B  #3,D1           ; Shift 3 bits right
+                    ASR.W   D1,D0  
                     
                     MULU    #6,D0               ; Form offset (move 6 bytes in memory for every 'JMP' command)
                     JSR     0(A0,D0)            ; Jump indirect with index, i.e. jump to 'table' + displacement                
 
-tableSomeMOVEM    JMP     MOVEMcode00   ;MOVEM.W
-                  JMP     MOVEMcode01   ;MOVEM.L                                      
+tableSomeMOVEM    JMP     MOVEMcode0   ;MOVEM.W
+                  JMP     MOVEMcode1   ;MOVEM.L                                      
                       
 
                           
-MOVEMcode00         JSR     ISMOVEMW
+MOVEMcode0         JSR     ISMOVEMW
                     JSR     DONE
-MOVEMcode01         JSR     ISMOVEML
+MOVEMcode1         JSR     ISMOVEML
                     JSR     DONE
 
 *****************************END someMOVEM ************************************
@@ -452,7 +463,7 @@ NOP_MOVEM_LEA_JSR_CLR_RTS     LEA     STACK,SP            ; Load the SP
                     MOVE.B  #7,D1           ; Shift 7 bits right 
                     ASR.W   D1,D0 
 
-                    MOVE.B  #13,D1           ; Shift 6 bits left 
+                    MOVE.B  #13,D1           ; Shift 13 bits left 
                     ASL.W   D1,D0            
                     MOVE.B  #shift,D1           ; Shift 12 bits to the right  
                     LSR.W   D1,D0               ; Move the bits (moves highest 4 bits to lowest 4 positions,
@@ -480,27 +491,27 @@ tableNOP_MOVEM_LEA_JSR_CLR_RTS    JMP     LOTScode0000
                       
 
                           
-LOTScode0000       STOP  #$2700
-LOTScode0001       STOP  #$2700
+LOTScode0000        JSR   ISMULSL
+LOTScode0001        STOP  #$2700
 LOTScode0010        JSR    someMOVEM
-                   JSR    DONE
-LOTScode0011       STOP  #$2700                   
+                    JSR    DONE
+LOTScode0011        STOP  #$2700                   
 LOTScode0100        STOP  #$2700
 LOTScode0101        STOP  #$2700
 LOTScode0110        JSR    ISLEA  
-                   JSR    DONE 
+                    JSR    DONE 
 LOTScode0111        STOP  #$2700 
 LOTScode1000        JSR    NOPorCLRorRTSorJSR
-                   JSR    DONE
+                    JSR    DONE
 LOTScode1001        STOP  #$2700               
 LOTScode1010        JSR    NOPorCLRorRTSorJSR
-                   JSR    DONE
+                    JSR    DONE
 LOTScode1011        STOP  #$2700                   
 LOTScode1100        STOP  #$2700
-LOTScode1101     STOP  #$2700
+LOTScode1101        STOP  #$2700
 LOTScode1110        JSR    ISLEA 
-                   JSR    DONE
-LOTScode1111       STOP  #$2700                
+                    JSR    DONE
+LOTScode1111        STOP  #$2700                
                    
 *****************************END NOP_MOVEM_LEA_JSR_CLR_RTS ************************************
 
@@ -617,6 +628,14 @@ MOVEWcode110     JSR     ISMOVEW
 MOVEWcode111     JSR     ISMOVEW 
                 JSR    DONE
 *****************************END MOVEA_WorMOVE_W ************************************
+
+ISMULSL  MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
+            LEA MESSAGEMULSL, A1         *OPCODE is MULS.L
+            MOVE.B  #14, D0
+            TRAP    #15
+   
+            MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
+            RTS
 
 ISMULSW  MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
             LEA MESSAGEMULSW, A1         *OPCODE is MULS.W
@@ -969,12 +988,14 @@ MESSAGEANDW DC.B    'AND.W',CR,LF, 0
 MESSAGEANDL DC.B    'AND.L',CR,LF, 0
 
 MESSAGEMULSW DC.B    'MULS.W',CR,LF, 0
+MESSAGEMULSL DC.B    'MULS.L',CR,LF, 0
 
     SIMHALT             ; halt simulator
 
 * Put variables and constants here
 
     END    START        ; last line of source
+
 
 
 
