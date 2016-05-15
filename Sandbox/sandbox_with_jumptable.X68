@@ -52,7 +52,10 @@ START:                  ; first instruction of program
 *example EQU     %1101100001000011 ; ADD.W D4, D3 = 1101 100 001 000 011
 
 *example EQU     %1101100110000011 ; ADD.L D3, D4 = 1101 100 110 000 011
-example EQU     %1101100010000011 ; ADD.L D4, D3 = 1101 100 010 000 011
+*example EQU     %1101100010000011 ; ADD.L D4, D3 = 1101 100 010 000 011
+
+*example EQU     %1101100011000011 ; ADDA.W D3, A4 = 1101 100 011 000 011
+example EQU     %1101100111000011 ; ADDA.L D3, A4 = 1101 100 111 000 011
 
 shift   EQU     12                 ; Shift 12 bits 
 
@@ -131,11 +134,11 @@ tableADD_BorADD_WorADD_L         JMP    ADDcode000   *ADD.B
                                  JMP    ADDcode001   *ADD.W                                      
                                  JMP    ADDcode010   *ADD.L
                                  
-                                 JMP    ADDcode011   
+                                 JMP    ADDcode011   *ADDA.W
                                  JMP    ADDcode100   *ADD.B
                                  JMP    ADDcode101   *ADD.W 
                                  JMP    ADDcode110   *ADD.L
-   
+                                 JMP    ADDcode111   *ADDA.L
 
 
 ADDcode000   JSR     ISADDB
@@ -144,13 +147,16 @@ ADDcode001   JSR     ISADDW
              JSR     DONE                                 
 ADDcode010   JSR     ISADDL 
              JSR     DONE  
-ADDcode011   STOP  #$2700 
+ADDcode011   JSR     ISADDAW
+             JSR     DONE
 ADDcode100   JSR     ISADDB
              JSR     DONE
 ADDcode101   JSR     ISADDW  
              JSR     DONE                                 
 ADDcode110   JSR     ISADDL 
              JSR     DONE 
+ADDcode111   JSR     ISADDAL
+             JSR     DONE
    
 ***************************** END  ADD_BorADD_WorADD_L ************************************
 
@@ -555,6 +561,22 @@ MOVEWcode111     JSR     ISMOVEW
                 JSR    DONE
 *****************************END MOVEA_WorMOVE_W ************************************
 
+ISADDAW  MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
+            LEA MESSAGEADDAW, A1         *OPCODE is SUB.W
+            MOVE.B  #14, D0
+            TRAP    #15
+   
+            MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
+            RTS
+            
+ISADDAL  MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
+            LEA MESSAGEADDAL, A1         *OPCODE is SUB.L
+            MOVE.B  #14, D0
+            TRAP    #15
+   
+            MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
+            RTS 
+
 ISADDB  MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
             LEA MESSAGEADDB, A1         *OPCODE is SUB.B
             MOVE.B  #14, D0
@@ -847,6 +869,9 @@ MESSAGESUBL DC.B    'SUB.L',CR,LF, 0
 MESSAGEADDB DC.B    'ADD.B',CR,LF, 0 
 MESSAGEADDW DC.B    'ADD.W',CR,LF, 0
 MESSAGEADDL DC.B    'ADD.L',CR,LF, 0
+
+MESSAGEADDAW DC.B    'ADDA.W',CR,LF, 0
+MESSAGEADDAL DC.B    'ADDA.L',CR,LF, 0
 
 MESSAGEMOVEQL DC.B    'MOVEQ.L',CR,LF, 0
 

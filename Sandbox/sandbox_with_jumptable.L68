@@ -1,6 +1,6 @@
 00001000 Starting Address
 Assembler used: EASy68K Editor/Assembler v5.15.04
-Created On: 5/14/2016 6:57:13 PM
+Created On: 5/14/2016 7:11:02 PM
 
 00000000                             1  *-----------------------------------------------------------
 00000000                             2  * Title      : NOP check
@@ -56,809 +56,834 @@ Created On: 5/14/2016 6:57:13 PM
 00001000                            52  *example EQU     %1101100001000011 ; ADD.W D4, D3 = 1101 100 001 000 011
 00001000                            53  
 00001000                            54  *example EQU     %1101100110000011 ; ADD.L D3, D4 = 1101 100 110 000 011
-00001000  =0000D883                 55  example EQU     %1101100010000011 ; ADD.L D4, D3 = 1101 100 010 000 011
+00001000                            55  *example EQU     %1101100010000011 ; ADD.L D4, D3 = 1101 100 010 000 011
 00001000                            56  
-00001000  =0000000C                 57  shift   EQU     12                 ; Shift 12 bits 
-00001000                            58  
-00001000                            59  * Program starts here
-00001000                            60  
-00001000  4FF8 7000                 61          LEA     STACK,SP            ; Load the SP
-00001004  41F9 0000101E             62          LEA     table,A0            ; Index into the table
-0000100A  4280                      63          CLR.L   D0                  ; Zero it
-0000100C  303C D883                 64          MOVE.W  #example,D0         ; We'll play with it here
-00001010  123C 000C                 65          MOVE.B  #shift,D1           ; Shift 12 bits to the right  
-00001014  E268                      66          LSR.W   D1,D0               ; Move the bits (moves highest 4 bits to lowest 4 positions,
-00001016                            67                                      ; and the rest are zeroed out)
-00001016  C0FC 0006                 68          MULU    #6,D0               ; Form offset (move 6 bytes in memory for every 'JMP' command)
-0000101A  4EB0 0000                 69          JSR     0(A0,D0)            ; Jump indirect with index, i.e. jump to 'table' + displacement                
-0000101E                            70  
-0000101E  4EF9 0000107E             71  table   JMP     code0000        ; ADDI.B, ADDI.W, or ADDI.L
-00001024  4EF9 00001084             72          JMP     code0001        ; MOVE.B
-0000102A  4EF9 00001090             73          JMP     code0010        ; MOVEA.L or MOVE.L
-00001030  4EF9 00001096             74          JMP     code0011        ; MOVEA.W or MOVE.W
-00001036  4EF9 0000109C             75          JMP     code0100        ; NOP or MOVEM.W or MOVEM.L or LEA or CLR.B or CLR.W or CLR.L or JSR or RTS
-0000103C  4EF9 000010A8             76          JMP     code0101        ; ADDQ.B or ADDQ.W or ADDQ.L
-00001042  4EF9 000010B4             77          JMP     code0110
-00001048  4EF9 000010B8             78          JMP     code0111        ; MOVEQ.L
-0000104E  4EF9 000010C4             79          JMP     code1000
-00001054  4EF9 000010C8             80          JMP     code1001        ; SUB.B or SUB.W or SUB.L
-0000105A  4EF9 000010D4             81          JMP     code1010
-00001060  4EF9 000010D8             82          JMP     code1011        ; CMP.B or CMP.W or CMP.L
-00001066  4EF9 000010E4             83          JMP     code1100
-0000106C  4EF9 000010E8             84          JMP     code1101        ; ADD.B or ADD.W or ADD.L
-00001072  4EF9 000010F4             85          JMP     code1110
-00001078  4EF9 000010F8             86          JMP     code1111
-0000107E                            87         
-0000107E                            88  *The following subroutines will get filled in as you decode the instructions . For *now, just exit gracefully.
-0000107E                            89  
-0000107E  4EB9 00001588             90  code0000 JSR   ADDI_BorADDI_WorADDI_L
-00001084  4EB9 0000199C             91  code0001 JSR   ISMOVEB
-0000108A  4EB9 000019F4             92           JSR   DONE
-00001090  4EB9 000015E2             93  code0010 JSR   MOVEA_LorMOVE_L        ; MOVEA.L or MOVE.L
-00001096  4EB9 00001696             94  code0011 JSR  MOVEA_WorMOVE_W        ; MOVEA.W or MOVE.W
-0000109C  4EB9 000014A2             95  code0100 JSR    NOP_MOVEM_LEA_JSR_CLR_RTS
-000010A2  4EB9 000019F4             96           JSR    DONE
-000010A8  4EB9 0000129C             97  code0101 JSR    ADDQ_BorADDQ_WorADDQ_L
-000010AE  4EB9 000019F4             98           JSR    DONE
-000010B4  4E72 2700                 99  code0110 STOP  #$2700
-000010B8  4EB9 00001852            100  code0111 JSR    ISMOVEQL
-000010BE  4EB9 000019F4            101           JSR    DONE
-000010C4  4E72 2700                102  code1000 STOP  #$2700
-000010C8  4EB9 0000119C            103  code1001 JSR    SUB_BorSUB_WorSUB_L
-000010CE  4EB9 000019F4            104           JSR    DONE
-000010D4  4E72 2700                105  code1010 STOP  #$2700
-000010D8  4EB9 0000123C            106  code1011 JSR    CMP_BorCMP_WorCMP_L
-000010DE  4EB9 000019F4            107           JSR DONE
-000010E4  4E72 2700                108  code1100 STOP  #$2700
-000010E8  4EB9 000010FC            109  code1101 JSR    ADD_BorADD_WorADD_L
-000010EE  4EB9 000019F4            110           JSR    DONE
-000010F4  4E72 2700                111  code1110 STOP  #$2700
-000010F8  4E72 2700                112  code1111 STOP  #$2700
-000010FC                           113  
-000010FC                           114  *****************************  ADD_BorADD_WorADD_L ************************************
-000010FC  4FF8 7000                115  ADD_BorADD_WorADD_L     LEA     STACK,SP            ; Load the SP
-00001100  41F9 00001126            116                      LEA     tableADD_BorADD_WorADD_L, A0            ; Index into the table
-00001106  4280                     117                      CLR.L   D0                  ; Zero it
-00001108  303C D883                118                      MOVE.W  #example,D0         ; We'll play with it here
-0000110C  123C 0007                119                      MOVE.B  #7,D1           ; Shift 7 bits left 
-00001110  E360                     120                      ASL.W   D1,D0            
-00001112  123C 000C                121                      MOVE.B  #shift,D1           ; Shift 12 bits to the right  
-00001116  E268                     122                      LSR.W   D1,D0               ; Move the bits (moves highest 4 bits to lowest 4 positions,
-00001118                           123                                      ; and the rest are zeroed out)           
-00001118  123C 0001                124                      MOVE.B  #1,D1           ; Shift 1 bits right
-0000111C  E260                     125                      ASR.W   D1,D0 
-0000111E                           126                      
-0000111E  C0FC 0006                127                      MULU    #6,D0               ; Form offset (move 6 bytes in memory for every 'JMP' command)
-00001122  4EB0 0000                128                      JSR     0(A0,D0)            ; Jump indirect with index, i.e. jump to 'table' + displacement                
-00001126                           129  
-00001126  4EF9 00001150            130  tableADD_BorADD_WorADD_L         JMP    ADDcode000   *ADD.B
-0000112C  4EF9 0000115C            131                                   JMP    ADDcode001   *ADD.W                                      
-00001132  4EF9 00001168            132                                   JMP    ADDcode010   *ADD.L
-00001138                           133                                   
-00001138  4EF9 00001174            134                                   JMP    ADDcode011   
-0000113E  4EF9 00001178            135                                   JMP    ADDcode100   *ADD.B
-00001144  4EF9 00001184            136                                   JMP    ADDcode101   *ADD.W 
-0000114A  4EF9 00001190            137                                   JMP    ADDcode110   *ADD.L
-00001150                           138     
-00001150                           139  
-00001150                           140  
-00001150  4EB9 0000174A            141  ADDcode000   JSR     ISADDB
-00001156  4EB9 000019F4            142               JSR     DONE
-0000115C  4EB9 00001760            143  ADDcode001   JSR     ISADDW  
-00001162  4EB9 000019F4            144               JSR     DONE                                 
-00001168  4EB9 00001776            145  ADDcode010   JSR     ISADDL 
-0000116E  4EB9 000019F4            146               JSR     DONE  
-00001174  4E72 2700                147  ADDcode011   STOP  #$2700 
-00001178  4EB9 0000174A            148  ADDcode100   JSR     ISADDB
-0000117E  4EB9 000019F4            149               JSR     DONE
-00001184  4EB9 00001760            150  ADDcode101   JSR     ISADDW  
-0000118A  4EB9 000019F4            151               JSR     DONE                                 
-00001190  4EB9 00001776            152  ADDcode110   JSR     ISADDL 
-00001196  4EB9 000019F4            153               JSR     DONE 
-0000119C                           154     
-0000119C                           155  ***************************** END  ADD_BorADD_WorADD_L ************************************
-0000119C                           156  
-0000119C                           157  *****************************  SUB_BorSUB_WorSUB_L ************************************
-0000119C  4FF8 7000                158  SUB_BorSUB_WorSUB_L     LEA     STACK,SP            ; Load the SP
-000011A0  41F9 000011C6            159                      LEA     tableSUB_BorSUB_WorSUB_L, A0            ; Index into the table
-000011A6  4280                     160                      CLR.L   D0                  ; Zero it
-000011A8  303C D883                161                      MOVE.W  #example,D0         ; We'll play with it here
-000011AC  123C 0007                162                      MOVE.B  #7,D1           ; Shift 7 bits left 
-000011B0  E360                     163                      ASL.W   D1,D0            
-000011B2  123C 000C                164                      MOVE.B  #shift,D1           ; Shift 12 bits to the right  
-000011B6  E268                     165                      LSR.W   D1,D0               ; Move the bits (moves highest 4 bits to lowest 4 positions,
-000011B8                           166                                      ; and the rest are zeroed out)           
-000011B8  123C 0001                167                      MOVE.B  #1,D1           ; Shift 1 bits right
-000011BC  E260                     168                      ASR.W   D1,D0 
-000011BE                           169                      
-000011BE  C0FC 0006                170                      MULU    #6,D0               ; Form offset (move 6 bytes in memory for every 'JMP' command)
-000011C2  4EB0 0000                171                      JSR     0(A0,D0)            ; Jump indirect with index, i.e. jump to 'table' + displacement                
-000011C6                           172  
-000011C6  4EF9 000011F0            173  tableSUB_BorSUB_WorSUB_L         JMP    SUBcode000   *SUB.B
-000011CC  4EF9 000011FC            174                                   JMP    SUBcode001   *SUB.W                                      
-000011D2  4EF9 00001208            175                                   JMP    SUBcode010   *SUB.L
-000011D8                           176                                   
-000011D8  4EF9 00001214            177                                   JMP    SUBcode011   
-000011DE  4EF9 00001218            178                                   JMP    SUBcode100   *SUB.B
-000011E4  4EF9 00001224            179                                   JMP    SUBcode101   *SUB.W 
-000011EA  4EF9 00001230            180                                   JMP    SUBcode110   *SUB.L
-000011F0                           181     
-000011F0                           182  
-000011F0                           183  
-000011F0  4EB9 0000178C            184  SUBcode000   JSR     ISSUBB
-000011F6  4EB9 000019F4            185               JSR     DONE
-000011FC  4EB9 000017A2            186  SUBcode001   JSR     ISSUBW  
-00001202  4EB9 000019F4            187               JSR     DONE                                 
-00001208  4EB9 000017B8            188  SUBcode010   JSR     ISSUBL 
-0000120E  4EB9 000019F4            189               JSR     DONE  
-00001214  4E72 2700                190  SUBcode011   STOP  #$2700 
-00001218  4EB9 0000178C            191  SUBcode100   JSR     ISSUBB
-0000121E  4EB9 000019F4            192               JSR     DONE
-00001224  4EB9 000017A2            193  SUBcode101   JSR     ISSUBW  
-0000122A  4EB9 000019F4            194               JSR     DONE                                 
-00001230  4EB9 000017B8            195  SUBcode110   JSR     ISSUBL 
-00001236  4EB9 000019F4            196               JSR     DONE 
-0000123C                           197     
-0000123C                           198  ***************************** END  SUB_BorSUB_WorSUB_L ************************************
-0000123C                           199  
-0000123C                           200  
-0000123C                           201  ***************************** CMP_BorCMP_WorCMP_L ************************************
-0000123C  4FF8 7000                202  CMP_BorCMP_WorCMP_L     LEA     STACK,SP            ; Load the SP
-00001240  41F9 00001266            203                      LEA     tableCMP_BorCMP_WorCMP_L, A0            ; Index into the table
-00001246  4280                     204                      CLR.L   D0                  ; Zero it
-00001248  303C D883                205                      MOVE.W  #example,D0         ; We'll play with it here
-0000124C  123C 0007                206                      MOVE.B  #7,D1           ; Shift 7 bits left 
-00001250  E360                     207                      ASL.W   D1,D0            
-00001252  123C 000C                208                      MOVE.B  #shift,D1           ; Shift 12 bits to the right  
-00001256  E268                     209                      LSR.W   D1,D0               ; Move the bits (moves highest 4 bits to lowest 4 positions,
-00001258                           210                                      ; and the rest are zeroed out)           
-00001258  123C 0001                211                      MOVE.B  #1,D1           ; Shift 1 bits right
-0000125C  E260                     212                      ASR.W   D1,D0 
-0000125E                           213                      
-0000125E  C0FC 0006                214                      MULU    #6,D0               ; Form offset (move 6 bytes in memory for every 'JMP' command)
-00001262  4EB0 0000                215                      JSR     0(A0,D0)            ; Jump indirect with index, i.e. jump to 'table' + displacement                
-00001266                           216  
-00001266  4EF9 00001278            217  tableCMP_BorCMP_WorCMP_L         JMP    CMPcode000   *CMP.B
-0000126C  4EF9 00001284            218                                   JMP    CMPcode001   *CMP.W                                      
-00001272  4EF9 00001290            219                                   JMP    CMPcode010   *CMP.L
-00001278                           220  
-00001278  4EB9 000017CE            221  CMPcode000   JSR     ISCMPB
-0000127E  4EB9 000019F4            222              JSR     DONE
-00001284  4EB9 000017E4            223  CMPcode001   JSR     ISCMPW  
-0000128A  4EB9 000019F4            224              JSR     DONE                                 
-00001290  4EB9 000017FA            225  CMPcode010   JSR     ISCMPL 
-00001296  4EB9 000019F4            226              JSR     DONE                    
-0000129C                           227  
-0000129C                           228  ***************************** END CMP_BorCMP_WorCMP_L ************************************
-0000129C                           229  
-0000129C                           230  
-0000129C                           231  ***************************** ADDQ_BorADDQ_WorADDQ_L ************************************
-0000129C  4FF8 7000                232  ADDQ_BorADDQ_WorADDQ_L     LEA     STACK,SP            ; Load the SP
-000012A0  41F9 000012C6            233                      LEA     tableADDQ_BorADDQ_WorADDQ_L, A0            ; Index into the table
-000012A6  4280                     234                      CLR.L   D0                  ; Zero it
-000012A8  303C D883                235                      MOVE.W  #example,D0         ; We'll play with it here
-000012AC  123C 0008                236                      MOVE.B  #8,D1           ; Shift 8 bits left 
-000012B0  E360                     237                      ASL.W   D1,D0            
-000012B2  123C 000C                238                      MOVE.B  #shift,D1           ; Shift 12 bits to the right  
-000012B6  E268                     239                      LSR.W   D1,D0               ; Move the bits (moves highest 4 bits to lowest 4 positions,
-000012B8                           240                                      ; and the rest are zeroed out)           
-000012B8  123C 0002                241                      MOVE.B  #2,D1           ; Shift 2 bits right
-000012BC  E260                     242                      ASR.W   D1,D0 
-000012BE                           243                      
-000012BE  C0FC 0006                244                      MULU    #6,D0               ; Form offset (move 6 bytes in memory for every 'JMP' command)
-000012C2  4EB0 0000                245                      JSR     0(A0,D0)            ; Jump indirect with index, i.e. jump to 'table' + displacement                
-000012C6                           246  
-000012C6  4EF9 000012D8            247  tableADDQ_BorADDQ_WorADDQ_L         JMP     ADDQcode00   *ADDQ.B
-000012CC  4EF9 000012E4            248                                      JMP     ADDQcode01   *ADDQ.W                                      
-000012D2  4EF9 000012F0            249                                      JMP     ADDQcode10   *ADDQ.L
-000012D8                           250  
-000012D8  4EB9 00001810            251  ADDQcode00   JSR     ISADDQB
-000012DE  4EB9 000019F4            252              JSR     DONE
-000012E4  4EB9 00001826            253  ADDQcode01   JSR     ISADDQW  
-000012EA  4EB9 000019F4            254              JSR     DONE                                 
-000012F0  4EB9 0000183C            255  ADDQcode10   JSR     ISADDQL 
-000012F6  4EB9 000019F4            256              JSR     DONE                    
-000012FC                           257  
-000012FC                           258  ***************************** END ADDQ_BorADDQ_WorADDQ_L ************************************
-000012FC                           259  
-000012FC                           260  
-000012FC                           261  *****************************someCLR ************************************
-000012FC  4FF8 7000                262  someCLR     LEA     STACK,SP            ; Load the SP
-00001300  41F9 00001326            263                      LEA     tableSomeCLR, A0            ; Index into the table
-00001306  4280                     264                      CLR.L   D0                  ; Zero it
-00001308  303C D883                265                      MOVE.W  #example,D0         ; We'll play with it here
-0000130C  123C 0008                266                      MOVE.B  #8,D1           ; Shift 8 bits left 
-00001310  E360                     267                      ASL.W   D1,D0            
-00001312  123C 000C                268                      MOVE.B  #shift,D1           ; Shift 12 bits to the right  
-00001316  E268                     269                      LSR.W   D1,D0               ; Move the bits (moves highest 4 bits to lowest 4 positions,
-00001318                           270                                      ; and the rest are zeroed out)           
-00001318  123C 0002                271                      MOVE.B  #2,D1           ; Shift 2 bits right
-0000131C  E260                     272                      ASR.W   D1,D0 
-0000131E                           273                      
-0000131E  C0FC 0006                274                      MULU    #6,D0               ; Form offset (move 6 bytes in memory for every 'JMP' command)
-00001322  4EB0 0000                275                      JSR     0(A0,D0)            ; Jump indirect with index, i.e. jump to 'table' + displacement                
-00001326                           276  
-00001326  4EF9 00001338            277  tableSomeCLR        JMP     CLRcode00   *CLR.B
-0000132C  4EF9 00001344            278                      JMP     CLRcode01   *CLR.W                                      
-00001332  4EF9 00001350            279                      JMP     CLRcode10   *CLR.L
-00001338                           280  
-00001338  4EB9 00001868            281  CLRcode00   JSR     ISCLRB
-0000133E  4EB9 000019F4            282              JSR     DONE
-00001344  4EB9 0000187E            283  CLRcode01   JSR     ISCLRW  
-0000134A  4EB9 000019F4            284              JSR     DONE                                 
-00001350  4EB9 00001894            285  CLRcode10   JSR     ISCLRL  
-00001356  4EB9 000019F4            286              JSR     DONE                    
-0000135C                           287  
-0000135C                           288  *****************************END someCLR ************************************
-0000135C                           289  
-0000135C                           290  *****************************NOPorCLRorRTSorJSR ************************************
-0000135C  4FF8 7000                291  NOPorCLRorRTSorJSR     LEA     STACK,SP            ; Load the SP
-00001360  41F9 00001394            292                      LEA     tableNOPorCLRorRTSorJSR, A0            ; Index into the table
-00001366  4280                     293                      CLR.L   D0                  ; Zero it
-00001368  303C D883                294                      MOVE.W  #example,D0         ; We'll play with it here
-0000136C                           295                      
-0000136C  323C 4E71                296                      MOVE.W  #%0100111001110001,D1  ; 0100111001110001 = NOP
-00001370  B240                     297                      CMP.W   D0, D1
-00001372  6700 008C                298                      BEQ     NOPcommand
-00001376                           299   
-00001376  323C 4E75                300                      MOVE.W  #%0100111001110101,D1  ; 0100111001110101 = RTS
-0000137A  B240                     301                      CMP.W   D0, D1
-0000137C  6700 0076                302                      BEQ     RTScommand
-00001380                           303    
-00001380  123C 0004                304                      MOVE.B  #4,D1           ; Shift 4 bits left 
-00001384  E360                     305                      ASL.W   D1,D0            
-00001386  123C 000C                306                      MOVE.B  #shift,D1           ; Shift 12 bits to the right  
-0000138A  E268                     307                      LSR.W   D1,D0               ; Move the bits (moves highest 4 bits to lowest 4 positions,
-0000138C                           308                                      ; and the rest are zeroed out)           
-0000138C                           309    
-0000138C                           310                      
-0000138C  C0FC 0006                311                      MULU    #6,D0               ; Form offset (move 6 bytes in memory for every 'JMP' command)
-00001390  4EB0 0000                312                      JSR     0(A0,D0)            ; Jump indirect with index, i.e. jump to 'table' + displacement                
-00001394                           313  
-00001394  4EF9 0000140C            314  tableNOPorCLRorRTSorJSR    JMP     JSRorCLRcode0000
-0000139A  4EF9 00001410            315                             JMP     JSRorCLRcode0001
-000013A0  4EF9 00001414            316                             JMP     JSRorCLRcode0010   
-000013A6  4EF9 0000141E            317                             JMP     JSRorCLRcode0011
-000013AC  4EF9 00001422            318                             JMP     JSRorCLRcode0100
-000013B2  4EF9 00001426            319                             JMP     JSRorCLRcode0101
-000013B8  4EF9 0000142A            320                             JMP     JSRorCLRcode0110
-000013BE  4EF9 0000142E            321                             JMP     JSRorCLRcode0111
-000013C4  4EF9 00001432            322                             JMP     JSRorCLRcode1000
-000013CA  4EF9 00001436            323                             JMP     JSRorCLRcode1001
-000013D0  4EF9 0000143A            324                             JMP     JSRorCLRcode1010
-000013D6  4EF9 0000143E            325                             JMP     JSRorCLRcode1011
-000013DC  4EF9 00001442            326                             JMP     JSRorCLRcode1100
-000013E2  4EF9 00001446            327                             JMP     JSRorCLRcode1101
-000013E8  4EF9 0000144A            328                             JMP     JSRorCLRcode1110
-000013EE  4EF9 00001456            329                             JMP     JSRorCLRcode1111
-000013F4                           330  
-000013F4  4EB9 00001902            331  RTScommand          JSR     ISRTS
-000013FA  4EB9 000019F4            332                      JSR     DONE
-00001400  4EB9 0000192E            333  NOPcommand          JSR     ISNOP 
-00001406  4EB9 000019F4            334                      JSR     DONE                                                                  
-0000140C  4E72 2700                335  JSRorCLRcode0000     STOP  #$2700
-00001410  4E72 2700                336  JSRorCLRcode0001     STOP  #$2700
-00001414  4EB8 12FC                337  JSRorCLRcode0010    JSR      someCLR
-00001418  4EB9 000019F4            338                      JSR     DONE
-0000141E  4E72 2700                339  JSRorCLRcode0011     STOP  #$2700
-00001422  4E72 2700                340  JSRorCLRcode0100     STOP  #$2700
-00001426  4E72 2700                341  JSRorCLRcode0101     STOP  #$2700
-0000142A  4E72 2700                342  JSRorCLRcode0110     STOP  #$2700
-0000142E  4E72 2700                343  JSRorCLRcode0111     STOP  #$2700
-00001432  4E72 2700                344  JSRorCLRcode1000     STOP  #$2700
-00001436  4E72 2700                345  JSRorCLRcode1001     STOP  #$2700
-0000143A  4E72 2700                346  JSRorCLRcode1010     STOP  #$2700
-0000143E  4E72 2700                347  JSRorCLRcode1011     STOP  #$2700
-00001442  4E72 2700                348  JSRorCLRcode1100     STOP  #$2700
-00001446  4E72 2700                349  JSRorCLRcode1101     STOP  #$2700
-0000144A  4EB9 000018EC            350  JSRorCLRcode1110    JSR     ISJSR
-00001450  4EB9 000019F4            351                      JSR     DONE
-00001456  4E72 2700                352  JSRorCLRcode1111     STOP  #$2700
-0000145A                           353  
-0000145A                           354  *****************************END NOPorCLRorRTSorJSR ************************************
-0000145A                           355  
-0000145A                           356  
-0000145A                           357  *****************************someMOVEM ************************************
-0000145A  4FF8 7000                358  someMOVEM     LEA     STACK,SP            ; Load the SP
-0000145E  41F9 0000147E            359                      LEA     tableSomeMOVEM, A0            ; Index into the table
-00001464  4280                     360                      CLR.L   D0                  ; Zero it
-00001466  303C D883                361                      MOVE.W  #example,D0         ; We'll play with it here
-0000146A  123C 0009                362                      MOVE.B  #9,D1           ; Shift 9 bits left 
-0000146E  E360                     363                      ASL.W   D1,D0            
-00001470  123C 000C                364                      MOVE.B  #shift,D1           ; Shift 12 bits to the right  
-00001474  E268                     365                      LSR.W   D1,D0               ; Move the bits (moves highest 4 bits to lowest 4 positions,
-00001476                           366                                      ; and the rest are zeroed out)           
-00001476                           367    
-00001476                           368                      
-00001476  C0FC 0006                369                      MULU    #6,D0               ; Form offset (move 6 bytes in memory for every 'JMP' command)
-0000147A  4EB0 0000                370                      JSR     0(A0,D0)            ; Jump indirect with index, i.e. jump to 'table' + displacement                
-0000147E                           371  
-0000147E  4EF9 0000148A            372  tableSomeMOVEM    JMP     MOVEMcode00   ;MOVEM.W
-00001484  4EF9 00001496            373                    JMP     MOVEMcode01   ;MOVEM.L                                      
-0000148A                           374                        
-0000148A                           375  
-0000148A                           376                            
-0000148A  4EB9 000018C0            377  MOVEMcode00         JSR     ISMOVEMW
-00001490  4EB9 000019F4            378                      JSR     DONE
-00001496  4EB9 000018AA            379  MOVEMcode01         JSR     ISMOVEML
-0000149C  4EB9 000019F4            380                      JSR     DONE
-000014A2                           381  
-000014A2                           382  *****************************END someMOVEM ************************************
-000014A2                           383  
-000014A2                           384  *****************************NOP_MOVEM_LEA_JSR_CLR_RTS ************************************
-000014A2  4FF8 7000                385  NOP_MOVEM_LEA_JSR_CLR_RTS     LEA     STACK,SP            ; Load the SP
-000014A6  41F9 000014CC            386                      LEA     tableNOP_MOVEM_LEA_JSR_CLR_RTS, A0            ; Index into the table
-000014AC  4280                     387                      CLR.L   D0                  ; Zero it
-000014AE  303C D883                388                      MOVE.W  #example,D0         ; We'll play with it here
-000014B2  123C 0007                389                      MOVE.B  #7,D1           ; Shift 7 bits right 
-000014B6  E260                     390                      ASR.W   D1,D0 
-000014B8                           391  
-000014B8  123C 000D                392                      MOVE.B  #13,D1           ; Shift 6 bits left 
-000014BC  E360                     393                      ASL.W   D1,D0            
-000014BE  123C 000C                394                      MOVE.B  #shift,D1           ; Shift 12 bits to the right  
-000014C2  E268                     395                      LSR.W   D1,D0               ; Move the bits (moves highest 4 bits to lowest 4 positions,
-000014C4                           396                                      ; and the rest are zeroed out)         
-000014C4                           397    
-000014C4                           398                      
-000014C4  C0FC 0006                399                      MULU    #6,D0               ; Form offset (move 6 bytes in memory for every 'JMP' command)
-000014C8  4EB0 0000                400                      JSR     0(A0,D0)            ; Jump indirect with index, i.e. jump to 'table' + displacement                
-000014CC                           401  
-000014CC  4EF9 00001526            402  tableNOP_MOVEM_LEA_JSR_CLR_RTS    JMP     LOTScode0000
-000014D2  4EF9 0000152A            403                                    JMP     LOTScode0001
-000014D8  4EF9 0000152E            404                                    JMP     LOTScode0010
-000014DE  4EF9 00001538            405                                    JMP     LOTScode0011
-000014E4  4EF9 0000153C            406                                    JMP     LOTScode0100
-000014EA  4EF9 00001540            407                                    JMP     LOTScode0101
-000014F0  4EF9 00001544            408                                    JMP     LOTScode0110
-000014F6  4EF9 00001550            409                                    JMP     LOTScode0111
-000014FC  4EF9 00001554            410                                    JMP     LOTScode1000
-00001502  4EF9 0000155E            411                                    JMP     LOTScode1001
-00001508  4EF9 00001562            412                                    JMP     LOTScode1010
-0000150E  4EF9 0000156C            413                                    JMP     LOTScode1011
-00001514  4EF9 00001570            414                                    JMP     LOTScode1100
-0000151A  4EF9 00001574            415                                    JMP     LOTScode1101                               JMP     LOTScode1110
-00001520  4EF9 00001584            416                                    JMP     LOTScode1111                           
-00001526                           417                        
-00001526                           418  
-00001526                           419                            
-00001526  4E72 2700                420  LOTScode0000       STOP  #$2700
-0000152A  4E72 2700                421  LOTScode0001       STOP  #$2700
-0000152E  4EB8 145A                422  LOTScode0010        JSR    someMOVEM
-00001532  4EB9 000019F4            423                     JSR    DONE
-00001538  4E72 2700                424  LOTScode0011       STOP  #$2700                   
-0000153C  4E72 2700                425  LOTScode0100        STOP  #$2700
-00001540  4E72 2700                426  LOTScode0101        STOP  #$2700
-00001544  4EB9 000018D6            427  LOTScode0110        JSR    ISLEA  
-0000154A  4EB9 000019F4            428                     JSR    DONE 
-00001550  4E72 2700                429  LOTScode0111        STOP  #$2700 
-00001554  4EB8 135C                430  LOTScode1000        JSR    NOPorCLRorRTSorJSR
-00001558  4EB9 000019F4            431                     JSR    DONE
-0000155E  4E72 2700                432  LOTScode1001        STOP  #$2700               
-00001562  4EB8 135C                433  LOTScode1010        JSR    NOPorCLRorRTSorJSR
-00001566  4EB9 000019F4            434                     JSR    DONE
-0000156C  4E72 2700                435  LOTScode1011        STOP  #$2700                   
-00001570  4E72 2700                436  LOTScode1100        STOP  #$2700
-00001574  4E72 2700                437  LOTScode1101     STOP  #$2700
-00001578  4EB9 000018D6            438  LOTScode1110        JSR    ISLEA 
-0000157E  4EB9 000019F4            439                     JSR    DONE
-00001584  4E72 2700                440  LOTScode1111       STOP  #$2700                
-00001588                           441                     
-00001588                           442  *****************************END NOP_MOVEM_LEA_JSR_CLR_RTS ************************************
-00001588                           443  
-00001588                           444  
-00001588                           445  *****************************ADDI_BorADDI_WorADDI_L ************************************
-00001588  4FF8 7000                446  ADDI_BorADDI_WorADDI_L     LEA     STACK,SP            ; Load the SP
-0000158C  41F9 000015AC            447                      LEA     tableADDI_BorADDI_WorADDI_L,A0            ; Index into the table
-00001592  4280                     448                      CLR.L   D0                  ; Zero it
-00001594  303C D883                449                      MOVE.W  #example,D0         ; We'll play with it here
-00001598  123C 0007                450                      MOVE.B  #7,D1           ; Shift 7 bits left 
-0000159C  E360                     451                      ASL.W   D1,D0            
-0000159E  123C 000D                452                      MOVE.B  #13,D1           
-000015A2  E260                     453                      ASR.W   D1,D0             
-000015A4                           454    
-000015A4                           455                      
-000015A4  C0FC 0006                456                      MULU    #6,D0               ; Form offset (move 6 bytes in memory for every 'JMP' command)
-000015A8  4EB0 0000                457                      JSR     0(A0,D0)            ; Jump indirect with index, i.e. jump to 'table' + displacement                
-000015AC                           458  
-000015AC  4EF9 000015BE            459  tableADDI_BorADDI_WorADDI_L    JMP     ADDIBcode00
-000015B2  4EF9 000015CA            460                                 JMP     ADDIWcode01
-000015B8  4EF9 000015D6            461                                 JMP     ADDILcode10
-000015BE                           462  
-000015BE                           463                            
-000015BE  4EB9 000019DE            464  ADDIBcode00        JSR     ISADDIB
-000015C4  4EB9 000019F4            465                      JSR    DONE
-000015CA  4EB9 000019B2            466  ADDIWcode01        JSR     ISADDIW
-000015D0  4EB9 000019F4            467                      JSR    DONE
-000015D6  4EB9 000019C8            468  ADDILcode10        JSR     ISADDIL
-000015DC  4EB9 000019F4            469                      JSR    DONE
-000015E2                           470  
-000015E2                           471  *****************************END ADDI_BorADDI_WorADDI_L ************************************
-000015E2                           472  
-000015E2                           473  
-000015E2                           474  
-000015E2                           475  
-000015E2                           476  *****************************MOVEA_LorMOVE_L ************************************
-000015E2  4FF8 7000                477  MOVEA_LorMOVE_L     LEA     STACK,SP            ; Load the SP
-000015E6  41F9 00001606            478                      LEA     tableMOVEA_LorMOVE_L,A0            ; Index into the table
-000015EC  4280                     479                      CLR.L   D0                  ; Zero it
-000015EE  303C D883                480                      MOVE.W  #example,D0         ; We'll play with it here
-000015F2  123C 0007                481                      MOVE.B  #7,D1           ; Shift 7 bits left 
-000015F6  E360                     482                      ASL.W   D1,D0            ; 0011 1010 0100 0100 to 0010 0000 0000 0000
-000015F8  123C 000D                483                      MOVE.B  #13,D1           ; Shift 13 bits right
-000015FC  E260                     484                      ASR.W   D1,D0             ; 0010 0000 0000 0000 to 0000 0000 0000 0001
-000015FE                           485    
-000015FE                           486                      
-000015FE  C0FC 0006                487                      MULU    #6,D0               ; Form offset (move 6 bytes in memory for every 'JMP' command)
-00001602  4EB0 0000                488                      JSR     0(A0,D0)            ; Jump indirect with index, i.e. jump to 'table' + displacement                
-00001606                           489  
-00001606  4EF9 00001636            490  tableMOVEA_LorMOVE_L    JMP     MOVEcode000
-0000160C  4EF9 00001642            491                          JMP     MOVEAcode001
-00001612  4EF9 0000164E            492                          JMP     MOVEcode010
-00001618  4EF9 0000165A            493                          JMP     MOVEcode011
-0000161E  4EF9 00001666            494                          JMP     MOVEcode100
-00001624  4EF9 00001672            495                          JMP     MOVEcode101
-0000162A  4EF9 0000167E            496                          JMP     MOVEcode110
-00001630  4EF9 0000168A            497                          JMP     MOVEcode111
-00001636                           498                            
-00001636  4EB9 00001970            499  MOVEcode000     JSR     ISMOVEL
-0000163C  4EB9 000019F4            500                  JSR    DONE
-00001642  4EB9 00001986            501  MOVEAcode001    JSR     ISMOVEAL
-00001648  4EB9 000019F4            502                  JSR    DONE
-0000164E  4EB9 00001970            503  MOVEcode010     JSR     ISMOVEL
-00001654  4EB9 000019F4            504                  JSR    DONE
-0000165A  4EB9 00001970            505  MOVEcode011     JSR     ISMOVEL
-00001660  4EB9 000019F4            506                  JSR    DONE
-00001666  4EB9 00001970            507  MOVEcode100     JSR     ISMOVEL
-0000166C  4EB9 000019F4            508                  JSR    DONE
-00001672  4EB9 00001970            509  MOVEcode101     JSR     ISMOVEL
-00001678  4EB9 000019F4            510                  JSR    DONE
-0000167E  4EB9 00001970            511  MOVEcode110     JSR     ISMOVEL
-00001684  4EB9 000019F4            512                  JSR    DONE
-0000168A  4EB9 00001970            513  MOVEcode111     JSR     ISMOVEL 
-00001690  4EB9 000019F4            514                  JSR    DONE
-00001696                           515  *****************************END MOVEA_LorMOVE_L ************************************
-00001696                           516  
-00001696                           517  *****************************MOVEA_WorMOVE_W ************************************
-00001696  4FF8 7000                518  MOVEA_WorMOVE_W     LEA     STACK,SP            ; Load the SP
-0000169A  41F9 000016BA            519                      LEA     tableMOVEA_WorMOVE_W,A0            ; Index into the table
-000016A0  4280                     520                      CLR.L   D0                  ; Zero it
-000016A2  303C D883                521                      MOVE.W  #example,D0         ; We'll play with it here
-000016A6  123C 0007                522                      MOVE.B  #7,D1           ; Shift 7 bits left 
-000016AA  E360                     523                      ASL.W   D1,D0            ; 0011 1010 0100 0100 to 0010 0000 0000 0000
-000016AC  123C 000D                524                      MOVE.B  #13,D1           ; Shift 13 bits right
-000016B0  E260                     525                      ASR.W   D1,D0             ; 0010 0000 0000 0000 to 0000 0000 0000 0001
-000016B2                           526    
-000016B2                           527                      
-000016B2  C0FC 0006                528                      MULU    #6,D0               ; Form offset (move 6 bytes in memory for every 'JMP' command)
-000016B6  4EB0 0000                529                      JSR     0(A0,D0)            ; Jump indirect with index, i.e. jump to 'table' + displacement                
-000016BA                           530  
-000016BA  4EF9 000016EA            531  tableMOVEA_WorMOVE_W    JMP     MOVEWcode000
-000016C0  4EF9 000016F6            532                          JMP     MOVEAWcode001
-000016C6  4EF9 00001702            533                          JMP     MOVEWcode010
-000016CC  4EF9 0000170E            534                          JMP     MOVEWcode011
-000016D2  4EF9 0000171A            535                          JMP     MOVEWcode100
-000016D8  4EF9 00001726            536                          JMP     MOVEWcode101
-000016DE  4EF9 00001732            537                          JMP     MOVEWcode110
-000016E4  4EF9 0000173E            538                          JMP     MOVEWcode111
-000016EA                           539                            
-000016EA  4EB9 00001944            540  MOVEWcode000     JSR     ISMOVEW
-000016F0  4EB9 000019F4            541                  JSR    DONE
-000016F6  4EB9 0000195A            542  MOVEAWcode001    JSR     ISMOVEAW
-000016FC  4EB9 000019F4            543                  JSR    DONE
-00001702  4EB9 00001944            544  MOVEWcode010     JSR     ISMOVEW
-00001708  4EB9 000019F4            545                  JSR    DONE
-0000170E  4EB9 00001944            546  MOVEWcode011     JSR     ISMOVEW
-00001714  4EB9 000019F4            547                  JSR    DONE
-0000171A  4EB9 00001944            548  MOVEWcode100     JSR     ISMOVEW
-00001720  4EB9 000019F4            549                  JSR    DONE
-00001726  4EB9 00001944            550  MOVEWcode101     JSR     ISMOVEW
-0000172C  4EB9 000019F4            551                  JSR    DONE
-00001732  4EB9 00001944            552  MOVEWcode110     JSR     ISMOVEW
-00001738  4EB9 000019F4            553                  JSR    DONE
-0000173E  4EB9 00001944            554  MOVEWcode111     JSR     ISMOVEW 
-00001744  4EB9 000019F4            555                  JSR    DONE
-0000174A                           556  *****************************END MOVEA_WorMOVE_W ************************************
-0000174A                           557  
-0000174A  48A7 FFFF                558  ISADDB  MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
-0000174E  43F9 00001AD9            559              LEA MESSAGEADDB, A1         *OPCODE is SUB.B
-00001754  103C 000E                560              MOVE.B  #14, D0
-00001758  4E4F                     561              TRAP    #15
-0000175A                           562     
-0000175A  4C9F FFFF                563              MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
-0000175E  4E75                     564              RTS
-00001760                           565  
-00001760  48A7 FFFF                566  ISADDW  MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
-00001764  43F9 00001AE1            567              LEA MESSAGEADDW, A1         *OPCODE is SUB.W
-0000176A  103C 000E                568              MOVE.B  #14, D0
-0000176E  4E4F                     569              TRAP    #15
-00001770                           570     
-00001770  4C9F FFFF                571              MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
-00001774  4E75                     572              RTS
-00001776                           573              
-00001776  48A7 FFFF                574  ISADDL  MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
-0000177A  43F9 00001AE9            575              LEA MESSAGEADDL, A1         *OPCODE is SUB.L
-00001780  103C 000E                576              MOVE.B  #14, D0
-00001784  4E4F                     577              TRAP    #15
-00001786                           578     
-00001786  4C9F FFFF                579              MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
-0000178A  4E75                     580              RTS  
-0000178C                           581  
-0000178C  48A7 FFFF                582  ISSUBB  MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
-00001790  43F9 00001AC1            583              LEA MESSAGESUBB, A1         *OPCODE is SUB.B
-00001796  103C 000E                584              MOVE.B  #14, D0
-0000179A  4E4F                     585              TRAP    #15
-0000179C                           586     
-0000179C  4C9F FFFF                587              MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
-000017A0  4E75                     588              RTS
-000017A2                           589  
-000017A2  48A7 FFFF                590  ISSUBW  MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
-000017A6  43F9 00001AC9            591              LEA MESSAGESUBW, A1         *OPCODE is SUB.W
-000017AC  103C 000E                592              MOVE.B  #14, D0
-000017B0  4E4F                     593              TRAP    #15
-000017B2                           594     
-000017B2  4C9F FFFF                595              MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
-000017B6  4E75                     596              RTS
-000017B8                           597              
-000017B8  48A7 FFFF                598  ISSUBL  MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
-000017BC  43F9 00001AD1            599              LEA MESSAGESUBL, A1         *OPCODE is SUB.L
-000017C2  103C 000E                600              MOVE.B  #14, D0
-000017C6  4E4F                     601              TRAP    #15
-000017C8                           602     
-000017C8  4C9F FFFF                603              MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
-000017CC  4E75                     604              RTS  
-000017CE                           605  
-000017CE  48A7 FFFF                606  ISCMPB  MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
-000017D2  43F9 00001AA9            607              LEA MESSAGECMPB, A1         *OPCODE is CMP.B
-000017D8  103C 000E                608              MOVE.B  #14, D0
-000017DC  4E4F                     609              TRAP    #15
-000017DE                           610     
-000017DE  4C9F FFFF                611              MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
-000017E2  4E75                     612              RTS
-000017E4                           613  
-000017E4  48A7 FFFF                614  ISCMPW  MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
-000017E8  43F9 00001AB1            615              LEA MESSAGECMPW, A1         *OPCODE is CMP.W
-000017EE  103C 000E                616              MOVE.B  #14, D0
-000017F2  4E4F                     617              TRAP    #15
-000017F4                           618     
-000017F4  4C9F FFFF                619              MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
-000017F8  4E75                     620              RTS
-000017FA                           621              
-000017FA  48A7 FFFF                622  ISCMPL  MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
-000017FE  43F9 00001AB9            623              LEA MESSAGECMPL, A1         *OPCODE is CMP.L
-00001804  103C 000E                624              MOVE.B  #14, D0
-00001808  4E4F                     625              TRAP    #15
-0000180A                           626     
-0000180A  4C9F FFFF                627              MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
-0000180E  4E75                     628              RTS    
-00001810                           629  
-00001810  48A7 FFFF                630  ISADDQB  MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
-00001814  43F9 00001A8E            631              LEA MESSAGEADDQB, A1         *OPCODE is ADDQ.B
-0000181A  103C 000E                632              MOVE.B  #14, D0
-0000181E  4E4F                     633              TRAP    #15
-00001820                           634     
-00001820  4C9F FFFF                635              MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
-00001824  4E75                     636              RTS
-00001826                           637  
-00001826  48A7 FFFF                638  ISADDQW  MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
-0000182A  43F9 00001A97            639              LEA MESSAGEADDQW, A1         *OPCODE is ADDQ.W
-00001830  103C 000E                640              MOVE.B  #14, D0
-00001834  4E4F                     641              TRAP    #15
-00001836                           642     
-00001836  4C9F FFFF                643              MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
-0000183A  4E75                     644              RTS
-0000183C                           645              
-0000183C  48A7 FFFF                646  ISADDQL  MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
-00001840  43F9 00001AA0            647              LEA MESSAGEADDQL, A1         *OPCODE is ADDQ.L
-00001846  103C 000E                648              MOVE.B  #14, D0
-0000184A  4E4F                     649              TRAP    #15
-0000184C                           650     
-0000184C  4C9F FFFF                651              MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
-00001850  4E75                     652              RTS            
-00001852                           653              
-00001852  48A7 FFFF                654  ISMOVEQL    MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
-00001856  43F9 00001AF1            655              LEA MESSAGEMOVEQL, A1         *OPCODE is MOVEQ.L
-0000185C  103C 000E                656              MOVE.B  #14, D0
-00001860  4E4F                     657              TRAP    #15
-00001862                           658     
-00001862  4C9F FFFF                659              MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
-00001866  4E75                     660              RTS
-00001868                           661  
-00001868  48A7 FFFF                662  ISCLRB    MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
-0000186C  43F9 00001A76            663              LEA MESSAGECLRB, A1         *OPCODE is CLR.B
-00001872  103C 000E                664              MOVE.B  #14, D0
-00001876  4E4F                     665              TRAP    #15
-00001878                           666     
-00001878  4C9F FFFF                667              MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
-0000187C  4E75                     668              RTS
-0000187E                           669  
-0000187E  48A7 FFFF                670  ISCLRW    MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
-00001882  43F9 00001A7E            671              LEA MESSAGECLRW, A1         *OPCODE is CLR.W
-00001888  103C 000E                672              MOVE.B  #14, D0
-0000188C  4E4F                     673              TRAP    #15
-0000188E                           674     
-0000188E  4C9F FFFF                675              MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
-00001892  4E75                     676              RTS
-00001894                           677  
-00001894  48A7 FFFF                678  ISCLRL    MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
-00001898  43F9 00001A86            679              LEA MESSAGECLRL, A1         *OPCODE is CLR.L
-0000189E  103C 000E                680              MOVE.B  #14, D0
-000018A2  4E4F                     681              TRAP    #15
-000018A4                           682     
-000018A4  4C9F FFFF                683              MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
-000018A8  4E75                     684              RTS
-000018AA                           685              
-000018AA  48A7 FFFF                686  ISMOVEML    MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
-000018AE  43F9 00001A4A            687              LEA MESSAGEMOVEML, A1         *OPCODE is MOVEM.L 
-000018B4  103C 000E                688              MOVE.B  #14, D0
-000018B8  4E4F                     689              TRAP    #15
-000018BA                           690     
-000018BA  4C9F FFFF                691              MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
-000018BE  4E75                     692              RTS
-000018C0                           693  
-000018C0  48A7 FFFF                694  ISMOVEMW    MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
-000018C4  43F9 00001A54            695              LEA MESSAGEMOVEMW, A1         *OPCODE is MOVEM.W 
-000018CA  103C 000E                696              MOVE.B  #14, D0
-000018CE  4E4F                     697              TRAP    #15
-000018D0                           698     
-000018D0  4C9F FFFF                699              MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
-000018D4  4E75                     700              RTS  
-000018D6                           701  
-000018D6  48A7 FFFF                702  ISLEA    MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
-000018DA  43F9 00001A70            703              LEA MESSAGELEA, A1         *OPCODE is LEA so display LEA message
-000018E0  103C 000E                704              MOVE.B  #14, D0
-000018E4  4E4F                     705              TRAP    #15
-000018E6                           706     
-000018E6  4C9F FFFF                707              MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
-000018EA  4E75                     708              RTS                          ; Exit subroutine
-000018EC                           709  
-000018EC  48A7 FFFF                710  ISJSR       MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
-000018F0  43F9 00001A5E            711              LEA MESSAGEJSR, A1         *OPCODE is NOP so display NOP message
-000018F6  103C 000E                712              MOVE.B  #14, D0
-000018FA  4E4F                     713              TRAP    #15
-000018FC  4C9F FFFF                714              MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
-00001900  4E75                     715              RTS                          ; Exit subroutine
-00001902                           716              
-00001902  48A7 FFFF                717  ISRTS       MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
-00001906  43F9 00001A6A            718              LEA MESSAGERTS, A1         *OPCODE is RTS
-0000190C  103C 000E                719              MOVE.B  #14, D0
-00001910  4E4F                     720              TRAP    #15
-00001912  4C9F FFFF                721              MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
-00001916  4E75                     722              RTS  
-00001918                           723  
-00001918  48A7 FFFF                724  ISCLR       MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
-0000191C  43F9 00001A64            725              LEA MESSAGECLR, A1         *OPCODE is CLR
-00001922  103C 000E                726              MOVE.B  #14, D0
-00001926  4E4F                     727              TRAP    #15
-00001928  4C9F FFFF                728              MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
-0000192C  4E75                     729              RTS  
-0000192E                           730              
-0000192E  48A7 FFFF                731  ISNOP       MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
-00001932  43F9 000019FA            732              LEA MESSAGENOP, A1         *OPCODE is NOP so display NOP message
-00001938  103C 000E                733              MOVE.B  #14, D0
-0000193C  4E4F                     734              TRAP    #15
-0000193E  4C9F FFFF                735              MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
-00001942  4E75                     736              RTS                          ; Exit subroutine
-00001944                           737           
-00001944  48A7 FFFF                738  ISMOVEW     MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
-00001948  43F9 00001A00            739              LEA MESSAGEMOVEW, A1         *OPCODE is MOVE.W so display MOVEW message
-0000194E  103C 000E                740              MOVE.B  #14, D0
-00001952  4E4F                     741              TRAP    #15
-00001954                           742     
-00001954  4C9F FFFF                743              MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
-00001958  4E75                     744              RTS                          ; Exit subroutine
-0000195A                           745              
-0000195A  48A7 FFFF                746  ISMOVEAW    MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
-0000195E  43F9 00001A40            747              LEA MESSAGEMOVEAW, A1         *OPCODE is MOVEA.W so display MOVEA.W message
-00001964  103C 000E                748              MOVE.B  #14, D0
-00001968  4E4F                     749              TRAP    #15
-0000196A                           750     
-0000196A  4C9F FFFF                751              MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
-0000196E  4E75                     752              RTS                          ; Exit subroutine
-00001970                           753              
-00001970  48A7 FFFF                754  ISMOVEL     MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
-00001974  43F9 00001A09            755              LEA MESSAGEMOVEL, A1         *OPCODE is MOVE.L so display MOVE.L message
-0000197A  103C 000E                756              MOVE.B  #14, D0
-0000197E  4E4F                     757              TRAP    #15
-00001980                           758              
-00001980  4C9F FFFF                759              MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
-00001984  4E75                     760              RTS                          ; Exit subroutine
-00001986                           761              
-00001986  48A7 FFFF                762  ISMOVEAL    MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
-0000198A  43F9 00001A36            763              LEA MESSAGEMOVEAL, A1         *OPCODE is MOVEA.L so display MOVEA.L message
-00001990  103C 000E                764              MOVE.B  #14, D0
-00001994  4E4F                     765              TRAP    #15
-00001996                           766              
-00001996  4C9F FFFF                767              MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
-0000199A  4E75                     768              RTS                          ; Exit subroutine
-0000199C                           769         
-0000199C  48A7 FFFF                770  ISMOVEB     MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
-000019A0  43F9 00001A12            771              LEA MESSAGEMOVEB, A1         *OPCODE is MOVE.B so display MOVEB message
-000019A6  103C 000E                772              MOVE.B  #14, D0
-000019AA  4E4F                     773              TRAP    #15
-000019AC                           774              
-000019AC  4C9F FFFF                775              MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
-000019B0  4E75                     776              RTS                          ; Exit subroutine
-000019B2                           777           
-000019B2  48A7 FFFF                778  ISADDIW     MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
-000019B6  43F9 00001A1B            779              LEA MESSAGEADDIW, A1         *OPCODE is ADDI.W so display ADDI.W message
-000019BC  103C 000E                780              MOVE.B  #14, D0
-000019C0  4E4F                     781              TRAP    #15
-000019C2                           782              
-000019C2  4C9F FFFF                783              MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
-000019C6  4E75                     784              RTS                          ; Exit subroutine
-000019C8                           785              
-000019C8  48A7 FFFF                786  ISADDIL     MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
-000019CC  43F9 00001A24            787              LEA MESSAGEADDIL, A1         *OPCODE is ADDI.L so display ADDI.L message
-000019D2  103C 000E                788              MOVE.B  #14, D0
-000019D6  4E4F                     789              TRAP    #15
-000019D8                           790              
-000019D8  4C9F FFFF                791              MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
-000019DC  4E75                     792              RTS                          ; Exit subroutine
-000019DE                           793                  
-000019DE  48A7 FFFF                794  ISADDIB     MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
-000019E2  43F9 00001A2D            795              LEA MESSAGEADDIB, A1         *OPCODE is ADDI.B so display ADDI.B message
-000019E8  103C 000E                796              MOVE.B  #14, D0
-000019EC  4E4F                     797              TRAP    #15
-000019EE                           798              
-000019EE  4C9F FFFF                799              MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
-000019F2  4E75                     800              RTS                          ; Exit subroutine
-000019F4                           801                        
-000019F4  103C 0009                802  DONE        MOVE.B      #9, D0
-000019F8  4E4F                     803              TRAP        #15
-000019FA                           804  
-000019FA  =0000000D                805  CR  EQU     $0D 
-000019FA  =0000000A                806  LF  EQU     $0A
-000019FA= 4E 4F 50 0D 0A 00        807  MESSAGENOP DC.B    'NOP',CR,LF, 0    
-00001A00                           808      
-00001A00= 4D 4F 56 45 2E 57 ...    809  MESSAGEMOVEW DC.B    'MOVE.W',CR,LF, 0    
-00001A09= 4D 4F 56 45 2E 4C ...    810  MESSAGEMOVEL DC.B    'MOVE.L',CR,LF, 0 
-00001A12= 4D 4F 56 45 2E 42 ...    811  MESSAGEMOVEB DC.B    'MOVE.B',CR,LF, 0       
-00001A1B                           812  
-00001A1B= 41 44 44 49 2E 57 ...    813  MESSAGEADDIW DC.B    'ADDI.W',CR,LF, 0    
-00001A24= 41 44 44 49 2E 4C ...    814  MESSAGEADDIL DC.B    'ADDI.L',CR,LF, 0 
-00001A2D= 41 44 44 49 2E 42 ...    815  MESSAGEADDIB DC.B    'ADDI.B',CR,LF, 0 
-00001A36                           816  
-00001A36= 4D 4F 56 45 41 2E ...    817  MESSAGEMOVEAL DC.B    'MOVEA.L',CR,LF, 0 
-00001A40= 4D 4F 56 45 41 2E ...    818  MESSAGEMOVEAW DC.B    'MOVEA.W',CR,LF, 0 
-00001A4A                           819  
-00001A4A= 4D 4F 56 45 4D 2E ...    820  MESSAGEMOVEML DC.B    'MOVEM.L',CR,LF, 0 
-00001A54= 4D 4F 56 45 4D 2E ...    821  MESSAGEMOVEMW DC.B    'MOVEM.W',CR,LF, 0 
-00001A5E                           822  
-00001A5E= 4A 53 52 0D 0A 00        823  MESSAGEJSR DC.B    'JSR',CR,LF, 0 
-00001A64                           824  
-00001A64= 43 4C 52 0D 0A 00        825  MESSAGECLR DC.B    'CLR',CR,LF, 0
-00001A6A                           826  
-00001A6A= 52 54 53 0D 0A 00        827  MESSAGERTS DC.B    'RTS',CR,LF, 0
-00001A70                           828  
-00001A70= 4C 45 41 0D 0A 00        829  MESSAGELEA DC.B    'LEA',CR,LF, 0
-00001A76                           830  
-00001A76= 43 4C 52 2E 42 0D ...    831  MESSAGECLRB DC.B    'CLR.B',CR,LF, 0 
-00001A7E= 43 4C 52 2E 57 0D ...    832  MESSAGECLRW DC.B    'CLR.W',CR,LF, 0
-00001A86= 43 4C 52 2E 4C 0D ...    833  MESSAGECLRL DC.B    'CLR.L',CR,LF, 0
-00001A8E                           834  
-00001A8E= 41 44 44 51 2E 42 ...    835  MESSAGEADDQB DC.B    'ADDQ.B',CR,LF, 0 
-00001A97= 41 44 44 51 2E 57 ...    836  MESSAGEADDQW DC.B    'ADDQ.W',CR,LF, 0
-00001AA0= 41 44 44 51 2E 4C ...    837  MESSAGEADDQL DC.B    'ADDQ.L',CR,LF, 0
-00001AA9                           838  
-00001AA9= 43 4D 50 2E 42 0D ...    839  MESSAGECMPB DC.B    'CMP.B',CR,LF, 0 
-00001AB1= 43 4D 50 2E 57 0D ...    840  MESSAGECMPW DC.B    'CMP.W',CR,LF, 0
-00001AB9= 43 4D 50 2E 4C 0D ...    841  MESSAGECMPL DC.B    'CMP.L',CR,LF, 0
-00001AC1                           842  
-00001AC1= 53 55 42 2E 42 0D ...    843  MESSAGESUBB DC.B    'SUB.B',CR,LF, 0 
-00001AC9= 53 55 42 2E 57 0D ...    844  MESSAGESUBW DC.B    'SUB.W',CR,LF, 0
-00001AD1= 53 55 42 2E 4C 0D ...    845  MESSAGESUBL DC.B    'SUB.L',CR,LF, 0
-00001AD9                           846  
-00001AD9= 41 44 44 2E 42 0D ...    847  MESSAGEADDB DC.B    'ADD.B',CR,LF, 0 
-00001AE1= 41 44 44 2E 57 0D ...    848  MESSAGEADDW DC.B    'ADD.W',CR,LF, 0
-00001AE9= 41 44 44 2E 4C 0D ...    849  MESSAGEADDL DC.B    'ADD.L',CR,LF, 0
-00001AF1                           850  
-00001AF1= 4D 4F 56 45 51 2E ...    851  MESSAGEMOVEQL DC.B    'MOVEQ.L',CR,LF, 0
-00001AFB                           852  
-00001AFC  FFFF FFFF                853      SIMHALT             ; halt simulator
-00001B00                           854  
-00001B00                           855  * Put variables and constants here
-00001B00                           856  
-00001B00                           857      END    START        ; last line of source
+00001000                            57  *example EQU     %1101100011000011 ; ADDA.W D3, A4 = 1101 100 011 000 011
+00001000  =0000D9C3                 58  example EQU     %1101100111000011 ; ADDA.L D3, A4 = 1101 100 111 000 011
+00001000                            59  
+00001000  =0000000C                 60  shift   EQU     12                 ; Shift 12 bits 
+00001000                            61  
+00001000                            62  * Program starts here
+00001000                            63  
+00001000  4FF8 7000                 64          LEA     STACK,SP            ; Load the SP
+00001004  41F9 0000101E             65          LEA     table,A0            ; Index into the table
+0000100A  4280                      66          CLR.L   D0                  ; Zero it
+0000100C  303C D9C3                 67          MOVE.W  #example,D0         ; We'll play with it here
+00001010  123C 000C                 68          MOVE.B  #shift,D1           ; Shift 12 bits to the right  
+00001014  E268                      69          LSR.W   D1,D0               ; Move the bits (moves highest 4 bits to lowest 4 positions,
+00001016                            70                                      ; and the rest are zeroed out)
+00001016  C0FC 0006                 71          MULU    #6,D0               ; Form offset (move 6 bytes in memory for every 'JMP' command)
+0000101A  4EB0 0000                 72          JSR     0(A0,D0)            ; Jump indirect with index, i.e. jump to 'table' + displacement                
+0000101E                            73  
+0000101E  4EF9 0000107E             74  table   JMP     code0000        ; ADDI.B, ADDI.W, or ADDI.L
+00001024  4EF9 00001084             75          JMP     code0001        ; MOVE.B
+0000102A  4EF9 00001090             76          JMP     code0010        ; MOVEA.L or MOVE.L
+00001030  4EF9 00001096             77          JMP     code0011        ; MOVEA.W or MOVE.W
+00001036  4EF9 0000109C             78          JMP     code0100        ; NOP or MOVEM.W or MOVEM.L or LEA or CLR.B or CLR.W or CLR.L or JSR or RTS
+0000103C  4EF9 000010A8             79          JMP     code0101        ; ADDQ.B or ADDQ.W or ADDQ.L
+00001042  4EF9 000010B4             80          JMP     code0110
+00001048  4EF9 000010B8             81          JMP     code0111        ; MOVEQ.L
+0000104E  4EF9 000010C4             82          JMP     code1000
+00001054  4EF9 000010C8             83          JMP     code1001        ; SUB.B or SUB.W or SUB.L
+0000105A  4EF9 000010D4             84          JMP     code1010
+00001060  4EF9 000010D8             85          JMP     code1011        ; CMP.B or CMP.W or CMP.L
+00001066  4EF9 000010E4             86          JMP     code1100
+0000106C  4EF9 000010E8             87          JMP     code1101        ; ADD.B or ADD.W or ADD.L
+00001072  4EF9 000010F4             88          JMP     code1110
+00001078  4EF9 000010F8             89          JMP     code1111
+0000107E                            90         
+0000107E                            91  *The following subroutines will get filled in as you decode the instructions . For *now, just exit gracefully.
+0000107E                            92  
+0000107E  4EB9 000015A2             93  code0000 JSR   ADDI_BorADDI_WorADDI_L
+00001084  4EB9 000019E2             94  code0001 JSR   ISMOVEB
+0000108A  4EB9 00001A3A             95           JSR   DONE
+00001090  4EB9 000015FC             96  code0010 JSR   MOVEA_LorMOVE_L        ; MOVEA.L or MOVE.L
+00001096  4EB9 000016B0             97  code0011 JSR  MOVEA_WorMOVE_W        ; MOVEA.W or MOVE.W
+0000109C  4EB9 000014BC             98  code0100 JSR    NOP_MOVEM_LEA_JSR_CLR_RTS
+000010A2  4EB9 00001A3A             99           JSR    DONE
+000010A8  4EB9 000012B6            100  code0101 JSR    ADDQ_BorADDQ_WorADDQ_L
+000010AE  4EB9 00001A3A            101           JSR    DONE
+000010B4  4E72 2700                102  code0110 STOP  #$2700
+000010B8  4EB9 00001898            103  code0111 JSR    ISMOVEQL
+000010BE  4EB9 00001A3A            104           JSR    DONE
+000010C4  4E72 2700                105  code1000 STOP  #$2700
+000010C8  4EB9 000011B6            106  code1001 JSR    SUB_BorSUB_WorSUB_L
+000010CE  4EB9 00001A3A            107           JSR    DONE
+000010D4  4E72 2700                108  code1010 STOP  #$2700
+000010D8  4EB9 00001256            109  code1011 JSR    CMP_BorCMP_WorCMP_L
+000010DE  4EB9 00001A3A            110           JSR DONE
+000010E4  4E72 2700                111  code1100 STOP  #$2700
+000010E8  4EB9 000010FC            112  code1101 JSR    ADD_BorADD_WorADD_L
+000010EE  4EB9 00001A3A            113           JSR    DONE
+000010F4  4E72 2700                114  code1110 STOP  #$2700
+000010F8  4E72 2700                115  code1111 STOP  #$2700
+000010FC                           116  
+000010FC                           117  *****************************  ADD_BorADD_WorADD_L ************************************
+000010FC  4FF8 7000                118  ADD_BorADD_WorADD_L     LEA     STACK,SP            ; Load the SP
+00001100  41F9 00001126            119                      LEA     tableADD_BorADD_WorADD_L, A0            ; Index into the table
+00001106  4280                     120                      CLR.L   D0                  ; Zero it
+00001108  303C D9C3                121                      MOVE.W  #example,D0         ; We'll play with it here
+0000110C  123C 0007                122                      MOVE.B  #7,D1           ; Shift 7 bits left 
+00001110  E360                     123                      ASL.W   D1,D0            
+00001112  123C 000C                124                      MOVE.B  #shift,D1           ; Shift 12 bits to the right  
+00001116  E268                     125                      LSR.W   D1,D0               ; Move the bits (moves highest 4 bits to lowest 4 positions,
+00001118                           126                                      ; and the rest are zeroed out)           
+00001118  123C 0001                127                      MOVE.B  #1,D1           ; Shift 1 bits right
+0000111C  E260                     128                      ASR.W   D1,D0 
+0000111E                           129                      
+0000111E  C0FC 0006                130                      MULU    #6,D0               ; Form offset (move 6 bytes in memory for every 'JMP' command)
+00001122  4EB0 0000                131                      JSR     0(A0,D0)            ; Jump indirect with index, i.e. jump to 'table' + displacement                
+00001126                           132  
+00001126  4EF9 00001156            133  tableADD_BorADD_WorADD_L         JMP    ADDcode000   *ADD.B
+0000112C  4EF9 00001162            134                                   JMP    ADDcode001   *ADD.W                                      
+00001132  4EF9 0000116E            135                                   JMP    ADDcode010   *ADD.L
+00001138                           136                                   
+00001138  4EF9 0000117A            137                                   JMP    ADDcode011   *ADDA.W
+0000113E  4EF9 00001186            138                                   JMP    ADDcode100   *ADD.B
+00001144  4EF9 00001192            139                                   JMP    ADDcode101   *ADD.W 
+0000114A  4EF9 0000119E            140                                   JMP    ADDcode110   *ADD.L
+00001150  4EF9 000011AA            141                                   JMP    ADDcode111   *ADDA.L
+00001156                           142  
+00001156                           143  
+00001156  4EB9 00001790            144  ADDcode000   JSR     ISADDB
+0000115C  4EB9 00001A3A            145               JSR     DONE
+00001162  4EB9 000017A6            146  ADDcode001   JSR     ISADDW  
+00001168  4EB9 00001A3A            147               JSR     DONE                                 
+0000116E  4EB9 000017BC            148  ADDcode010   JSR     ISADDL 
+00001174  4EB9 00001A3A            149               JSR     DONE  
+0000117A  4EB9 00001764            150  ADDcode011   JSR     ISADDAW
+00001180  4EB9 00001A3A            151               JSR     DONE
+00001186  4EB9 00001790            152  ADDcode100   JSR     ISADDB
+0000118C  4EB9 00001A3A            153               JSR     DONE
+00001192  4EB9 000017A6            154  ADDcode101   JSR     ISADDW  
+00001198  4EB9 00001A3A            155               JSR     DONE                                 
+0000119E  4EB9 000017BC            156  ADDcode110   JSR     ISADDL 
+000011A4  4EB9 00001A3A            157               JSR     DONE 
+000011AA  4EB9 0000177A            158  ADDcode111   JSR     ISADDAL
+000011B0  4EB9 00001A3A            159               JSR     DONE
+000011B6                           160     
+000011B6                           161  ***************************** END  ADD_BorADD_WorADD_L ************************************
+000011B6                           162  
+000011B6                           163  *****************************  SUB_BorSUB_WorSUB_L ************************************
+000011B6  4FF8 7000                164  SUB_BorSUB_WorSUB_L     LEA     STACK,SP            ; Load the SP
+000011BA  41F9 000011E0            165                      LEA     tableSUB_BorSUB_WorSUB_L, A0            ; Index into the table
+000011C0  4280                     166                      CLR.L   D0                  ; Zero it
+000011C2  303C D9C3                167                      MOVE.W  #example,D0         ; We'll play with it here
+000011C6  123C 0007                168                      MOVE.B  #7,D1           ; Shift 7 bits left 
+000011CA  E360                     169                      ASL.W   D1,D0            
+000011CC  123C 000C                170                      MOVE.B  #shift,D1           ; Shift 12 bits to the right  
+000011D0  E268                     171                      LSR.W   D1,D0               ; Move the bits (moves highest 4 bits to lowest 4 positions,
+000011D2                           172                                      ; and the rest are zeroed out)           
+000011D2  123C 0001                173                      MOVE.B  #1,D1           ; Shift 1 bits right
+000011D6  E260                     174                      ASR.W   D1,D0 
+000011D8                           175                      
+000011D8  C0FC 0006                176                      MULU    #6,D0               ; Form offset (move 6 bytes in memory for every 'JMP' command)
+000011DC  4EB0 0000                177                      JSR     0(A0,D0)            ; Jump indirect with index, i.e. jump to 'table' + displacement                
+000011E0                           178  
+000011E0  4EF9 0000120A            179  tableSUB_BorSUB_WorSUB_L         JMP    SUBcode000   *SUB.B
+000011E6  4EF9 00001216            180                                   JMP    SUBcode001   *SUB.W                                      
+000011EC  4EF9 00001222            181                                   JMP    SUBcode010   *SUB.L
+000011F2                           182                                   
+000011F2  4EF9 0000122E            183                                   JMP    SUBcode011   
+000011F8  4EF9 00001232            184                                   JMP    SUBcode100   *SUB.B
+000011FE  4EF9 0000123E            185                                   JMP    SUBcode101   *SUB.W 
+00001204  4EF9 0000124A            186                                   JMP    SUBcode110   *SUB.L
+0000120A                           187     
+0000120A                           188  
+0000120A                           189  
+0000120A  4EB9 000017D2            190  SUBcode000   JSR     ISSUBB
+00001210  4EB9 00001A3A            191               JSR     DONE
+00001216  4EB9 000017E8            192  SUBcode001   JSR     ISSUBW  
+0000121C  4EB9 00001A3A            193               JSR     DONE                                 
+00001222  4EB9 000017FE            194  SUBcode010   JSR     ISSUBL 
+00001228  4EB9 00001A3A            195               JSR     DONE  
+0000122E  4E72 2700                196  SUBcode011   STOP  #$2700 
+00001232  4EB9 000017D2            197  SUBcode100   JSR     ISSUBB
+00001238  4EB9 00001A3A            198               JSR     DONE
+0000123E  4EB9 000017E8            199  SUBcode101   JSR     ISSUBW  
+00001244  4EB9 00001A3A            200               JSR     DONE                                 
+0000124A  4EB9 000017FE            201  SUBcode110   JSR     ISSUBL 
+00001250  4EB9 00001A3A            202               JSR     DONE 
+00001256                           203     
+00001256                           204  ***************************** END  SUB_BorSUB_WorSUB_L ************************************
+00001256                           205  
+00001256                           206  
+00001256                           207  ***************************** CMP_BorCMP_WorCMP_L ************************************
+00001256  4FF8 7000                208  CMP_BorCMP_WorCMP_L     LEA     STACK,SP            ; Load the SP
+0000125A  41F9 00001280            209                      LEA     tableCMP_BorCMP_WorCMP_L, A0            ; Index into the table
+00001260  4280                     210                      CLR.L   D0                  ; Zero it
+00001262  303C D9C3                211                      MOVE.W  #example,D0         ; We'll play with it here
+00001266  123C 0007                212                      MOVE.B  #7,D1           ; Shift 7 bits left 
+0000126A  E360                     213                      ASL.W   D1,D0            
+0000126C  123C 000C                214                      MOVE.B  #shift,D1           ; Shift 12 bits to the right  
+00001270  E268                     215                      LSR.W   D1,D0               ; Move the bits (moves highest 4 bits to lowest 4 positions,
+00001272                           216                                      ; and the rest are zeroed out)           
+00001272  123C 0001                217                      MOVE.B  #1,D1           ; Shift 1 bits right
+00001276  E260                     218                      ASR.W   D1,D0 
+00001278                           219                      
+00001278  C0FC 0006                220                      MULU    #6,D0               ; Form offset (move 6 bytes in memory for every 'JMP' command)
+0000127C  4EB0 0000                221                      JSR     0(A0,D0)            ; Jump indirect with index, i.e. jump to 'table' + displacement                
+00001280                           222  
+00001280  4EF9 00001292            223  tableCMP_BorCMP_WorCMP_L         JMP    CMPcode000   *CMP.B
+00001286  4EF9 0000129E            224                                   JMP    CMPcode001   *CMP.W                                      
+0000128C  4EF9 000012AA            225                                   JMP    CMPcode010   *CMP.L
+00001292                           226  
+00001292  4EB9 00001814            227  CMPcode000   JSR     ISCMPB
+00001298  4EB9 00001A3A            228              JSR     DONE
+0000129E  4EB9 0000182A            229  CMPcode001   JSR     ISCMPW  
+000012A4  4EB9 00001A3A            230              JSR     DONE                                 
+000012AA  4EB9 00001840            231  CMPcode010   JSR     ISCMPL 
+000012B0  4EB9 00001A3A            232              JSR     DONE                    
+000012B6                           233  
+000012B6                           234  ***************************** END CMP_BorCMP_WorCMP_L ************************************
+000012B6                           235  
+000012B6                           236  
+000012B6                           237  ***************************** ADDQ_BorADDQ_WorADDQ_L ************************************
+000012B6  4FF8 7000                238  ADDQ_BorADDQ_WorADDQ_L     LEA     STACK,SP            ; Load the SP
+000012BA  41F9 000012E0            239                      LEA     tableADDQ_BorADDQ_WorADDQ_L, A0            ; Index into the table
+000012C0  4280                     240                      CLR.L   D0                  ; Zero it
+000012C2  303C D9C3                241                      MOVE.W  #example,D0         ; We'll play with it here
+000012C6  123C 0008                242                      MOVE.B  #8,D1           ; Shift 8 bits left 
+000012CA  E360                     243                      ASL.W   D1,D0            
+000012CC  123C 000C                244                      MOVE.B  #shift,D1           ; Shift 12 bits to the right  
+000012D0  E268                     245                      LSR.W   D1,D0               ; Move the bits (moves highest 4 bits to lowest 4 positions,
+000012D2                           246                                      ; and the rest are zeroed out)           
+000012D2  123C 0002                247                      MOVE.B  #2,D1           ; Shift 2 bits right
+000012D6  E260                     248                      ASR.W   D1,D0 
+000012D8                           249                      
+000012D8  C0FC 0006                250                      MULU    #6,D0               ; Form offset (move 6 bytes in memory for every 'JMP' command)
+000012DC  4EB0 0000                251                      JSR     0(A0,D0)            ; Jump indirect with index, i.e. jump to 'table' + displacement                
+000012E0                           252  
+000012E0  4EF9 000012F2            253  tableADDQ_BorADDQ_WorADDQ_L         JMP     ADDQcode00   *ADDQ.B
+000012E6  4EF9 000012FE            254                                      JMP     ADDQcode01   *ADDQ.W                                      
+000012EC  4EF9 0000130A            255                                      JMP     ADDQcode10   *ADDQ.L
+000012F2                           256  
+000012F2  4EB9 00001856            257  ADDQcode00   JSR     ISADDQB
+000012F8  4EB9 00001A3A            258              JSR     DONE
+000012FE  4EB9 0000186C            259  ADDQcode01   JSR     ISADDQW  
+00001304  4EB9 00001A3A            260              JSR     DONE                                 
+0000130A  4EB9 00001882            261  ADDQcode10   JSR     ISADDQL 
+00001310  4EB9 00001A3A            262              JSR     DONE                    
+00001316                           263  
+00001316                           264  ***************************** END ADDQ_BorADDQ_WorADDQ_L ************************************
+00001316                           265  
+00001316                           266  
+00001316                           267  *****************************someCLR ************************************
+00001316  4FF8 7000                268  someCLR     LEA     STACK,SP            ; Load the SP
+0000131A  41F9 00001340            269                      LEA     tableSomeCLR, A0            ; Index into the table
+00001320  4280                     270                      CLR.L   D0                  ; Zero it
+00001322  303C D9C3                271                      MOVE.W  #example,D0         ; We'll play with it here
+00001326  123C 0008                272                      MOVE.B  #8,D1           ; Shift 8 bits left 
+0000132A  E360                     273                      ASL.W   D1,D0            
+0000132C  123C 000C                274                      MOVE.B  #shift,D1           ; Shift 12 bits to the right  
+00001330  E268                     275                      LSR.W   D1,D0               ; Move the bits (moves highest 4 bits to lowest 4 positions,
+00001332                           276                                      ; and the rest are zeroed out)           
+00001332  123C 0002                277                      MOVE.B  #2,D1           ; Shift 2 bits right
+00001336  E260                     278                      ASR.W   D1,D0 
+00001338                           279                      
+00001338  C0FC 0006                280                      MULU    #6,D0               ; Form offset (move 6 bytes in memory for every 'JMP' command)
+0000133C  4EB0 0000                281                      JSR     0(A0,D0)            ; Jump indirect with index, i.e. jump to 'table' + displacement                
+00001340                           282  
+00001340  4EF9 00001352            283  tableSomeCLR        JMP     CLRcode00   *CLR.B
+00001346  4EF9 0000135E            284                      JMP     CLRcode01   *CLR.W                                      
+0000134C  4EF9 0000136A            285                      JMP     CLRcode10   *CLR.L
+00001352                           286  
+00001352  4EB9 000018AE            287  CLRcode00   JSR     ISCLRB
+00001358  4EB9 00001A3A            288              JSR     DONE
+0000135E  4EB9 000018C4            289  CLRcode01   JSR     ISCLRW  
+00001364  4EB9 00001A3A            290              JSR     DONE                                 
+0000136A  4EB9 000018DA            291  CLRcode10   JSR     ISCLRL  
+00001370  4EB9 00001A3A            292              JSR     DONE                    
+00001376                           293  
+00001376                           294  *****************************END someCLR ************************************
+00001376                           295  
+00001376                           296  *****************************NOPorCLRorRTSorJSR ************************************
+00001376  4FF8 7000                297  NOPorCLRorRTSorJSR     LEA     STACK,SP            ; Load the SP
+0000137A  41F9 000013AE            298                      LEA     tableNOPorCLRorRTSorJSR, A0            ; Index into the table
+00001380  4280                     299                      CLR.L   D0                  ; Zero it
+00001382  303C D9C3                300                      MOVE.W  #example,D0         ; We'll play with it here
+00001386                           301                      
+00001386  323C 4E71                302                      MOVE.W  #%0100111001110001,D1  ; 0100111001110001 = NOP
+0000138A  B240                     303                      CMP.W   D0, D1
+0000138C  6700 008C                304                      BEQ     NOPcommand
+00001390                           305   
+00001390  323C 4E75                306                      MOVE.W  #%0100111001110101,D1  ; 0100111001110101 = RTS
+00001394  B240                     307                      CMP.W   D0, D1
+00001396  6700 0076                308                      BEQ     RTScommand
+0000139A                           309    
+0000139A  123C 0004                310                      MOVE.B  #4,D1           ; Shift 4 bits left 
+0000139E  E360                     311                      ASL.W   D1,D0            
+000013A0  123C 000C                312                      MOVE.B  #shift,D1           ; Shift 12 bits to the right  
+000013A4  E268                     313                      LSR.W   D1,D0               ; Move the bits (moves highest 4 bits to lowest 4 positions,
+000013A6                           314                                      ; and the rest are zeroed out)           
+000013A6                           315    
+000013A6                           316                      
+000013A6  C0FC 0006                317                      MULU    #6,D0               ; Form offset (move 6 bytes in memory for every 'JMP' command)
+000013AA  4EB0 0000                318                      JSR     0(A0,D0)            ; Jump indirect with index, i.e. jump to 'table' + displacement                
+000013AE                           319  
+000013AE  4EF9 00001426            320  tableNOPorCLRorRTSorJSR    JMP     JSRorCLRcode0000
+000013B4  4EF9 0000142A            321                             JMP     JSRorCLRcode0001
+000013BA  4EF9 0000142E            322                             JMP     JSRorCLRcode0010   
+000013C0  4EF9 00001438            323                             JMP     JSRorCLRcode0011
+000013C6  4EF9 0000143C            324                             JMP     JSRorCLRcode0100
+000013CC  4EF9 00001440            325                             JMP     JSRorCLRcode0101
+000013D2  4EF9 00001444            326                             JMP     JSRorCLRcode0110
+000013D8  4EF9 00001448            327                             JMP     JSRorCLRcode0111
+000013DE  4EF9 0000144C            328                             JMP     JSRorCLRcode1000
+000013E4  4EF9 00001450            329                             JMP     JSRorCLRcode1001
+000013EA  4EF9 00001454            330                             JMP     JSRorCLRcode1010
+000013F0  4EF9 00001458            331                             JMP     JSRorCLRcode1011
+000013F6  4EF9 0000145C            332                             JMP     JSRorCLRcode1100
+000013FC  4EF9 00001460            333                             JMP     JSRorCLRcode1101
+00001402  4EF9 00001464            334                             JMP     JSRorCLRcode1110
+00001408  4EF9 00001470            335                             JMP     JSRorCLRcode1111
+0000140E                           336  
+0000140E  4EB9 00001948            337  RTScommand          JSR     ISRTS
+00001414  4EB9 00001A3A            338                      JSR     DONE
+0000141A  4EB9 00001974            339  NOPcommand          JSR     ISNOP 
+00001420  4EB9 00001A3A            340                      JSR     DONE                                                                  
+00001426  4E72 2700                341  JSRorCLRcode0000     STOP  #$2700
+0000142A  4E72 2700                342  JSRorCLRcode0001     STOP  #$2700
+0000142E  4EB8 1316                343  JSRorCLRcode0010    JSR      someCLR
+00001432  4EB9 00001A3A            344                      JSR     DONE
+00001438  4E72 2700                345  JSRorCLRcode0011     STOP  #$2700
+0000143C  4E72 2700                346  JSRorCLRcode0100     STOP  #$2700
+00001440  4E72 2700                347  JSRorCLRcode0101     STOP  #$2700
+00001444  4E72 2700                348  JSRorCLRcode0110     STOP  #$2700
+00001448  4E72 2700                349  JSRorCLRcode0111     STOP  #$2700
+0000144C  4E72 2700                350  JSRorCLRcode1000     STOP  #$2700
+00001450  4E72 2700                351  JSRorCLRcode1001     STOP  #$2700
+00001454  4E72 2700                352  JSRorCLRcode1010     STOP  #$2700
+00001458  4E72 2700                353  JSRorCLRcode1011     STOP  #$2700
+0000145C  4E72 2700                354  JSRorCLRcode1100     STOP  #$2700
+00001460  4E72 2700                355  JSRorCLRcode1101     STOP  #$2700
+00001464  4EB9 00001932            356  JSRorCLRcode1110    JSR     ISJSR
+0000146A  4EB9 00001A3A            357                      JSR     DONE
+00001470  4E72 2700                358  JSRorCLRcode1111     STOP  #$2700
+00001474                           359  
+00001474                           360  *****************************END NOPorCLRorRTSorJSR ************************************
+00001474                           361  
+00001474                           362  
+00001474                           363  *****************************someMOVEM ************************************
+00001474  4FF8 7000                364  someMOVEM     LEA     STACK,SP            ; Load the SP
+00001478  41F9 00001498            365                      LEA     tableSomeMOVEM, A0            ; Index into the table
+0000147E  4280                     366                      CLR.L   D0                  ; Zero it
+00001480  303C D9C3                367                      MOVE.W  #example,D0         ; We'll play with it here
+00001484  123C 0009                368                      MOVE.B  #9,D1           ; Shift 9 bits left 
+00001488  E360                     369                      ASL.W   D1,D0            
+0000148A  123C 000C                370                      MOVE.B  #shift,D1           ; Shift 12 bits to the right  
+0000148E  E268                     371                      LSR.W   D1,D0               ; Move the bits (moves highest 4 bits to lowest 4 positions,
+00001490                           372                                      ; and the rest are zeroed out)           
+00001490                           373    
+00001490                           374                      
+00001490  C0FC 0006                375                      MULU    #6,D0               ; Form offset (move 6 bytes in memory for every 'JMP' command)
+00001494  4EB0 0000                376                      JSR     0(A0,D0)            ; Jump indirect with index, i.e. jump to 'table' + displacement                
+00001498                           377  
+00001498  4EF9 000014A4            378  tableSomeMOVEM    JMP     MOVEMcode00   ;MOVEM.W
+0000149E  4EF9 000014B0            379                    JMP     MOVEMcode01   ;MOVEM.L                                      
+000014A4                           380                        
+000014A4                           381  
+000014A4                           382                            
+000014A4  4EB9 00001906            383  MOVEMcode00         JSR     ISMOVEMW
+000014AA  4EB9 00001A3A            384                      JSR     DONE
+000014B0  4EB9 000018F0            385  MOVEMcode01         JSR     ISMOVEML
+000014B6  4EB9 00001A3A            386                      JSR     DONE
+000014BC                           387  
+000014BC                           388  *****************************END someMOVEM ************************************
+000014BC                           389  
+000014BC                           390  *****************************NOP_MOVEM_LEA_JSR_CLR_RTS ************************************
+000014BC  4FF8 7000                391  NOP_MOVEM_LEA_JSR_CLR_RTS     LEA     STACK,SP            ; Load the SP
+000014C0  41F9 000014E6            392                      LEA     tableNOP_MOVEM_LEA_JSR_CLR_RTS, A0            ; Index into the table
+000014C6  4280                     393                      CLR.L   D0                  ; Zero it
+000014C8  303C D9C3                394                      MOVE.W  #example,D0         ; We'll play with it here
+000014CC  123C 0007                395                      MOVE.B  #7,D1           ; Shift 7 bits right 
+000014D0  E260                     396                      ASR.W   D1,D0 
+000014D2                           397  
+000014D2  123C 000D                398                      MOVE.B  #13,D1           ; Shift 6 bits left 
+000014D6  E360                     399                      ASL.W   D1,D0            
+000014D8  123C 000C                400                      MOVE.B  #shift,D1           ; Shift 12 bits to the right  
+000014DC  E268                     401                      LSR.W   D1,D0               ; Move the bits (moves highest 4 bits to lowest 4 positions,
+000014DE                           402                                      ; and the rest are zeroed out)         
+000014DE                           403    
+000014DE                           404                      
+000014DE  C0FC 0006                405                      MULU    #6,D0               ; Form offset (move 6 bytes in memory for every 'JMP' command)
+000014E2  4EB0 0000                406                      JSR     0(A0,D0)            ; Jump indirect with index, i.e. jump to 'table' + displacement                
+000014E6                           407  
+000014E6  4EF9 00001540            408  tableNOP_MOVEM_LEA_JSR_CLR_RTS    JMP     LOTScode0000
+000014EC  4EF9 00001544            409                                    JMP     LOTScode0001
+000014F2  4EF9 00001548            410                                    JMP     LOTScode0010
+000014F8  4EF9 00001552            411                                    JMP     LOTScode0011
+000014FE  4EF9 00001556            412                                    JMP     LOTScode0100
+00001504  4EF9 0000155A            413                                    JMP     LOTScode0101
+0000150A  4EF9 0000155E            414                                    JMP     LOTScode0110
+00001510  4EF9 0000156A            415                                    JMP     LOTScode0111
+00001516  4EF9 0000156E            416                                    JMP     LOTScode1000
+0000151C  4EF9 00001578            417                                    JMP     LOTScode1001
+00001522  4EF9 0000157C            418                                    JMP     LOTScode1010
+00001528  4EF9 00001586            419                                    JMP     LOTScode1011
+0000152E  4EF9 0000158A            420                                    JMP     LOTScode1100
+00001534  4EF9 0000158E            421                                    JMP     LOTScode1101                               JMP     LOTScode1110
+0000153A  4EF9 0000159E            422                                    JMP     LOTScode1111                           
+00001540                           423                        
+00001540                           424  
+00001540                           425                            
+00001540  4E72 2700                426  LOTScode0000       STOP  #$2700
+00001544  4E72 2700                427  LOTScode0001       STOP  #$2700
+00001548  4EB8 1474                428  LOTScode0010        JSR    someMOVEM
+0000154C  4EB9 00001A3A            429                     JSR    DONE
+00001552  4E72 2700                430  LOTScode0011       STOP  #$2700                   
+00001556  4E72 2700                431  LOTScode0100        STOP  #$2700
+0000155A  4E72 2700                432  LOTScode0101        STOP  #$2700
+0000155E  4EB9 0000191C            433  LOTScode0110        JSR    ISLEA  
+00001564  4EB9 00001A3A            434                     JSR    DONE 
+0000156A  4E72 2700                435  LOTScode0111        STOP  #$2700 
+0000156E  4EB8 1376                436  LOTScode1000        JSR    NOPorCLRorRTSorJSR
+00001572  4EB9 00001A3A            437                     JSR    DONE
+00001578  4E72 2700                438  LOTScode1001        STOP  #$2700               
+0000157C  4EB8 1376                439  LOTScode1010        JSR    NOPorCLRorRTSorJSR
+00001580  4EB9 00001A3A            440                     JSR    DONE
+00001586  4E72 2700                441  LOTScode1011        STOP  #$2700                   
+0000158A  4E72 2700                442  LOTScode1100        STOP  #$2700
+0000158E  4E72 2700                443  LOTScode1101     STOP  #$2700
+00001592  4EB9 0000191C            444  LOTScode1110        JSR    ISLEA 
+00001598  4EB9 00001A3A            445                     JSR    DONE
+0000159E  4E72 2700                446  LOTScode1111       STOP  #$2700                
+000015A2                           447                     
+000015A2                           448  *****************************END NOP_MOVEM_LEA_JSR_CLR_RTS ************************************
+000015A2                           449  
+000015A2                           450  
+000015A2                           451  *****************************ADDI_BorADDI_WorADDI_L ************************************
+000015A2  4FF8 7000                452  ADDI_BorADDI_WorADDI_L     LEA     STACK,SP            ; Load the SP
+000015A6  41F9 000015C6            453                      LEA     tableADDI_BorADDI_WorADDI_L,A0            ; Index into the table
+000015AC  4280                     454                      CLR.L   D0                  ; Zero it
+000015AE  303C D9C3                455                      MOVE.W  #example,D0         ; We'll play with it here
+000015B2  123C 0007                456                      MOVE.B  #7,D1           ; Shift 7 bits left 
+000015B6  E360                     457                      ASL.W   D1,D0            
+000015B8  123C 000D                458                      MOVE.B  #13,D1           
+000015BC  E260                     459                      ASR.W   D1,D0             
+000015BE                           460    
+000015BE                           461                      
+000015BE  C0FC 0006                462                      MULU    #6,D0               ; Form offset (move 6 bytes in memory for every 'JMP' command)
+000015C2  4EB0 0000                463                      JSR     0(A0,D0)            ; Jump indirect with index, i.e. jump to 'table' + displacement                
+000015C6                           464  
+000015C6  4EF9 000015D8            465  tableADDI_BorADDI_WorADDI_L    JMP     ADDIBcode00
+000015CC  4EF9 000015E4            466                                 JMP     ADDIWcode01
+000015D2  4EF9 000015F0            467                                 JMP     ADDILcode10
+000015D8                           468  
+000015D8                           469                            
+000015D8  4EB9 00001A24            470  ADDIBcode00        JSR     ISADDIB
+000015DE  4EB9 00001A3A            471                      JSR    DONE
+000015E4  4EB9 000019F8            472  ADDIWcode01        JSR     ISADDIW
+000015EA  4EB9 00001A3A            473                      JSR    DONE
+000015F0  4EB9 00001A0E            474  ADDILcode10        JSR     ISADDIL
+000015F6  4EB9 00001A3A            475                      JSR    DONE
+000015FC                           476  
+000015FC                           477  *****************************END ADDI_BorADDI_WorADDI_L ************************************
+000015FC                           478  
+000015FC                           479  
+000015FC                           480  
+000015FC                           481  
+000015FC                           482  *****************************MOVEA_LorMOVE_L ************************************
+000015FC  4FF8 7000                483  MOVEA_LorMOVE_L     LEA     STACK,SP            ; Load the SP
+00001600  41F9 00001620            484                      LEA     tableMOVEA_LorMOVE_L,A0            ; Index into the table
+00001606  4280                     485                      CLR.L   D0                  ; Zero it
+00001608  303C D9C3                486                      MOVE.W  #example,D0         ; We'll play with it here
+0000160C  123C 0007                487                      MOVE.B  #7,D1           ; Shift 7 bits left 
+00001610  E360                     488                      ASL.W   D1,D0            ; 0011 1010 0100 0100 to 0010 0000 0000 0000
+00001612  123C 000D                489                      MOVE.B  #13,D1           ; Shift 13 bits right
+00001616  E260                     490                      ASR.W   D1,D0             ; 0010 0000 0000 0000 to 0000 0000 0000 0001
+00001618                           491    
+00001618                           492                      
+00001618  C0FC 0006                493                      MULU    #6,D0               ; Form offset (move 6 bytes in memory for every 'JMP' command)
+0000161C  4EB0 0000                494                      JSR     0(A0,D0)            ; Jump indirect with index, i.e. jump to 'table' + displacement                
+00001620                           495  
+00001620  4EF9 00001650            496  tableMOVEA_LorMOVE_L    JMP     MOVEcode000
+00001626  4EF9 0000165C            497                          JMP     MOVEAcode001
+0000162C  4EF9 00001668            498                          JMP     MOVEcode010
+00001632  4EF9 00001674            499                          JMP     MOVEcode011
+00001638  4EF9 00001680            500                          JMP     MOVEcode100
+0000163E  4EF9 0000168C            501                          JMP     MOVEcode101
+00001644  4EF9 00001698            502                          JMP     MOVEcode110
+0000164A  4EF9 000016A4            503                          JMP     MOVEcode111
+00001650                           504                            
+00001650  4EB9 000019B6            505  MOVEcode000     JSR     ISMOVEL
+00001656  4EB9 00001A3A            506                  JSR    DONE
+0000165C  4EB9 000019CC            507  MOVEAcode001    JSR     ISMOVEAL
+00001662  4EB9 00001A3A            508                  JSR    DONE
+00001668  4EB9 000019B6            509  MOVEcode010     JSR     ISMOVEL
+0000166E  4EB9 00001A3A            510                  JSR    DONE
+00001674  4EB9 000019B6            511  MOVEcode011     JSR     ISMOVEL
+0000167A  4EB9 00001A3A            512                  JSR    DONE
+00001680  4EB9 000019B6            513  MOVEcode100     JSR     ISMOVEL
+00001686  4EB9 00001A3A            514                  JSR    DONE
+0000168C  4EB9 000019B6            515  MOVEcode101     JSR     ISMOVEL
+00001692  4EB9 00001A3A            516                  JSR    DONE
+00001698  4EB9 000019B6            517  MOVEcode110     JSR     ISMOVEL
+0000169E  4EB9 00001A3A            518                  JSR    DONE
+000016A4  4EB9 000019B6            519  MOVEcode111     JSR     ISMOVEL 
+000016AA  4EB9 00001A3A            520                  JSR    DONE
+000016B0                           521  *****************************END MOVEA_LorMOVE_L ************************************
+000016B0                           522  
+000016B0                           523  *****************************MOVEA_WorMOVE_W ************************************
+000016B0  4FF8 7000                524  MOVEA_WorMOVE_W     LEA     STACK,SP            ; Load the SP
+000016B4  41F9 000016D4            525                      LEA     tableMOVEA_WorMOVE_W,A0            ; Index into the table
+000016BA  4280                     526                      CLR.L   D0                  ; Zero it
+000016BC  303C D9C3                527                      MOVE.W  #example,D0         ; We'll play with it here
+000016C0  123C 0007                528                      MOVE.B  #7,D1           ; Shift 7 bits left 
+000016C4  E360                     529                      ASL.W   D1,D0            ; 0011 1010 0100 0100 to 0010 0000 0000 0000
+000016C6  123C 000D                530                      MOVE.B  #13,D1           ; Shift 13 bits right
+000016CA  E260                     531                      ASR.W   D1,D0             ; 0010 0000 0000 0000 to 0000 0000 0000 0001
+000016CC                           532    
+000016CC                           533                      
+000016CC  C0FC 0006                534                      MULU    #6,D0               ; Form offset (move 6 bytes in memory for every 'JMP' command)
+000016D0  4EB0 0000                535                      JSR     0(A0,D0)            ; Jump indirect with index, i.e. jump to 'table' + displacement                
+000016D4                           536  
+000016D4  4EF9 00001704            537  tableMOVEA_WorMOVE_W    JMP     MOVEWcode000
+000016DA  4EF9 00001710            538                          JMP     MOVEAWcode001
+000016E0  4EF9 0000171C            539                          JMP     MOVEWcode010
+000016E6  4EF9 00001728            540                          JMP     MOVEWcode011
+000016EC  4EF9 00001734            541                          JMP     MOVEWcode100
+000016F2  4EF9 00001740            542                          JMP     MOVEWcode101
+000016F8  4EF9 0000174C            543                          JMP     MOVEWcode110
+000016FE  4EF9 00001758            544                          JMP     MOVEWcode111
+00001704                           545                            
+00001704  4EB9 0000198A            546  MOVEWcode000     JSR     ISMOVEW
+0000170A  4EB9 00001A3A            547                  JSR    DONE
+00001710  4EB9 000019A0            548  MOVEAWcode001    JSR     ISMOVEAW
+00001716  4EB9 00001A3A            549                  JSR    DONE
+0000171C  4EB9 0000198A            550  MOVEWcode010     JSR     ISMOVEW
+00001722  4EB9 00001A3A            551                  JSR    DONE
+00001728  4EB9 0000198A            552  MOVEWcode011     JSR     ISMOVEW
+0000172E  4EB9 00001A3A            553                  JSR    DONE
+00001734  4EB9 0000198A            554  MOVEWcode100     JSR     ISMOVEW
+0000173A  4EB9 00001A3A            555                  JSR    DONE
+00001740  4EB9 0000198A            556  MOVEWcode101     JSR     ISMOVEW
+00001746  4EB9 00001A3A            557                  JSR    DONE
+0000174C  4EB9 0000198A            558  MOVEWcode110     JSR     ISMOVEW
+00001752  4EB9 00001A3A            559                  JSR    DONE
+00001758  4EB9 0000198A            560  MOVEWcode111     JSR     ISMOVEW 
+0000175E  4EB9 00001A3A            561                  JSR    DONE
+00001764                           562  *****************************END MOVEA_WorMOVE_W ************************************
+00001764                           563  
+00001764  48A7 FFFF                564  ISADDAW  MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
+00001768  43F9 00001B37            565              LEA MESSAGEADDAW, A1         *OPCODE is SUB.W
+0000176E  103C 000E                566              MOVE.B  #14, D0
+00001772  4E4F                     567              TRAP    #15
+00001774                           568     
+00001774  4C9F FFFF                569              MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
+00001778  4E75                     570              RTS
+0000177A                           571              
+0000177A  48A7 FFFF                572  ISADDAL  MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
+0000177E  43F9 00001B40            573              LEA MESSAGEADDAL, A1         *OPCODE is SUB.L
+00001784  103C 000E                574              MOVE.B  #14, D0
+00001788  4E4F                     575              TRAP    #15
+0000178A                           576     
+0000178A  4C9F FFFF                577              MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
+0000178E  4E75                     578              RTS 
+00001790                           579  
+00001790  48A7 FFFF                580  ISADDB  MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
+00001794  43F9 00001B1F            581              LEA MESSAGEADDB, A1         *OPCODE is SUB.B
+0000179A  103C 000E                582              MOVE.B  #14, D0
+0000179E  4E4F                     583              TRAP    #15
+000017A0                           584     
+000017A0  4C9F FFFF                585              MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
+000017A4  4E75                     586              RTS
+000017A6                           587  
+000017A6  48A7 FFFF                588  ISADDW  MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
+000017AA  43F9 00001B27            589              LEA MESSAGEADDW, A1         *OPCODE is SUB.W
+000017B0  103C 000E                590              MOVE.B  #14, D0
+000017B4  4E4F                     591              TRAP    #15
+000017B6                           592     
+000017B6  4C9F FFFF                593              MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
+000017BA  4E75                     594              RTS
+000017BC                           595              
+000017BC  48A7 FFFF                596  ISADDL  MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
+000017C0  43F9 00001B2F            597              LEA MESSAGEADDL, A1         *OPCODE is SUB.L
+000017C6  103C 000E                598              MOVE.B  #14, D0
+000017CA  4E4F                     599              TRAP    #15
+000017CC                           600     
+000017CC  4C9F FFFF                601              MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
+000017D0  4E75                     602              RTS  
+000017D2                           603  
+000017D2  48A7 FFFF                604  ISSUBB  MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
+000017D6  43F9 00001B07            605              LEA MESSAGESUBB, A1         *OPCODE is SUB.B
+000017DC  103C 000E                606              MOVE.B  #14, D0
+000017E0  4E4F                     607              TRAP    #15
+000017E2                           608     
+000017E2  4C9F FFFF                609              MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
+000017E6  4E75                     610              RTS
+000017E8                           611  
+000017E8  48A7 FFFF                612  ISSUBW  MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
+000017EC  43F9 00001B0F            613              LEA MESSAGESUBW, A1         *OPCODE is SUB.W
+000017F2  103C 000E                614              MOVE.B  #14, D0
+000017F6  4E4F                     615              TRAP    #15
+000017F8                           616     
+000017F8  4C9F FFFF                617              MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
+000017FC  4E75                     618              RTS
+000017FE                           619              
+000017FE  48A7 FFFF                620  ISSUBL  MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
+00001802  43F9 00001B17            621              LEA MESSAGESUBL, A1         *OPCODE is SUB.L
+00001808  103C 000E                622              MOVE.B  #14, D0
+0000180C  4E4F                     623              TRAP    #15
+0000180E                           624     
+0000180E  4C9F FFFF                625              MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
+00001812  4E75                     626              RTS  
+00001814                           627  
+00001814  48A7 FFFF                628  ISCMPB  MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
+00001818  43F9 00001AEF            629              LEA MESSAGECMPB, A1         *OPCODE is CMP.B
+0000181E  103C 000E                630              MOVE.B  #14, D0
+00001822  4E4F                     631              TRAP    #15
+00001824                           632     
+00001824  4C9F FFFF                633              MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
+00001828  4E75                     634              RTS
+0000182A                           635  
+0000182A  48A7 FFFF                636  ISCMPW  MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
+0000182E  43F9 00001AF7            637              LEA MESSAGECMPW, A1         *OPCODE is CMP.W
+00001834  103C 000E                638              MOVE.B  #14, D0
+00001838  4E4F                     639              TRAP    #15
+0000183A                           640     
+0000183A  4C9F FFFF                641              MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
+0000183E  4E75                     642              RTS
+00001840                           643              
+00001840  48A7 FFFF                644  ISCMPL  MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
+00001844  43F9 00001AFF            645              LEA MESSAGECMPL, A1         *OPCODE is CMP.L
+0000184A  103C 000E                646              MOVE.B  #14, D0
+0000184E  4E4F                     647              TRAP    #15
+00001850                           648     
+00001850  4C9F FFFF                649              MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
+00001854  4E75                     650              RTS    
+00001856                           651  
+00001856  48A7 FFFF                652  ISADDQB  MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
+0000185A  43F9 00001AD4            653              LEA MESSAGEADDQB, A1         *OPCODE is ADDQ.B
+00001860  103C 000E                654              MOVE.B  #14, D0
+00001864  4E4F                     655              TRAP    #15
+00001866                           656     
+00001866  4C9F FFFF                657              MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
+0000186A  4E75                     658              RTS
+0000186C                           659  
+0000186C  48A7 FFFF                660  ISADDQW  MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
+00001870  43F9 00001ADD            661              LEA MESSAGEADDQW, A1         *OPCODE is ADDQ.W
+00001876  103C 000E                662              MOVE.B  #14, D0
+0000187A  4E4F                     663              TRAP    #15
+0000187C                           664     
+0000187C  4C9F FFFF                665              MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
+00001880  4E75                     666              RTS
+00001882                           667              
+00001882  48A7 FFFF                668  ISADDQL  MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
+00001886  43F9 00001AE6            669              LEA MESSAGEADDQL, A1         *OPCODE is ADDQ.L
+0000188C  103C 000E                670              MOVE.B  #14, D0
+00001890  4E4F                     671              TRAP    #15
+00001892                           672     
+00001892  4C9F FFFF                673              MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
+00001896  4E75                     674              RTS            
+00001898                           675              
+00001898  48A7 FFFF                676  ISMOVEQL    MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
+0000189C  43F9 00001B49            677              LEA MESSAGEMOVEQL, A1         *OPCODE is MOVEQ.L
+000018A2  103C 000E                678              MOVE.B  #14, D0
+000018A6  4E4F                     679              TRAP    #15
+000018A8                           680     
+000018A8  4C9F FFFF                681              MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
+000018AC  4E75                     682              RTS
+000018AE                           683  
+000018AE  48A7 FFFF                684  ISCLRB    MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
+000018B2  43F9 00001ABC            685              LEA MESSAGECLRB, A1         *OPCODE is CLR.B
+000018B8  103C 000E                686              MOVE.B  #14, D0
+000018BC  4E4F                     687              TRAP    #15
+000018BE                           688     
+000018BE  4C9F FFFF                689              MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
+000018C2  4E75                     690              RTS
+000018C4                           691  
+000018C4  48A7 FFFF                692  ISCLRW    MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
+000018C8  43F9 00001AC4            693              LEA MESSAGECLRW, A1         *OPCODE is CLR.W
+000018CE  103C 000E                694              MOVE.B  #14, D0
+000018D2  4E4F                     695              TRAP    #15
+000018D4                           696     
+000018D4  4C9F FFFF                697              MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
+000018D8  4E75                     698              RTS
+000018DA                           699  
+000018DA  48A7 FFFF                700  ISCLRL    MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
+000018DE  43F9 00001ACC            701              LEA MESSAGECLRL, A1         *OPCODE is CLR.L
+000018E4  103C 000E                702              MOVE.B  #14, D0
+000018E8  4E4F                     703              TRAP    #15
+000018EA                           704     
+000018EA  4C9F FFFF                705              MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
+000018EE  4E75                     706              RTS
+000018F0                           707              
+000018F0  48A7 FFFF                708  ISMOVEML    MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
+000018F4  43F9 00001A90            709              LEA MESSAGEMOVEML, A1         *OPCODE is MOVEM.L 
+000018FA  103C 000E                710              MOVE.B  #14, D0
+000018FE  4E4F                     711              TRAP    #15
+00001900                           712     
+00001900  4C9F FFFF                713              MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
+00001904  4E75                     714              RTS
+00001906                           715  
+00001906  48A7 FFFF                716  ISMOVEMW    MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
+0000190A  43F9 00001A9A            717              LEA MESSAGEMOVEMW, A1         *OPCODE is MOVEM.W 
+00001910  103C 000E                718              MOVE.B  #14, D0
+00001914  4E4F                     719              TRAP    #15
+00001916                           720     
+00001916  4C9F FFFF                721              MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
+0000191A  4E75                     722              RTS  
+0000191C                           723  
+0000191C  48A7 FFFF                724  ISLEA    MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
+00001920  43F9 00001AB6            725              LEA MESSAGELEA, A1         *OPCODE is LEA so display LEA message
+00001926  103C 000E                726              MOVE.B  #14, D0
+0000192A  4E4F                     727              TRAP    #15
+0000192C                           728     
+0000192C  4C9F FFFF                729              MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
+00001930  4E75                     730              RTS                          ; Exit subroutine
+00001932                           731  
+00001932  48A7 FFFF                732  ISJSR       MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
+00001936  43F9 00001AA4            733              LEA MESSAGEJSR, A1         *OPCODE is NOP so display NOP message
+0000193C  103C 000E                734              MOVE.B  #14, D0
+00001940  4E4F                     735              TRAP    #15
+00001942  4C9F FFFF                736              MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
+00001946  4E75                     737              RTS                          ; Exit subroutine
+00001948                           738              
+00001948  48A7 FFFF                739  ISRTS       MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
+0000194C  43F9 00001AB0            740              LEA MESSAGERTS, A1         *OPCODE is RTS
+00001952  103C 000E                741              MOVE.B  #14, D0
+00001956  4E4F                     742              TRAP    #15
+00001958  4C9F FFFF                743              MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
+0000195C  4E75                     744              RTS  
+0000195E                           745  
+0000195E  48A7 FFFF                746  ISCLR       MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
+00001962  43F9 00001AAA            747              LEA MESSAGECLR, A1         *OPCODE is CLR
+00001968  103C 000E                748              MOVE.B  #14, D0
+0000196C  4E4F                     749              TRAP    #15
+0000196E  4C9F FFFF                750              MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
+00001972  4E75                     751              RTS  
+00001974                           752              
+00001974  48A7 FFFF                753  ISNOP       MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
+00001978  43F9 00001A40            754              LEA MESSAGENOP, A1         *OPCODE is NOP so display NOP message
+0000197E  103C 000E                755              MOVE.B  #14, D0
+00001982  4E4F                     756              TRAP    #15
+00001984  4C9F FFFF                757              MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
+00001988  4E75                     758              RTS                          ; Exit subroutine
+0000198A                           759           
+0000198A  48A7 FFFF                760  ISMOVEW     MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
+0000198E  43F9 00001A46            761              LEA MESSAGEMOVEW, A1         *OPCODE is MOVE.W so display MOVEW message
+00001994  103C 000E                762              MOVE.B  #14, D0
+00001998  4E4F                     763              TRAP    #15
+0000199A                           764     
+0000199A  4C9F FFFF                765              MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
+0000199E  4E75                     766              RTS                          ; Exit subroutine
+000019A0                           767              
+000019A0  48A7 FFFF                768  ISMOVEAW    MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
+000019A4  43F9 00001A86            769              LEA MESSAGEMOVEAW, A1         *OPCODE is MOVEA.W so display MOVEA.W message
+000019AA  103C 000E                770              MOVE.B  #14, D0
+000019AE  4E4F                     771              TRAP    #15
+000019B0                           772     
+000019B0  4C9F FFFF                773              MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
+000019B4  4E75                     774              RTS                          ; Exit subroutine
+000019B6                           775              
+000019B6  48A7 FFFF                776  ISMOVEL     MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
+000019BA  43F9 00001A4F            777              LEA MESSAGEMOVEL, A1         *OPCODE is MOVE.L so display MOVE.L message
+000019C0  103C 000E                778              MOVE.B  #14, D0
+000019C4  4E4F                     779              TRAP    #15
+000019C6                           780              
+000019C6  4C9F FFFF                781              MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
+000019CA  4E75                     782              RTS                          ; Exit subroutine
+000019CC                           783              
+000019CC  48A7 FFFF                784  ISMOVEAL    MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
+000019D0  43F9 00001A7C            785              LEA MESSAGEMOVEAL, A1         *OPCODE is MOVEA.L so display MOVEA.L message
+000019D6  103C 000E                786              MOVE.B  #14, D0
+000019DA  4E4F                     787              TRAP    #15
+000019DC                           788              
+000019DC  4C9F FFFF                789              MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
+000019E0  4E75                     790              RTS                          ; Exit subroutine
+000019E2                           791         
+000019E2  48A7 FFFF                792  ISMOVEB     MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
+000019E6  43F9 00001A58            793              LEA MESSAGEMOVEB, A1         *OPCODE is MOVE.B so display MOVEB message
+000019EC  103C 000E                794              MOVE.B  #14, D0
+000019F0  4E4F                     795              TRAP    #15
+000019F2                           796              
+000019F2  4C9F FFFF                797              MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
+000019F6  4E75                     798              RTS                          ; Exit subroutine
+000019F8                           799           
+000019F8  48A7 FFFF                800  ISADDIW     MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
+000019FC  43F9 00001A61            801              LEA MESSAGEADDIW, A1         *OPCODE is ADDI.W so display ADDI.W message
+00001A02  103C 000E                802              MOVE.B  #14, D0
+00001A06  4E4F                     803              TRAP    #15
+00001A08                           804              
+00001A08  4C9F FFFF                805              MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
+00001A0C  4E75                     806              RTS                          ; Exit subroutine
+00001A0E                           807              
+00001A0E  48A7 FFFF                808  ISADDIL     MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
+00001A12  43F9 00001A6A            809              LEA MESSAGEADDIL, A1         *OPCODE is ADDI.L so display ADDI.L message
+00001A18  103C 000E                810              MOVE.B  #14, D0
+00001A1C  4E4F                     811              TRAP    #15
+00001A1E                           812              
+00001A1E  4C9F FFFF                813              MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
+00001A22  4E75                     814              RTS                          ; Exit subroutine
+00001A24                           815                  
+00001A24  48A7 FFFF                816  ISADDIB     MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
+00001A28  43F9 00001A73            817              LEA MESSAGEADDIB, A1         *OPCODE is ADDI.B so display ADDI.B message
+00001A2E  103C 000E                818              MOVE.B  #14, D0
+00001A32  4E4F                     819              TRAP    #15
+00001A34                           820              
+00001A34  4C9F FFFF                821              MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
+00001A38  4E75                     822              RTS                          ; Exit subroutine
+00001A3A                           823                        
+00001A3A  103C 0009                824  DONE        MOVE.B      #9, D0
+00001A3E  4E4F                     825              TRAP        #15
+00001A40                           826  
+00001A40  =0000000D                827  CR  EQU     $0D 
+00001A40  =0000000A                828  LF  EQU     $0A
+00001A40= 4E 4F 50 0D 0A 00        829  MESSAGENOP DC.B    'NOP',CR,LF, 0    
+00001A46                           830      
+00001A46= 4D 4F 56 45 2E 57 ...    831  MESSAGEMOVEW DC.B    'MOVE.W',CR,LF, 0    
+00001A4F= 4D 4F 56 45 2E 4C ...    832  MESSAGEMOVEL DC.B    'MOVE.L',CR,LF, 0 
+00001A58= 4D 4F 56 45 2E 42 ...    833  MESSAGEMOVEB DC.B    'MOVE.B',CR,LF, 0       
+00001A61                           834  
+00001A61= 41 44 44 49 2E 57 ...    835  MESSAGEADDIW DC.B    'ADDI.W',CR,LF, 0    
+00001A6A= 41 44 44 49 2E 4C ...    836  MESSAGEADDIL DC.B    'ADDI.L',CR,LF, 0 
+00001A73= 41 44 44 49 2E 42 ...    837  MESSAGEADDIB DC.B    'ADDI.B',CR,LF, 0 
+00001A7C                           838  
+00001A7C= 4D 4F 56 45 41 2E ...    839  MESSAGEMOVEAL DC.B    'MOVEA.L',CR,LF, 0 
+00001A86= 4D 4F 56 45 41 2E ...    840  MESSAGEMOVEAW DC.B    'MOVEA.W',CR,LF, 0 
+00001A90                           841  
+00001A90= 4D 4F 56 45 4D 2E ...    842  MESSAGEMOVEML DC.B    'MOVEM.L',CR,LF, 0 
+00001A9A= 4D 4F 56 45 4D 2E ...    843  MESSAGEMOVEMW DC.B    'MOVEM.W',CR,LF, 0 
+00001AA4                           844  
+00001AA4= 4A 53 52 0D 0A 00        845  MESSAGEJSR DC.B    'JSR',CR,LF, 0 
+00001AAA                           846  
+00001AAA= 43 4C 52 0D 0A 00        847  MESSAGECLR DC.B    'CLR',CR,LF, 0
+00001AB0                           848  
+00001AB0= 52 54 53 0D 0A 00        849  MESSAGERTS DC.B    'RTS',CR,LF, 0
+00001AB6                           850  
+00001AB6= 4C 45 41 0D 0A 00        851  MESSAGELEA DC.B    'LEA',CR,LF, 0
+00001ABC                           852  
+00001ABC= 43 4C 52 2E 42 0D ...    853  MESSAGECLRB DC.B    'CLR.B',CR,LF, 0 
+00001AC4= 43 4C 52 2E 57 0D ...    854  MESSAGECLRW DC.B    'CLR.W',CR,LF, 0
+00001ACC= 43 4C 52 2E 4C 0D ...    855  MESSAGECLRL DC.B    'CLR.L',CR,LF, 0
+00001AD4                           856  
+00001AD4= 41 44 44 51 2E 42 ...    857  MESSAGEADDQB DC.B    'ADDQ.B',CR,LF, 0 
+00001ADD= 41 44 44 51 2E 57 ...    858  MESSAGEADDQW DC.B    'ADDQ.W',CR,LF, 0
+00001AE6= 41 44 44 51 2E 4C ...    859  MESSAGEADDQL DC.B    'ADDQ.L',CR,LF, 0
+00001AEF                           860  
+00001AEF= 43 4D 50 2E 42 0D ...    861  MESSAGECMPB DC.B    'CMP.B',CR,LF, 0 
+00001AF7= 43 4D 50 2E 57 0D ...    862  MESSAGECMPW DC.B    'CMP.W',CR,LF, 0
+00001AFF= 43 4D 50 2E 4C 0D ...    863  MESSAGECMPL DC.B    'CMP.L',CR,LF, 0
+00001B07                           864  
+00001B07= 53 55 42 2E 42 0D ...    865  MESSAGESUBB DC.B    'SUB.B',CR,LF, 0 
+00001B0F= 53 55 42 2E 57 0D ...    866  MESSAGESUBW DC.B    'SUB.W',CR,LF, 0
+00001B17= 53 55 42 2E 4C 0D ...    867  MESSAGESUBL DC.B    'SUB.L',CR,LF, 0
+00001B1F                           868  
+00001B1F= 41 44 44 2E 42 0D ...    869  MESSAGEADDB DC.B    'ADD.B',CR,LF, 0 
+00001B27= 41 44 44 2E 57 0D ...    870  MESSAGEADDW DC.B    'ADD.W',CR,LF, 0
+00001B2F= 41 44 44 2E 4C 0D ...    871  MESSAGEADDL DC.B    'ADD.L',CR,LF, 0
+00001B37                           872  
+00001B37= 41 44 44 41 2E 57 ...    873  MESSAGEADDAW DC.B    'ADDA.W',CR,LF, 0
+00001B40= 41 44 44 41 2E 4C ...    874  MESSAGEADDAL DC.B    'ADDA.L',CR,LF, 0
+00001B49                           875  
+00001B49= 4D 4F 56 45 51 2E ...    876  MESSAGEMOVEQL DC.B    'MOVEQ.L',CR,LF, 0
+00001B53                           877  
+00001B54  FFFF FFFF                878      SIMHALT             ; halt simulator
+00001B58                           879  
+00001B58                           880  * Put variables and constants here
+00001B58                           881  
+00001B58                           882      END    START        ; last line of source
 
 No errors detected
 No warnings generated
@@ -867,29 +892,30 @@ No warnings generated
 SYMBOL TABLE INFORMATION
 Symbol-name         Value
 -------------------------
-ADDCODE000          1150
-ADDCODE001          115C
-ADDCODE010          1168
-ADDCODE011          1174
-ADDCODE100          1178
-ADDCODE101          1184
-ADDCODE110          1190
-ADDIBCODE00         15BE
-ADDILCODE10         15D6
-ADDIWCODE01         15CA
-ADDI_BORADDI_WORADDI_L  1588
-ADDQCODE00          12D8
-ADDQCODE01          12E4
-ADDQCODE10          12F0
-ADDQ_BORADDQ_WORADDQ_L  129C
+ADDCODE000          1156
+ADDCODE001          1162
+ADDCODE010          116E
+ADDCODE011          117A
+ADDCODE100          1186
+ADDCODE101          1192
+ADDCODE110          119E
+ADDCODE111          11AA
+ADDIBCODE00         15D8
+ADDILCODE10         15F0
+ADDIWCODE01         15E4
+ADDI_BORADDI_WORADDI_L  15A2
+ADDQCODE00          12F2
+ADDQCODE01          12FE
+ADDQCODE10          130A
+ADDQ_BORADDQ_WORADDQ_L  12B6
 ADD_BORADD_WORADD_L  10FC
-CLRCODE00           1338
-CLRCODE01           1344
-CLRCODE10           1350
-CMPCODE000          1278
-CMPCODE001          1284
-CMPCODE010          1290
-CMP_BORCMP_WORCMP_L  123C
+CLRCODE00           1352
+CLRCODE01           135E
+CLRCODE10           136A
+CMPCODE000          1292
+CMPCODE001          129E
+CMPCODE010          12AA
+CMP_BORCMP_WORCMP_L  1256
 CODE0000            107E
 CODE0001            1084
 CODE0010            1090
@@ -907,149 +933,153 @@ CODE1101            10E8
 CODE1110            10F4
 CODE1111            10F8
 CR                  D
-DONE                19F4
-EXAMPLE             D883
-ISADDB              174A
-ISADDIB             19DE
-ISADDIL             19C8
-ISADDIW             19B2
-ISADDL              1776
-ISADDQB             1810
-ISADDQL             183C
-ISADDQW             1826
-ISADDW              1760
-ISCLR               1918
-ISCLRB              1868
-ISCLRL              1894
-ISCLRW              187E
-ISCMPB              17CE
-ISCMPL              17FA
-ISCMPW              17E4
-ISJSR               18EC
-ISLEA               18D6
-ISMOVEAL            1986
-ISMOVEAW            195A
-ISMOVEB             199C
-ISMOVEL             1970
-ISMOVEML            18AA
-ISMOVEMW            18C0
-ISMOVEQL            1852
-ISMOVEW             1944
-ISNOP               192E
-ISRTS               1902
-ISSUBB              178C
-ISSUBL              17B8
-ISSUBW              17A2
-JSRORCLRCODE0000    140C
-JSRORCLRCODE0001    1410
-JSRORCLRCODE0010    1414
-JSRORCLRCODE0011    141E
-JSRORCLRCODE0100    1422
-JSRORCLRCODE0101    1426
-JSRORCLRCODE0110    142A
-JSRORCLRCODE0111    142E
-JSRORCLRCODE1000    1432
-JSRORCLRCODE1001    1436
-JSRORCLRCODE1010    143A
-JSRORCLRCODE1011    143E
-JSRORCLRCODE1100    1442
-JSRORCLRCODE1101    1446
-JSRORCLRCODE1110    144A
-JSRORCLRCODE1111    1456
+DONE                1A3A
+EXAMPLE             D9C3
+ISADDAL             177A
+ISADDAW             1764
+ISADDB              1790
+ISADDIB             1A24
+ISADDIL             1A0E
+ISADDIW             19F8
+ISADDL              17BC
+ISADDQB             1856
+ISADDQL             1882
+ISADDQW             186C
+ISADDW              17A6
+ISCLR               195E
+ISCLRB              18AE
+ISCLRL              18DA
+ISCLRW              18C4
+ISCMPB              1814
+ISCMPL              1840
+ISCMPW              182A
+ISJSR               1932
+ISLEA               191C
+ISMOVEAL            19CC
+ISMOVEAW            19A0
+ISMOVEB             19E2
+ISMOVEL             19B6
+ISMOVEML            18F0
+ISMOVEMW            1906
+ISMOVEQL            1898
+ISMOVEW             198A
+ISNOP               1974
+ISRTS               1948
+ISSUBB              17D2
+ISSUBL              17FE
+ISSUBW              17E8
+JSRORCLRCODE0000    1426
+JSRORCLRCODE0001    142A
+JSRORCLRCODE0010    142E
+JSRORCLRCODE0011    1438
+JSRORCLRCODE0100    143C
+JSRORCLRCODE0101    1440
+JSRORCLRCODE0110    1444
+JSRORCLRCODE0111    1448
+JSRORCLRCODE1000    144C
+JSRORCLRCODE1001    1450
+JSRORCLRCODE1010    1454
+JSRORCLRCODE1011    1458
+JSRORCLRCODE1100    145C
+JSRORCLRCODE1101    1460
+JSRORCLRCODE1110    1464
+JSRORCLRCODE1111    1470
 LF                  A
-LOTSCODE0000        1526
-LOTSCODE0001        152A
-LOTSCODE0010        152E
-LOTSCODE0011        1538
-LOTSCODE0100        153C
-LOTSCODE0101        1540
-LOTSCODE0110        1544
-LOTSCODE0111        1550
-LOTSCODE1000        1554
-LOTSCODE1001        155E
-LOTSCODE1010        1562
-LOTSCODE1011        156C
-LOTSCODE1100        1570
-LOTSCODE1101        1574
-LOTSCODE1110        1578
-LOTSCODE1111        1584
-MESSAGEADDB         1AD9
-MESSAGEADDIB        1A2D
-MESSAGEADDIL        1A24
-MESSAGEADDIW        1A1B
-MESSAGEADDL         1AE9
-MESSAGEADDQB        1A8E
-MESSAGEADDQL        1AA0
-MESSAGEADDQW        1A97
-MESSAGEADDW         1AE1
-MESSAGECLR          1A64
-MESSAGECLRB         1A76
-MESSAGECLRL         1A86
-MESSAGECLRW         1A7E
-MESSAGECMPB         1AA9
-MESSAGECMPL         1AB9
-MESSAGECMPW         1AB1
-MESSAGEJSR          1A5E
-MESSAGELEA          1A70
-MESSAGEMOVEAL       1A36
-MESSAGEMOVEAW       1A40
-MESSAGEMOVEB        1A12
-MESSAGEMOVEL        1A09
-MESSAGEMOVEML       1A4A
-MESSAGEMOVEMW       1A54
-MESSAGEMOVEQL       1AF1
-MESSAGEMOVEW        1A00
-MESSAGENOP          19FA
-MESSAGERTS          1A6A
-MESSAGESUBB         1AC1
-MESSAGESUBL         1AD1
-MESSAGESUBW         1AC9
-MOVEACODE001        1642
-MOVEAWCODE001       16F6
-MOVEA_LORMOVE_L     15E2
-MOVEA_WORMOVE_W     1696
-MOVECODE000         1636
-MOVECODE010         164E
-MOVECODE011         165A
-MOVECODE100         1666
-MOVECODE101         1672
-MOVECODE110         167E
-MOVECODE111         168A
-MOVEMCODE00         148A
-MOVEMCODE01         1496
-MOVEWCODE000        16EA
-MOVEWCODE010        1702
-MOVEWCODE011        170E
-MOVEWCODE100        171A
-MOVEWCODE101        1726
-MOVEWCODE110        1732
-MOVEWCODE111        173E
-NOPCOMMAND          1400
-NOPORCLRORRTSORJSR  135C
-NOP_MOVEM_LEA_JSR_CLR_RTS  14A2
-RTSCOMMAND          13F4
+LOTSCODE0000        1540
+LOTSCODE0001        1544
+LOTSCODE0010        1548
+LOTSCODE0011        1552
+LOTSCODE0100        1556
+LOTSCODE0101        155A
+LOTSCODE0110        155E
+LOTSCODE0111        156A
+LOTSCODE1000        156E
+LOTSCODE1001        1578
+LOTSCODE1010        157C
+LOTSCODE1011        1586
+LOTSCODE1100        158A
+LOTSCODE1101        158E
+LOTSCODE1110        1592
+LOTSCODE1111        159E
+MESSAGEADDAL        1B40
+MESSAGEADDAW        1B37
+MESSAGEADDB         1B1F
+MESSAGEADDIB        1A73
+MESSAGEADDIL        1A6A
+MESSAGEADDIW        1A61
+MESSAGEADDL         1B2F
+MESSAGEADDQB        1AD4
+MESSAGEADDQL        1AE6
+MESSAGEADDQW        1ADD
+MESSAGEADDW         1B27
+MESSAGECLR          1AAA
+MESSAGECLRB         1ABC
+MESSAGECLRL         1ACC
+MESSAGECLRW         1AC4
+MESSAGECMPB         1AEF
+MESSAGECMPL         1AFF
+MESSAGECMPW         1AF7
+MESSAGEJSR          1AA4
+MESSAGELEA          1AB6
+MESSAGEMOVEAL       1A7C
+MESSAGEMOVEAW       1A86
+MESSAGEMOVEB        1A58
+MESSAGEMOVEL        1A4F
+MESSAGEMOVEML       1A90
+MESSAGEMOVEMW       1A9A
+MESSAGEMOVEQL       1B49
+MESSAGEMOVEW        1A46
+MESSAGENOP          1A40
+MESSAGERTS          1AB0
+MESSAGESUBB         1B07
+MESSAGESUBL         1B17
+MESSAGESUBW         1B0F
+MOVEACODE001        165C
+MOVEAWCODE001       1710
+MOVEA_LORMOVE_L     15FC
+MOVEA_WORMOVE_W     16B0
+MOVECODE000         1650
+MOVECODE010         1668
+MOVECODE011         1674
+MOVECODE100         1680
+MOVECODE101         168C
+MOVECODE110         1698
+MOVECODE111         16A4
+MOVEMCODE00         14A4
+MOVEMCODE01         14B0
+MOVEWCODE000        1704
+MOVEWCODE010        171C
+MOVEWCODE011        1728
+MOVEWCODE100        1734
+MOVEWCODE101        1740
+MOVEWCODE110        174C
+MOVEWCODE111        1758
+NOPCOMMAND          141A
+NOPORCLRORRTSORJSR  1376
+NOP_MOVEM_LEA_JSR_CLR_RTS  14BC
+RTSCOMMAND          140E
 SHIFT               C
-SOMECLR             12FC
-SOMEMOVEM           145A
+SOMECLR             1316
+SOMEMOVEM           1474
 STACK               7000
 START               1000
-SUBCODE000          11F0
-SUBCODE001          11FC
-SUBCODE010          1208
-SUBCODE011          1214
-SUBCODE100          1218
-SUBCODE101          1224
-SUBCODE110          1230
-SUB_BORSUB_WORSUB_L  119C
+SUBCODE000          120A
+SUBCODE001          1216
+SUBCODE010          1222
+SUBCODE011          122E
+SUBCODE100          1232
+SUBCODE101          123E
+SUBCODE110          124A
+SUB_BORSUB_WORSUB_L  11B6
 TABLE               101E
-TABLEADDI_BORADDI_WORADDI_L  15AC
-TABLEADDQ_BORADDQ_WORADDQ_L  12C6
+TABLEADDI_BORADDI_WORADDI_L  15C6
+TABLEADDQ_BORADDQ_WORADDQ_L  12E0
 TABLEADD_BORADD_WORADD_L  1126
-TABLECMP_BORCMP_WORCMP_L  1266
-TABLEMOVEA_LORMOVE_L  1606
-TABLEMOVEA_WORMOVE_W  16BA
-TABLENOPORCLRORRTSORJSR  1394
-TABLENOP_MOVEM_LEA_JSR_CLR_RTS  14CC
-TABLESOMECLR        1326
-TABLESOMEMOVEM      147E
-TABLESUB_BORSUB_WORSUB_L  11C6
+TABLECMP_BORCMP_WORCMP_L  1280
+TABLEMOVEA_LORMOVE_L  1620
+TABLEMOVEA_WORMOVE_W  16D4
+TABLENOPORCLRORRTSORJSR  13AE
+TABLENOP_MOVEM_LEA_JSR_CLR_RTS  14E6
+TABLESOMECLR        1340
+TABLESOMEMOVEM      1498
+TABLESUB_BORSUB_WORSUB_L  11E0
