@@ -55,7 +55,18 @@ START:                  ; first instruction of program
 *example EQU     %1101011010000100 ; ADD.L D4, D3 = 1101 011 010 000 100
 
 *example EQU     %1101100011000011 ; ADDA.W D3, A4 = 1101 100 011 000 011
-example EQU     %1101100111000011 ; ADDA.L D3, A4 = 1101 100 111 000 011
+*example EQU     %1101100111000011 ; ADDA.L D3, A4 = 1101 100 111 000 011
+
+*example EQU     %1100100000000011 ; AND.B D3, D4 = 1100 100 000 000 011
+*example EQU     %1100011100000100 ; AND.B D4, D3 = 1100 011 100 000 100
+
+*example EQU     %1100100001000011 ; AND.W D3, D4 = 1100 100 001 000 011
+*example EQU     %1100011101000100 ; AND.W D4, D3 = 1100 011 101 000 100
+
+*example EQU     %1100100010000011 ; AND.L D3, D4 = 1100 100 010 000 011
+*example EQU     %1100011110000100 ; AND.L D4, D3 = 1100 011 110 000 100
+
+example EQU     %1100100111000011 ; MULS.W D3, D4 = 1100 100 111 000 011
 
 shift   EQU     12                 ; Shift 12 bits 
 
@@ -83,7 +94,7 @@ table   JMP     code0000        ; ADDI.B, ADDI.W, or ADDI.L
         JMP     code1001        ; SUB.B or SUB.W or SUB.L
         JMP     code1010
         JMP     code1011        ; CMP.B or CMP.W or CMP.L
-        JMP     code1100
+        JMP     code1100        ; AND_BorAND_WorAND_LorMULS_W
         JMP     code1101        ; ADD.B or ADD.W or ADD.L
         JMP     code1110
         JMP     code1111
@@ -108,11 +119,57 @@ code1001 JSR    SUB_BorSUB_WorSUB_L
 code1010 STOP  #$2700
 code1011 JSR    CMP_BorCMP_WorCMP_L
          JSR DONE
-code1100 STOP  #$2700
+code1100 JSR    AND_BorAND_WorAND_LorMULS_W
+         JSR    DONE
 code1101 JSR    ADD_BorADD_WorADD_L
          JSR    DONE
 code1110 STOP  #$2700
 code1111 STOP  #$2700
+
+*****************************  AND_BorAND_WorAND_LorMULS_W ************************************
+AND_BorAND_WorAND_LorMULS_W     LEA     STACK,SP            ; Load the SP
+                    LEA     tableAND_BorAND_WorAND_LorMULS_W, A0            ; Index into the table
+                    CLR.L   D0                  ; Zero it
+                    MOVE.W  #example,D0         ; We'll play with it here
+                    MOVE.B  #7,D1           ; Shift 7 bits left 
+                    ASL.W   D1,D0            
+                    MOVE.B  #shift,D1           ; Shift 12 bits to the right  
+                    LSR.W   D1,D0               ; Move the bits (moves highest 4 bits to lowest 4 positions,
+                                    ; and the rest are zeroed out)           
+                    MOVE.B  #1,D1           ; Shift 1 bits right
+                    ASR.W   D1,D0 
+                    
+                    MULU    #6,D0               ; Form offset (move 6 bytes in memory for every 'JMP' command)
+                    JSR     0(A0,D0)            ; Jump indirect with index, i.e. jump to 'table' + displacement                
+
+tableAND_BorAND_WorAND_LorMULS_W        JMP    ANDcode000   ; AND.B
+                                        JMP    ANDcode001   ; AND.W                                     
+                                        JMP    ANDcode010   ; AND.L
+                                 
+                                        JMP    ANDcode011   
+                                        JMP    ANDcode100   ; AND.B
+                                        JMP    ANDcode101   ; AND.W 
+                                        JMP    ANDcode110   ; AND.L
+                                        JMP    ANDcode111   ; MULS.W
+
+
+ANDcode000   JSR     ISANDB
+             JSR     DONE
+ANDcode001   JSR     ISANDW  
+             JSR     DONE                                 
+ANDcode010   JSR     ISANDL 
+             JSR     DONE  
+ANDcode011   STOP  #$2700
+ANDcode100   JSR     ISANDB
+             JSR     DONE
+ANDcode101   JSR     ISANDW  
+             JSR     DONE                                 
+ANDcode110   JSR     ISANDL 
+             JSR     DONE 
+ANDcode111   JSR     ISMULSW
+             JSR     DONE
+   
+***************************** END  ADD_BorADD_WorADD_L ************************************
 
 *****************************  ADD_BorADD_WorADD_L ************************************
 ADD_BorADD_WorADD_L     LEA     STACK,SP            ; Load the SP
@@ -561,8 +618,40 @@ MOVEWcode111     JSR     ISMOVEW
                 JSR    DONE
 *****************************END MOVEA_WorMOVE_W ************************************
 
+ISMULSW  MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
+            LEA MESSAGEMULSW, A1         *OPCODE is MULS.W
+            MOVE.B  #14, D0
+            TRAP    #15
+   
+            MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
+            RTS
+
+ISANDB  MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
+            LEA MESSAGEANDB, A1         *OPCODE is AND.B
+            MOVE.B  #14, D0
+            TRAP    #15
+   
+            MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
+            RTS
+
+ISANDW  MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
+            LEA MESSAGEANDW, A1         *OPCODE is AND.W
+            MOVE.B  #14, D0
+            TRAP    #15
+   
+            MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
+            RTS
+            
+ISANDL  MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
+            LEA MESSAGEANDL, A1         *OPCODE is AND.L
+            MOVE.B  #14, D0
+            TRAP    #15
+   
+            MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
+            RTS  
+
 ISADDAW  MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
-            LEA MESSAGEADDAW, A1         *OPCODE is SUB.W
+            LEA MESSAGEADDAW, A1         *OPCODE is ADDA.W
             MOVE.B  #14, D0
             TRAP    #15
    
@@ -570,7 +659,7 @@ ISADDAW  MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
             RTS
             
 ISADDAL  MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
-            LEA MESSAGEADDAL, A1         *OPCODE is SUB.L
+            LEA MESSAGEADDAL, A1         *OPCODE is ADDA.L
             MOVE.B  #14, D0
             TRAP    #15
    
@@ -578,7 +667,7 @@ ISADDAL  MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
             RTS 
 
 ISADDB  MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
-            LEA MESSAGEADDB, A1         *OPCODE is SUB.B
+            LEA MESSAGEADDB, A1         *OPCODE is ADD.B
             MOVE.B  #14, D0
             TRAP    #15
    
@@ -586,7 +675,7 @@ ISADDB  MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
             RTS
 
 ISADDW  MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
-            LEA MESSAGEADDW, A1         *OPCODE is SUB.W
+            LEA MESSAGEADDW, A1         *OPCODE is ADD.W
             MOVE.B  #14, D0
             TRAP    #15
    
@@ -594,7 +683,7 @@ ISADDW  MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
             RTS
             
 ISADDL  MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
-            LEA MESSAGEADDL, A1         *OPCODE is SUB.L
+            LEA MESSAGEADDL, A1         *OPCODE is ADD.L
             MOVE.B  #14, D0
             TRAP    #15
    
@@ -874,6 +963,12 @@ MESSAGEADDAW DC.B    'ADDA.W',CR,LF, 0
 MESSAGEADDAL DC.B    'ADDA.L',CR,LF, 0
 
 MESSAGEMOVEQL DC.B    'MOVEQ.L',CR,LF, 0
+
+MESSAGEANDB DC.B    'AND.B',CR,LF, 0 
+MESSAGEANDW DC.B    'AND.W',CR,LF, 0
+MESSAGEANDL DC.B    'AND.L',CR,LF, 0
+
+MESSAGEMULSW DC.B    'MULS.W',CR,LF, 0
 
     SIMHALT             ; halt simulator
 
