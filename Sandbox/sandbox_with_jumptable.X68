@@ -14,23 +14,71 @@ START:                  ; first instruction of program
 
 *stack   EQU     $A000
 *example EQU     %0001101000000100 ; MOVE.B D4, D1 = 0001 1010 0000 0100 
-*example EQU     %0100111001110001   ; NOP  = 0100 1110 0111 0001
-*example EQU     %0010101001000100    ; MOVEA.L   D4, A5 = 0010 1010 0100 0100
-*example EQU     %0010101000000100    ; MOVE.L   D4, D5 = 0010 1010 0000 0100
-*example EQU     %0011101000000100    ; MOVE.W   D4, D5 = 0011 1010 0000 0100
-*example EQU     %0011101001000100    ; MOVEA.W   D4, D5 = 0011 1010 0100 0100
-*example EQU     %0000011000000101       ; 0000 0110 0000 0101 = ADDI.B D5, D7
-*example EQU     %0000011001000101       ; 0000 0110 0100 0101 = ADDI.W D5, D7
-*example EQU     %0000011010000101       ; 0000 0110 1000 0101 = ADDI.L D5, D7
-*example EQU     %0100100111010101      ; 0100 1001 1101 0101 = LEA D5, (A5)
-*example EQU     %0100111001110101  ; RTS  = 0100 1110 0111 0101
-*example EQU     %0100001010000111  ; CLR.L  = 0100 0010 1000 0111
-*example EQU     %0100001000000111  ; CLR.B  = 0100 0010 0000 0111
-example EQU     %0100001001000111  ; CLR.W  = 0100 0010 0100 0111
+*example EQU     %0100111001110001 ; NOP  = 0100 1110 0111 0001
+*example EQU     %0010101001000100 ; MOVEA.L   D4, A5 = 0010 1010 0100 0100
+*example EQU     %0010101000000100 ; MOVE.L   D4, D5 = 0010 1010 0000 0100
+*example EQU     %0011101000000100 ; MOVE.W   D4, D5 = 0011 1010 0000 0100
+*example EQU     %0011101001000100 ; MOVEA.W   D4, D5 = 0011 1010 0100 0100
+*example EQU     %0000011000000101 ; ADDI.B D5, D7 = 0000 0110 0000 0101 
+*example EQU     %0000011001000101 ; ADDI.W D5, D7 = 0000 0110 0100 0101
+*example EQU     %0000011010000101 ; ADDI.L D5, D7 = 0000 0110 1000 0101
+*example EQU     %0100100111010101 ; LEA D5, (A5) = 0100 1001 1101 0101
+*example EQU     %0100111001110101 ; RTS  = 0100 1110 0111 0101
+*example EQU     %0100001010000111 ; CLR.L  = 0100 0010 1000 0111
+*example EQU     %0100001000000111 ; CLR.B  = 0100 0010 0000 0111
+*example EQU     %0100001001000111 ; CLR.W  = 0100 0010 0100 0111
+*example EQU     %0111111011111111 ; MOVEQ.L #%11111111, D7 = 0111 1110 1111 1111
+*example EQU     %0100111010010110 ; JSR (A6)  = 0100 1110 1001 0110
+*example EQU     %0101111000000011 ; ADDQ.B    #%111, D3 = 0101 1110 0000 0011
+*example EQU     %0101111001000011 ; ADDQ.W    #%111, D3 = 0101 1110 0100 0011
+*example EQU     %0101111010000011 ; ADDQ.L    #%111, D3 = 0101 1110 1000 0011
+*example EQU     %1011100000000011 ; CMP.B D3, D4 = 1011 100 000 000 011
+*example EQU     %1011100001000011 ; CMP.W D3, D4 = 1011 100 001 000 011
+*example EQU     %1011100010000011 ; CMP.L D3, D4 = 1011 100 010 000 011
 
-*example EQU     %0100111010010110  ; JSR (A6)  = 0100 1110 1001 0110
+*example EQU     %1001100100000011 ; SUB.B D3, D4 = 1001 100 100 000 011
+*example EQU     %1001011000000100 ; SUB.B D4, D3 = 1001 011 000 000 100
 
-shift   EQU     12                  ; Shift 12 bits 
+*example EQU     %1001100101000011 ; SUB.W D3, D4 = 1001 100 101 000 011
+*example EQU     %1001011001000100 ; SUB.W D4, D3 = 1001 011 001 000 100
+
+*example EQU     %1001100110000011 ; SUB.L D3, D4 = 1001 100 110 000 011
+*example EQU     %1001011010000100 ; SUB.L D4, D3 = 1001 011 010 000 100
+
+*example EQU     %1101100100000011 ; ADD.B D3, D4 = 1101 100 100 000 011
+*example EQU     %1101011000000100 ; ADD.B D4, D3 = 1101 011 000 000 100
+
+*example EQU     %1101100101000011 ; ADD.W D3, D4 = 1101 100 101 000 011
+*example EQU     %1101011001000100 ; ADD.W D4, D3 = 1101 011 001 000 100
+
+*example EQU     %1101100110000011 ; ADD.L D3, D4 = 1101 100 110 000 011
+*example EQU     %1101011010000100 ; ADD.L D4, D3 = 1101 011 010 000 100
+
+*example EQU     %1101100011000011 ; ADDA.W D3, A4 = 1101 100 011 000 011
+*example EQU     %1101100111000011 ; ADDA.L D3, A4 = 1101 100 111 000 011
+
+*example EQU     %1100100000000011 ; AND.B D3, D4 = 1100 100 000 000 011
+*example EQU     %1100011100000100 ; AND.B D4, D3 = 1100 011 100 000 100
+
+*example EQU     %1100100001000011 ; AND.W D3, D4 = 1100 100 001 000 011
+*example EQU     %1100011101000100 ; AND.W D4, D3 = 1100 011 101 000 100
+
+*example EQU     %1100100010000011 ; AND.L D3, D4 = 1100 100 010 000 011
+*example EQU     %1100011110000100 ; AND.L D4, D3 = 1100 011 110 000 100
+
+*example EQU     %1100100111000011 ; MULS.W D3, D4 = 1100 100 111 000 011
+
+*example EQU     %0100110000000011 ; MULS.L D3, D4 = 01001 1 0000 000 011
+
+*example EQU     %0100100010010100 ; MOVEM.W (A4), (D16A6) = 0100 1000 10 010 100
+*example EQU     %0100110010101110 ; MOVEM.W (D16A6), (A4) = 0100 1100 10 101 110
+
+*example EQU     %0100100011010100 ; MOVEM.L (A4), (D16A6) = 0100 1000 11 010 100
+example EQU     %0100110011101110 ; MOVEM.L (D16A6), (A4) = 0100 1100 11 101 110
+
+
+
+shift   EQU     12                 ; Shift 12 bits 
 
 * Program starts here
 
@@ -48,16 +96,16 @@ table   JMP     code0000        ; ADDI.B, ADDI.W, or ADDI.L
         JMP     code0001        ; MOVE.B
         JMP     code0010        ; MOVEA.L or MOVE.L
         JMP     code0011        ; MOVEA.W or MOVE.W
-        JMP     code0100        ; NOP or MOVEM.W or MOVEM.L or LEA or CLR.B or CLR.W or CLR.L or JSR or RTS
-        JMP     code0101
+        JMP     code0100        ; NOP or MOVEM.W or MOVEM.L or LEA or CLR.B or CLR.W or CLR.L or JSR or RTS or MULS.W
+        JMP     code0101        ; ADDQ.B or ADDQ.W or ADDQ.L
         JMP     code0110
-        JMP     code0111
+        JMP     code0111        ; MOVEQ.L
         JMP     code1000
-        JMP     code1001
+        JMP     code1001        ; SUB.B or SUB.W or SUB.L
         JMP     code1010
-        JMP     code1011
-        JMP     code1100
-        JMP     code1101
+        JMP     code1011        ; CMP.B or CMP.W or CMP.L
+        JMP     code1100        ; AND_BorAND_WorAND_LorMULS_W
+        JMP     code1101        ; ADD.B or ADD.W or ADD.L
         JMP     code1110
         JMP     code1111
        
@@ -70,24 +118,225 @@ code0010 JSR   MOVEA_LorMOVE_L        ; MOVEA.L or MOVE.L
 code0011 JSR  MOVEA_WorMOVE_W        ; MOVEA.W or MOVE.W
 code0100 JSR    NOP_MOVEM_LEA_JSR_CLR_RTS
          JSR    DONE
-code0101 STOP  #$2700
+code0101 JSR    ADDQ_BorADDQ_WorADDQ_L
+         JSR    DONE
 code0110 STOP  #$2700
-code0111 STOP  #$2700
+code0111 JSR    ISMOVEQL
+         JSR    DONE
 code1000 STOP  #$2700
-code1001 STOP  #$2700
+code1001 JSR    SUB_BorSUB_WorSUB_L
+         JSR    DONE
 code1010 STOP  #$2700
-code1011 STOP  #$2700
-code1100 STOP  #$2700
-code1101 STOP  #$2700
+code1011 JSR    CMP_BorCMP_WorCMP_L
+         JSR DONE
+code1100 JSR    AND_BorAND_WorAND_LorMULS_W
+         JSR    DONE
+code1101 JSR    ADD_BorADD_WorADD_L
+         JSR    DONE
 code1110 STOP  #$2700
 code1111 STOP  #$2700
+
+*****************************  AND_BorAND_WorAND_LorMULS_W ************************************
+AND_BorAND_WorAND_LorMULS_W     LEA     STACK,SP            ; Load the SP
+                    LEA     tableAND_BorAND_WorAND_LorMULS_W, A0            ; Index into the table
+                    CLR.L   D0                  ; Zero it
+                    MOVE.W  #example,D0         ; We'll play with it here
+                    MOVE.B  #7,D1           ; Shift 7 bits left 
+                    ASL.W   D1,D0            
+                    MOVE.B  #shift,D1           ; Shift 12 bits to the right  
+                    LSR.W   D1,D0               ; Move the bits (moves highest 4 bits to lowest 4 positions,
+                                    ; and the rest are zeroed out)           
+                    MOVE.B  #1,D1           ; Shift 1 bits right
+                    ASR.W   D1,D0 
+                    
+                    MULU    #6,D0               ; Form offset (move 6 bytes in memory for every 'JMP' command)
+                    JSR     0(A0,D0)            ; Jump indirect with index, i.e. jump to 'table' + displacement                
+
+tableAND_BorAND_WorAND_LorMULS_W        JMP    ANDcode000   ; AND.B
+                                        JMP    ANDcode001   ; AND.W                                     
+                                        JMP    ANDcode010   ; AND.L
+                                 
+                                        JMP    ANDcode011   
+                                        JMP    ANDcode100   ; AND.B
+                                        JMP    ANDcode101   ; AND.W 
+                                        JMP    ANDcode110   ; AND.L
+                                        JMP    ANDcode111   ; MULS.W
+
+
+ANDcode000   JSR     ISANDB
+             JSR     DONE
+ANDcode001   JSR     ISANDW  
+             JSR     DONE                                 
+ANDcode010   JSR     ISANDL 
+             JSR     DONE  
+ANDcode011   STOP  #$2700
+ANDcode100   JSR     ISANDB
+             JSR     DONE
+ANDcode101   JSR     ISANDW  
+             JSR     DONE                                 
+ANDcode110   JSR     ISANDL 
+             JSR     DONE 
+ANDcode111   JSR     ISMULSW
+             JSR     DONE
+   
+***************************** END  ADD_BorADD_WorADD_L ************************************
+
+*****************************  ADD_BorADD_WorADD_L ************************************
+ADD_BorADD_WorADD_L     LEA     STACK,SP            ; Load the SP
+                    LEA     tableADD_BorADD_WorADD_L, A0            ; Index into the table
+                    CLR.L   D0                  ; Zero it
+                    MOVE.W  #example,D0         ; We'll play with it here
+                    MOVE.B  #7,D1           ; Shift 7 bits left 
+                    ASL.W   D1,D0            
+                    MOVE.B  #shift,D1           ; Shift 12 bits to the right  
+                    LSR.W   D1,D0               ; Move the bits (moves highest 4 bits to lowest 4 positions,
+                                    ; and the rest are zeroed out)           
+                    MOVE.B  #1,D1           ; Shift 1 bits right
+                    ASR.W   D1,D0 
+                    
+                    MULU    #6,D0               ; Form offset (move 6 bytes in memory for every 'JMP' command)
+                    JSR     0(A0,D0)            ; Jump indirect with index, i.e. jump to 'table' + displacement                
+
+tableADD_BorADD_WorADD_L         JMP    ADDcode000   *ADD.B
+                                 JMP    ADDcode001   *ADD.W                                      
+                                 JMP    ADDcode010   *ADD.L
+                                 
+                                 JMP    ADDcode011   *ADDA.W
+                                 JMP    ADDcode100   *ADD.B
+                                 JMP    ADDcode101   *ADD.W 
+                                 JMP    ADDcode110   *ADD.L
+                                 JMP    ADDcode111   *ADDA.L
+
+
+ADDcode000   JSR     ISADDB
+             JSR     DONE
+ADDcode001   JSR     ISADDW  
+             JSR     DONE                                 
+ADDcode010   JSR     ISADDL 
+             JSR     DONE  
+ADDcode011   JSR     ISADDAW
+             JSR     DONE
+ADDcode100   JSR     ISADDB
+             JSR     DONE
+ADDcode101   JSR     ISADDW  
+             JSR     DONE                                 
+ADDcode110   JSR     ISADDL 
+             JSR     DONE 
+ADDcode111   JSR     ISADDAL
+             JSR     DONE
+   
+***************************** END  ADD_BorADD_WorADD_L ************************************
+
+*****************************  SUB_BorSUB_WorSUB_L ************************************
+SUB_BorSUB_WorSUB_L     LEA     STACK,SP            ; Load the SP
+                    LEA     tableSUB_BorSUB_WorSUB_L, A0            ; Index into the table
+                    CLR.L   D0                  ; Zero it
+                    MOVE.W  #example,D0         ; We'll play with it here
+                    MOVE.B  #7,D1           ; Shift 7 bits left 
+                    ASL.W   D1,D0            
+                    MOVE.B  #shift,D1           ; Shift 12 bits to the right  
+                    LSR.W   D1,D0               ; Move the bits (moves highest 4 bits to lowest 4 positions,
+                                    ; and the rest are zeroed out)           
+                    MOVE.B  #1,D1           ; Shift 1 bits right
+                    ASR.W   D1,D0 
+                    
+                    MULU    #6,D0               ; Form offset (move 6 bytes in memory for every 'JMP' command)
+                    JSR     0(A0,D0)            ; Jump indirect with index, i.e. jump to 'table' + displacement                
+
+tableSUB_BorSUB_WorSUB_L         JMP    SUBcode000   *SUB.B
+                                 JMP    SUBcode001   *SUB.W                                      
+                                 JMP    SUBcode010   *SUB.L
+                                 
+                                 JMP    SUBcode011   
+                                 JMP    SUBcode100   *SUB.B
+                                 JMP    SUBcode101   *SUB.W 
+                                 JMP    SUBcode110   *SUB.L
+   
+
+
+SUBcode000   JSR     ISSUBB
+             JSR     DONE
+SUBcode001   JSR     ISSUBW  
+             JSR     DONE                                 
+SUBcode010   JSR     ISSUBL 
+             JSR     DONE  
+SUBcode011   STOP  #$2700 
+SUBcode100   JSR     ISSUBB
+             JSR     DONE
+SUBcode101   JSR     ISSUBW  
+             JSR     DONE                                 
+SUBcode110   JSR     ISSUBL 
+             JSR     DONE 
+   
+***************************** END  SUB_BorSUB_WorSUB_L ************************************
+
+
+***************************** CMP_BorCMP_WorCMP_L ************************************
+CMP_BorCMP_WorCMP_L     LEA     STACK,SP            ; Load the SP
+                    LEA     tableCMP_BorCMP_WorCMP_L, A0            ; Index into the table
+                    CLR.L   D0                  ; Zero it
+                    MOVE.W  #example,D0         ; We'll play with it here
+                    MOVE.B  #7,D1           ; Shift 7 bits left 
+                    ASL.W   D1,D0            
+                    MOVE.B  #shift,D1           ; Shift 12 bits to the right  
+                    LSR.W   D1,D0               ; Move the bits (moves highest 4 bits to lowest 4 positions,
+                                    ; and the rest are zeroed out)           
+                    MOVE.B  #1,D1           ; Shift 1 bits right
+                    ASR.W   D1,D0 
+                    
+                    MULU    #6,D0               ; Form offset (move 6 bytes in memory for every 'JMP' command)
+                    JSR     0(A0,D0)            ; Jump indirect with index, i.e. jump to 'table' + displacement                
+
+tableCMP_BorCMP_WorCMP_L         JMP    CMPcode000   *CMP.B
+                                 JMP    CMPcode001   *CMP.W                                      
+                                 JMP    CMPcode010   *CMP.L
+
+CMPcode000   JSR     ISCMPB
+            JSR     DONE
+CMPcode001   JSR     ISCMPW  
+            JSR     DONE                                 
+CMPcode010   JSR     ISCMPL 
+            JSR     DONE                    
+
+***************************** END CMP_BorCMP_WorCMP_L ************************************
+
+
+***************************** ADDQ_BorADDQ_WorADDQ_L ************************************
+ADDQ_BorADDQ_WorADDQ_L     LEA     STACK,SP            ; Load the SP
+                    LEA     tableADDQ_BorADDQ_WorADDQ_L, A0            ; Index into the table
+                    CLR.L   D0                  ; Zero it
+                    MOVE.W  #example,D0         ; We'll play with it here
+                    MOVE.B  #8,D1           ; Shift 8 bits left 
+                    ASL.W   D1,D0            
+                    MOVE.B  #shift,D1           ; Shift 12 bits to the right  
+                    LSR.W   D1,D0               ; Move the bits (moves highest 4 bits to lowest 4 positions,
+                                    ; and the rest are zeroed out)           
+                    MOVE.B  #2,D1           ; Shift 2 bits right
+                    ASR.W   D1,D0 
+                    
+                    MULU    #6,D0               ; Form offset (move 6 bytes in memory for every 'JMP' command)
+                    JSR     0(A0,D0)            ; Jump indirect with index, i.e. jump to 'table' + displacement                
+
+tableADDQ_BorADDQ_WorADDQ_L         JMP     ADDQcode00   *ADDQ.B
+                                    JMP     ADDQcode01   *ADDQ.W                                      
+                                    JMP     ADDQcode10   *ADDQ.L
+
+ADDQcode00   JSR     ISADDQB
+            JSR     DONE
+ADDQcode01   JSR     ISADDQW  
+            JSR     DONE                                 
+ADDQcode10   JSR     ISADDQL 
+            JSR     DONE                    
+
+***************************** END ADDQ_BorADDQ_WorADDQ_L ************************************
+
 
 *****************************someCLR ************************************
 someCLR     LEA     STACK,SP            ; Load the SP
                     LEA     tableSomeCLR, A0            ; Index into the table
                     CLR.L   D0                  ; Zero it
                     MOVE.W  #example,D0         ; We'll play with it here
-                    MOVE.B  #8,D1           ; Shift 9 bits left 
+                    MOVE.B  #8,D1           ; Shift 8 bits left 
                     ASL.W   D1,D0            
                     MOVE.B  #shift,D1           ; Shift 12 bits to the right  
                     LSR.W   D1,D0               ; Move the bits (moves highest 4 bits to lowest 4 positions,
@@ -188,19 +437,20 @@ someMOVEM     LEA     STACK,SP            ; Load the SP
                     MOVE.B  #shift,D1           ; Shift 12 bits to the right  
                     LSR.W   D1,D0               ; Move the bits (moves highest 4 bits to lowest 4 positions,
                                     ; and the rest are zeroed out)           
-  
+                    MOVE.B  #3,D1           ; Shift 3 bits right
+                    ASR.W   D1,D0  
                     
                     MULU    #6,D0               ; Form offset (move 6 bytes in memory for every 'JMP' command)
                     JSR     0(A0,D0)            ; Jump indirect with index, i.e. jump to 'table' + displacement                
 
-tableSomeMOVEM    JMP     MOVEMcode00   ;MOVEM.W
-                  JMP     MOVEMcode01   ;MOVEM.L                                      
+tableSomeMOVEM    JMP     MOVEMcode0   ;MOVEM.W
+                  JMP     MOVEMcode1   ;MOVEM.L                                      
                       
 
                           
-MOVEMcode00         JSR     ISMOVEMW
+MOVEMcode0         JSR     ISMOVEMW
                     JSR     DONE
-MOVEMcode01         JSR     ISMOVEML
+MOVEMcode1         JSR     ISMOVEML
                     JSR     DONE
 
 *****************************END someMOVEM ************************************
@@ -213,7 +463,7 @@ NOP_MOVEM_LEA_JSR_CLR_RTS     LEA     STACK,SP            ; Load the SP
                     MOVE.B  #7,D1           ; Shift 7 bits right 
                     ASR.W   D1,D0 
 
-                    MOVE.B  #13,D1           ; Shift 6 bits left 
+                    MOVE.B  #13,D1           ; Shift 13 bits left 
                     ASL.W   D1,D0            
                     MOVE.B  #shift,D1           ; Shift 12 bits to the right  
                     LSR.W   D1,D0               ; Move the bits (moves highest 4 bits to lowest 4 positions,
@@ -241,27 +491,27 @@ tableNOP_MOVEM_LEA_JSR_CLR_RTS    JMP     LOTScode0000
                       
 
                           
-LOTScode0000       STOP  #$2700
-LOTScode0001       STOP  #$2700
+LOTScode0000        JSR   ISMULSL
+LOTScode0001        STOP  #$2700
 LOTScode0010        JSR    someMOVEM
-                   JSR    DONE
-LOTScode0011       STOP  #$2700                   
+                    JSR    DONE
+LOTScode0011        STOP  #$2700                   
 LOTScode0100        STOP  #$2700
 LOTScode0101        STOP  #$2700
 LOTScode0110        JSR    ISLEA  
-                   JSR    DONE 
+                    JSR    DONE 
 LOTScode0111        STOP  #$2700 
 LOTScode1000        JSR    NOPorCLRorRTSorJSR
-                   JSR    DONE
+                    JSR    DONE
 LOTScode1001        STOP  #$2700               
 LOTScode1010        JSR    NOPorCLRorRTSorJSR
-                   JSR    DONE
+                    JSR    DONE
 LOTScode1011        STOP  #$2700                   
 LOTScode1100        STOP  #$2700
-LOTScode1101     STOP  #$2700
+LOTScode1101        STOP  #$2700
 LOTScode1110        JSR    ISLEA 
-                   JSR    DONE
-LOTScode1111       STOP  #$2700                
+                    JSR    DONE
+LOTScode1111        STOP  #$2700                
                    
 *****************************END NOP_MOVEM_LEA_JSR_CLR_RTS ************************************
 
@@ -379,6 +629,166 @@ MOVEWcode111     JSR     ISMOVEW
                 JSR    DONE
 *****************************END MOVEA_WorMOVE_W ************************************
 
+ISMULSL  MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
+            LEA MESSAGEMULSL, A1         *OPCODE is MULS.L
+            MOVE.B  #14, D0
+            TRAP    #15
+   
+            MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
+            RTS
+
+ISMULSW  MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
+            LEA MESSAGEMULSW, A1         *OPCODE is MULS.W
+            MOVE.B  #14, D0
+            TRAP    #15
+   
+            MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
+            RTS
+
+ISANDB  MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
+            LEA MESSAGEANDB, A1         *OPCODE is AND.B
+            MOVE.B  #14, D0
+            TRAP    #15
+   
+            MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
+            RTS
+
+ISANDW  MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
+            LEA MESSAGEANDW, A1         *OPCODE is AND.W
+            MOVE.B  #14, D0
+            TRAP    #15
+   
+            MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
+            RTS
+            
+ISANDL  MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
+            LEA MESSAGEANDL, A1         *OPCODE is AND.L
+            MOVE.B  #14, D0
+            TRAP    #15
+   
+            MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
+            RTS  
+
+ISADDAW  MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
+            LEA MESSAGEADDAW, A1         *OPCODE is ADDA.W
+            MOVE.B  #14, D0
+            TRAP    #15
+   
+            MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
+            RTS
+            
+ISADDAL  MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
+            LEA MESSAGEADDAL, A1         *OPCODE is ADDA.L
+            MOVE.B  #14, D0
+            TRAP    #15
+   
+            MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
+            RTS 
+
+ISADDB  MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
+            LEA MESSAGEADDB, A1         *OPCODE is ADD.B
+            MOVE.B  #14, D0
+            TRAP    #15
+   
+            MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
+            RTS
+
+ISADDW  MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
+            LEA MESSAGEADDW, A1         *OPCODE is ADD.W
+            MOVE.B  #14, D0
+            TRAP    #15
+   
+            MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
+            RTS
+            
+ISADDL  MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
+            LEA MESSAGEADDL, A1         *OPCODE is ADD.L
+            MOVE.B  #14, D0
+            TRAP    #15
+   
+            MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
+            RTS  
+
+ISSUBB  MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
+            LEA MESSAGESUBB, A1         *OPCODE is SUB.B
+            MOVE.B  #14, D0
+            TRAP    #15
+   
+            MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
+            RTS
+
+ISSUBW  MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
+            LEA MESSAGESUBW, A1         *OPCODE is SUB.W
+            MOVE.B  #14, D0
+            TRAP    #15
+   
+            MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
+            RTS
+            
+ISSUBL  MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
+            LEA MESSAGESUBL, A1         *OPCODE is SUB.L
+            MOVE.B  #14, D0
+            TRAP    #15
+   
+            MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
+            RTS  
+
+ISCMPB  MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
+            LEA MESSAGECMPB, A1         *OPCODE is CMP.B
+            MOVE.B  #14, D0
+            TRAP    #15
+   
+            MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
+            RTS
+
+ISCMPW  MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
+            LEA MESSAGECMPW, A1         *OPCODE is CMP.W
+            MOVE.B  #14, D0
+            TRAP    #15
+   
+            MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
+            RTS
+            
+ISCMPL  MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
+            LEA MESSAGECMPL, A1         *OPCODE is CMP.L
+            MOVE.B  #14, D0
+            TRAP    #15
+   
+            MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
+            RTS    
+
+ISADDQB  MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
+            LEA MESSAGEADDQB, A1         *OPCODE is ADDQ.B
+            MOVE.B  #14, D0
+            TRAP    #15
+   
+            MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
+            RTS
+
+ISADDQW  MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
+            LEA MESSAGEADDQW, A1         *OPCODE is ADDQ.W
+            MOVE.B  #14, D0
+            TRAP    #15
+   
+            MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
+            RTS
+            
+ISADDQL  MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
+            LEA MESSAGEADDQL, A1         *OPCODE is ADDQ.L
+            MOVE.B  #14, D0
+            TRAP    #15
+   
+            MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
+            RTS            
+            
+ISMOVEQL    MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
+            LEA MESSAGEMOVEQL, A1         *OPCODE is MOVEQ.L
+            MOVE.B  #14, D0
+            TRAP    #15
+   
+            MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
+            RTS
+
 ISCLRB    MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
             LEA MESSAGECLRB, A1         *OPCODE is CLR.B
             MOVE.B  #14, D0
@@ -388,7 +798,7 @@ ISCLRB    MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
             RTS
 
 ISCLRW    MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
-            LEA MESSAGECLRW, A1         *OPCODE is CLR.B
+            LEA MESSAGECLRW, A1         *OPCODE is CLR.W
             MOVE.B  #14, D0
             TRAP    #15
    
@@ -396,7 +806,7 @@ ISCLRW    MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
             RTS
 
 ISCLRL    MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
-            LEA MESSAGECLRL, A1         *OPCODE is CLR.B
+            LEA MESSAGECLRL, A1         *OPCODE is CLR.L
             MOVE.B  #14, D0
             TRAP    #15
    
@@ -404,7 +814,7 @@ ISCLRL    MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
             RTS
             
 ISMOVEML    MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
-            LEA MESSAGEMOVEML, A1         *OPCODE is MOVE.L so display MOVE.L message
+            LEA MESSAGEMOVEML, A1         *OPCODE is MOVEM.L 
             MOVE.B  #14, D0
             TRAP    #15
    
@@ -412,7 +822,7 @@ ISMOVEML    MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
             RTS
 
 ISMOVEMW    MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
-            LEA MESSAGEMOVEMW, A1         *OPCODE is MOVE.W so display MOVE.W message
+            LEA MESSAGEMOVEMW, A1         *OPCODE is MOVEM.W 
             MOVE.B  #14, D0
             TRAP    #15
    
@@ -552,11 +962,43 @@ MESSAGECLRB DC.B    'CLR.B',CR,LF, 0
 MESSAGECLRW DC.B    'CLR.W',CR,LF, 0
 MESSAGECLRL DC.B    'CLR.L',CR,LF, 0
 
+MESSAGEADDQB DC.B    'ADDQ.B',CR,LF, 0 
+MESSAGEADDQW DC.B    'ADDQ.W',CR,LF, 0
+MESSAGEADDQL DC.B    'ADDQ.L',CR,LF, 0
+
+MESSAGECMPB DC.B    'CMP.B',CR,LF, 0 
+MESSAGECMPW DC.B    'CMP.W',CR,LF, 0
+MESSAGECMPL DC.B    'CMP.L',CR,LF, 0
+
+MESSAGESUBB DC.B    'SUB.B',CR,LF, 0 
+MESSAGESUBW DC.B    'SUB.W',CR,LF, 0
+MESSAGESUBL DC.B    'SUB.L',CR,LF, 0
+
+MESSAGEADDB DC.B    'ADD.B',CR,LF, 0 
+MESSAGEADDW DC.B    'ADD.W',CR,LF, 0
+MESSAGEADDL DC.B    'ADD.L',CR,LF, 0
+
+MESSAGEADDAW DC.B    'ADDA.W',CR,LF, 0
+MESSAGEADDAL DC.B    'ADDA.L',CR,LF, 0
+
+MESSAGEMOVEQL DC.B    'MOVEQ.L',CR,LF, 0
+
+MESSAGEANDB DC.B    'AND.B',CR,LF, 0 
+MESSAGEANDW DC.B    'AND.W',CR,LF, 0
+MESSAGEANDL DC.B    'AND.L',CR,LF, 0
+
+MESSAGEMULSW DC.B    'MULS.W',CR,LF, 0
+MESSAGEMULSL DC.B    'MULS.L',CR,LF, 0
+
     SIMHALT             ; halt simulator
 
 * Put variables and constants here
 
     END    START        ; last line of source
+
+
+
+
 
 
 
