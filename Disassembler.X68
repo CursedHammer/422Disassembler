@@ -14,7 +14,7 @@
 *                Address Register Indirect
 *                Immediate Data
 *                Address Register Indirect with Post Increment
-*                Address Register Indirect with Pre Decremet
+*                Address Register Indirect with Pre Decrement
 *                Absolute Long Address
 *                Absolute Word Address
 *
