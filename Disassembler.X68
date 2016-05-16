@@ -87,17 +87,16 @@ OUT_OF_RANGE_ERROR JSR IO_OUT_OF_RANGE_ERROR ; for debugging
 STARTADDR DS.L  80                  ; Var for starting address
 ENDADDR   DS.L  80                  ; Var for ending address
 
+*---------- Reserved Registers -----------------------------
+*   A7: stack pointer
+*   A6: end address (stays constant)
+*   A5: current address (updated by subroutines)
+*   D0: instruction validity flag (reset by main control
+*       code, can be set to false by subroutines)
+*-----------------------------------------------------------
+
 *---------- End --------------------------------------------
-        END        START        ; last line of source
-
-
-
-
-
-
-
-
-
+        END        START            ; last line of source
 *~Font name~Courier New~
 *~Font size~10~
 *~Tab type~1~
