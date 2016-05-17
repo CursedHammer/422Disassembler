@@ -1,0 +1,409 @@
+00001000 Starting Address
+Assembler used: EASy68K Editor/Assembler v5.15.04
+Created On: 5/17/2016 12:42:17 AM
+
+00000000                             1  * TODO:
+00000000                             2  *    Make checks, ending address should not be less than beginning
+00000000                             3  *    Make sure addresses are even
+00000000                             4  *    ASCII to Hex
+00000000                             5  *    Hex to ASCII
+00000000                             6  *    Display full screens of data and clear
+00000000                             7  
+00000000                             8  * DONE:
+00000000                             9  *    Make sure all hex values (nearly none)
+00000000                            10  * 
+00000000                            11  *
+00000000                            12  
+00000000                            13  ******************************************************************************
+00000000                            14  *           DEFINITIONS                                                      *
+00000000                            15  ******************************************************************************
+00000000                            16  
+00000000  =00007000                 17  STACK       EQU   $7000
+00000000                            18  
+00000000  =00005000                 19  BEGINADDR   EQU   $5000
+00000000  =00005010                 20  ENDADDR     EQU   $5010
+00000000  =00005020                 21  STR_LEN     EQU   $5020
+00000000  =00005021                 22  HEXFLAG     EQU   $5021
+00000000  =00005030                 23  HEXVALUE    EQU   $5030
+00000000  =00005050                 24  REMAINDER   EQU   $5050
+00000000  =00000002                 25  MOD         EQU   2
+00000000                            26  
+00000000                            27  
+00000000  =00003000                 28  BADDR       EQU   $3000
+00000000  =00003010                 29  ENADDR      EQU   $3010
+00000000                            30             
+00000000  =00000000                 31  PRTSTRCRLF  EQU   0                  ; Trap function to print string + CRLF
+00000000  =00000001                 32  PRTSTR      EQU   1                  ; Trap function to print string
+00000000  =00000002                 33  READHEX     EQU   2                  ; Read String
+00000000                            34  
+00000000                            35  
+00000000  =0000000D                 36  CR          EQU   $0D
+00000000  =0000000A                 37  LF          EQU   $0A 
+00000000                            38  
+00001000                            39              ORG   $1000
+00001000                            40  
+00001000                            41  ******************************************************************************
+00001000                            42  *           BEGIN CODE                                                       *
+00001000                            43  ******************************************************************************
+00001000                            44  
+00001000                            45  *---------- START ------------------------------------------------------------
+00001000                            46  * Begins program's logical flow. Similar to main in C/C++
+00001000                            47  *-----------------------------------------------------------------------------           
+00001000                            48  START       
+00001000  4FF8 7000                 49      LEA    STACK, SP                * SP is stored in A7
+00001004  4EB9 000010B2             50      JSR    IO_WELCOME               * Run welcome subroutine
+0000100A                            51              
+0000100A                            52  GET_FIRST_ADDRESS
+0000100A  43F9 000012C4             53      LEA         PS1,A1              * Loads message into A1
+00001010  4EB9 000010E0             54      JSR         GET_HEXSTRING       * Get string from user
+00001016  0C38 0001 5021            55      CMPI.B      #1,HEXFLAG          * Does HEXFLAG = 1
+0000101C  66EC                      56      BNE         GET_FIRST_ADDRESS   * If yes, get hex again
+0000101E                            57     
+0000101E  4EB9 00001110             58      JSR         ASCII_TO_HEX        * Convert ascii to hex
+00001024  0C38 0001 5021            59      CMPI.B      #1,HEXFLAG          * Does HEXFLAG = 1
+0000102A  66DE                      60      BNE         GET_FIRST_ADDRESS   * If yes, get hex again
+0000102C                            61      
+0000102C  4EB9 0000124C             62      JSR         IS_HEX_EVEN         * Check that hex value is even
+00001032  0C38 0001 5021            63      CMPI.B      #1,HEXFLAG          * Does HEXFLAG = 1
+00001038  66D0                      64      BNE         GET_FIRST_ADDRESS   * If yes, get hex again
+0000103A                            65     
+0000103A  21F8 5030 5000            66      MOVE.L      HEXVALUE,BEGINADDR  * Copy hex value to begin
+00001040  43F9 00001334             67      LEA         BMESSAGE,A1         * Load message in A1 for display
+00001046  2238 5030                 68      MOVE.L      (HEXVALUE),D1       * Load hex value into A1 for display 
+0000104A  4EB9 00001280             69      JSR         PRINT_HEXVALUE      * Display hex value
+00001050  4EB9 0000128E             70      JSR         NEW_LINE            * Space
+00001056                            71      
+00001056  4EB9 000010C6             72      JSR         CLEAR               * Clear values for next hex
+0000105C                            73      
+0000105C                            74  GET_SECOND_ADDRESS
+0000105C  43F9 000012FC             75      LEA         PS2,A1              * Loads message into A1
+00001062  4EB9 000010E0             76      JSR         GET_HEXSTRING       * Get string from user
+00001068  0C38 0001 5021            77      CMPI.B      #1,HEXFLAG          * Does HEXFLAG = 1
+0000106E  66EC                      78      BNE         GET_SECOND_ADDRESS  * If yes, get hex again
+00001070                            79     
+00001070  4EB9 00001110             80      JSR         ASCII_TO_HEX        * Convert ascii to hex
+00001076  0C38 0001 5021            81      CMPI.B      #1,HEXFLAG          * Does HEXFLAG = 1
+0000107C  66DE                      82      BNE         GET_SECOND_ADDRESS  * If yes, get hex again
+0000107E                            83      
+0000107E  4EB9 0000124C             84      JSR         IS_HEX_EVEN         * Check that hex value is even
+00001084  0C38 0001 5021            85      CMPI.B      #1,HEXFLAG          * Does HEXFLAG = 1
+0000108A  66D0                      86      BNE         GET_SECOND_ADDRESS  * If yes, get hex again
+0000108C                            87     
+0000108C  21F8 5030 5010            88      MOVE.L      HEXVALUE,ENDADDR    * Copy hex value to begin
+00001092  43F9 0000134A             89      LEA         EMESSAGE,A1         * Load message in A1 for display
+00001098  2238 5030                 90      MOVE.L      (HEXVALUE),D1       * Load hex value into A1 for display
+0000109C  4EB9 00001280             91      JSR         PRINT_HEXVALUE      * Display hex value
+000010A2  4EB9 0000128E             92      JSR         NEW_LINE            * Space
+000010A8                            93      
+000010A8  4EB9 000010C6             94      JSR         CLEAR               * Clear values for next hex
+000010AE                            95      
+000010AE  FFFF FFFF                 96      SIMHALT                         * halt simulator
+000010B2                            97      
+000010B2                            98  *---------- END - START ------------------------------------------------------
+000010B2                            99         
+000010B2                           100             
+000010B2                           101  ******************************************************************************
+000010B2                           102  *           SUB ROUTINES                                                     *
+000010B2                           103  ******************************************************************************
+000010B2                           104             
+000010B2                           105  *---------- IO_WELCOME -------------------------------------------------------
+000010B2                           106  * Prints a welcome message
+000010B2                           107  *-----------------------------------------------------------------------------
+000010B2                           108  
+000010B2                           109  IO_WELCOME: 
+000010B2  43F9 0000129C            110              LEA     INTRO,A1        ; Loads message into A1
+000010B8  103C 000E                111              MOVE.B  #14,D0          ; Moves the Task 14 into D0
+000010BC  4E4F                     112              TRAP    #15             ; Displays Intro Message 
+000010BE                           113          
+000010BE  4EB9 0000128E            114              JSR     NEW_LINE        ; Call Subroutine        
+000010C4  4E75                     115              RTS                     ; Return from subroutine
+000010C6                           116          
+000010C6                           117  *---------- END - IO_WELCOME -------------------------------------------------
+000010C6                           118  
+000010C6                           119  
+000010C6                           120  *---------- CLEAR ------------------------------------------------------------
+000010C6                           121  * Clear HEXVALUE, D6, and STR_LEN. Then return to main.
+000010C6                           122  *-----------------------------------------------------------------------------
+000010C6                           123  CLEAR
+000010C6  4286                     124      CLR.L       D6                   * Clear
+000010C8  31FC FFFF 5020           125      MOVE.W      #$FFFF,STR_LEN       * Clear   
+000010CE  21FC FFFFFFFF 5030       126      MOVE.L      #$FFFFFFFF,HEXVALUE  * Clear  
+000010D6  21FC FFFFFFFF 5050       127      MOVE.L      #$FFFFFFFF,REMAINDER * Clear
+000010DE  4E75                     128      RTS                              * Return to main to get hex
+000010E0                           129  
+000010E0                           130  *---------- END - CLEAR ------------------------------------------------------
+000010E0                           131  
+000010E0                           132          
+000010E0                           133  *---------- GET_HEXSTRING ----------------------------------------------------
+000010E0                           134  * Read in the starting address and verify length is <= 8.
+000010E0                           135  *-----------------------------------------------------------------------------
+000010E0                           136  GET_HEXSTRING
+000010E0  103C 000E                137      MOVE.B      #14,D0              * Moves the Task 14 into D0
+000010E4  323C 0038                138      MOVE.W      #(PS2-PS1),D1       * The prompt string length
+000010E8  4E4F                     139      TRAP        #15                 * Displays contents of A1
+000010EA                           140   
+000010EA  43F9 00001361            141      LEA         HEXSTRING,A1        * Pointer to store the sentence
+000010F0  103C 0002                142      MOVE.B      #2,D0               * Set up readstring function
+000010F4  4E4F                     143      TRAP        #15                 * Get string from keyboard
+000010F6  11C1 5020                144      MOVE.B      D1,STR_LEN          * Save length of input string
+000010FA                           145      
+000010FA  0C38 0008 5020           146      CMPI.B      #8,(STR_LEN)        * Is length > 8?
+00001100  6EDE                     147      BGT         GET_HEXSTRING       * If yes, get hex again
+00001102                           148         
+00001102  41F9 00001361            149      LEA         HEXSTRING,A0        * Load address for verification     
+00001108  11FC 0001 5021           150      MOVE.B      #1,(HEXFLAG)   
+0000110E  4E75                     151      RTS                             * Return from subroutine
+00001110                           152          
+00001110                           153  *---------- END - GET_START_ADDR ---------------------------------------------
+00001110                           154  
+00001110                           155  
+00001110                           156  *---------- ASCII_TO_HEX -----------------------------------------------------------
+00001110                           157  * Checks to see if each character is hexadecimal
+00001110                           158  *-----------------------------------------------------------------------------
+00001110                           159  ASCII_TO_HEX      
+00001110  1618                     160      MOVE.B      (A0)+,D3            * Move first char into D3    
+00001112  0C03 0030                161      CMPI.B      #'0',D3             * Is Char equal to 0?
+00001116  6700 00D4                162      BEQ         HEXZERO            
+0000111A  0C03 0031                163      CMPI.B      #'1',D3             * Is Char equal to 1?
+0000111E  6700 00D4                164      BEQ         HEXONE                   
+00001122  0C03 0032                165      CMPI.B      #'2',D3             * Is Char equal to 2?
+00001126  6700 00D0                166      BEQ         HEXTWO    
+0000112A  0C03 0033                167      CMPI.B      #'3',D3             * Is Char equal to 3?
+0000112E  6700 00CC                168      BEQ         HEXTHREE    
+00001132  0C03 0034                169      CMPI.B      #'4',D3             * Is Char equal to 4?
+00001136  6700 00C8                170      BEQ         HEXFOUR    
+0000113A  0C03 0035                171      CMPI.B      #'5',D3             * Is Char equal to 5?
+0000113E  6700 00C4                172      BEQ         HEXFIVE    
+00001142  0C03 0036                173      CMPI.B      #'6',D3             * Is Char equal to 6?
+00001146  6700 00C0                174      BEQ         HEXSIX
+0000114A  0C03 0037                175      CMPI.B      #'7',D3             * Is Char equal to 7?
+0000114E  6700 00BC                176      BEQ         HEXSEVEN
+00001152  0C03 0038                177      CMPI.B      #'8',D3             * Is Char equal to 8?
+00001156  6700 00B8                178      BEQ         HEXEIGHT
+0000115A  0C03 0039                179      CMPI.B      #'9',D3             * Is Char equal to 9?
+0000115E  6700 00B4                180      BEQ         HEXNINE
+00001162  0C03 0041                181      CMPI.B      #'A',D3             * Is Char equal to A?
+00001166  6700 00B4                182      BEQ         HEXA                      
+0000116A  0C03 0042                183      CMPI.B      #'B',D3             * Is Char equal to B?
+0000116E  6700 00B4                184      BEQ         HEXB
+00001172  0C03 0043                185      CMPI.B      #'C',D3             * Is Char equal to C?
+00001176  6700 00B4                186      BEQ         HEXC
+0000117A  0C03 0044                187      CMPI.B      #'D',D3             * Is Char equal to D?
+0000117E  6700 00B4                188      BEQ         HEXD
+00001182  0C03 0045                189      CMPI.B      #'E',D3             * Is Char equal to E?
+00001186  6700 00B4                190      BEQ         HEXE
+0000118A  0C03 0046                191      CMPI.B      #'F',D3             * Is Char equal to F?
+0000118E  6700 00B4                192      BEQ         HEXF
+00001192  0C03 0061                193      CMPI.B      #'a',D3             * Is Char equal to a?
+00001196  6700 0084                194      BEQ         HEXA
+0000119A  0C03 0062                195      CMPI.B      #'b',D3             * Is Char equal to b?
+0000119E  6700 0084                196      BEQ         HEXB
+000011A2  0C03 0063                197      CMPI.B      #'c',D3             * Is Char equal to c?
+000011A6  6700 0084                198      BEQ         HEXC
+000011AA  0C03 0064                199      CMPI.B      #'d',D3             * Is Char equal to d?
+000011AE  6700 0084                200      BEQ         HEXD
+000011B2  0C03 0065                201      CMPI.B      #'e',D3             * Is Char equal to e?
+000011B6  6700 0084                202      BEQ         HEXE
+000011BA  0C03 0066                203      CMPI.B      #'f',D3             * Is Char equal to f?
+000011BE  6700 0084                204      BEQ         HEXF
+000011C2                           205      
+000011C2                           206  *   Value is not hex. Reset values and loop back to get hex
+000011C2                           207  *   =======================================================
+000011C2  11FC 0000 5021           208      MOVE.B      #0,HEXFLAG          * Set false    
+000011C8  6000 FEFC                209      BRA         CLEAR               * Clear some values
+000011CC                           210      
+000011CC                           211  FOUND  
+000011CC  5338 5020                212      SUBI.B      #1,STR_LEN          * Decrease string by one
+000011D0  0C38 0000 5020           213      CMPI.B      #0,STR_LEN          * Is string = 0?
+000011D6  6600 000E                214      BNE         SHIFTLEFT           * If no, shift value left 
+000011DA  21C6 5030                215      MOVE.L      D6,HEXVALUE         * If yes, save hex value
+000011DE  11FC 0001 5021           216      MOVE.B      #1,HEXFLAG          * Set true
+000011E4  4E75                     217      RTS                             * Then, return to main
+000011E6                           218  
+000011E6                           219  SHIFTLEFT
+000011E6  E98E                     220      LSL.L       #4,D6               * Shift the value left
+000011E8  6000 FF26                221      BRA         ASCII_TO_HEX        * Check next char
+000011EC                           222  
+000011EC                           223  HEXZERO
+000011EC  0686 00000000            224      ADD.L       #$0,D6              * Add value
+000011F2  60D8                     225      BRA         FOUND               * found, decrease strlen, shift value left    
+000011F4                           226  HEXONE
+000011F4  5286                     227      ADD.L       #$1,D6              * Add value
+000011F6  60D4                     228      BRA         FOUND               * found, decrease strlen, shift value left
+000011F8                           229  HEXTWO
+000011F8  5486                     230      ADD.L       #$2,D6              * Add value
+000011FA  60D0                     231      BRA         FOUND               * found, decrease strlen, shift value left
+000011FC                           232  HEXTHREE
+000011FC  5686                     233      ADD.L       #$3,D6              * Add value
+000011FE  60CC                     234      BRA         FOUND               * found, decrease strlen, shift value left
+00001200                           235  HEXFOUR
+00001200  5886                     236      ADD.L       #$4,D6              * Add value
+00001202  60C8                     237      BRA         FOUND               * found, decrease strlen, shift value left
+00001204                           238  HEXFIVE
+00001204  5A86                     239      ADD.L       #$5,D6              * Add value
+00001206  60C4                     240      BRA         FOUND               * found, decrease strlen, shift value left
+00001208                           241  HEXSIX
+00001208  5C86                     242      ADD.L       #$6,D6              * Add value
+0000120A  60C0                     243      BRA         FOUND               * found, decrease strlen, shift value left
+0000120C                           244  HEXSEVEN
+0000120C  5E86                     245      ADD.L       #$7,D6              * Add value
+0000120E  60BC                     246      BRA         FOUND               * found, decrease strlen, shift value left
+00001210                           247  HEXEIGHT
+00001210  5086                     248      ADD.L       #$8,D6              * Add value
+00001212  60B8                     249      BRA         FOUND               * found, decrease strlen, shift value left
+00001214                           250  HEXNINE
+00001214  0686 00000009            251      ADD.L       #$9,D6              * Add value
+0000121A  60B0                     252      BRA         FOUND               * found, decrease strlen, shift value left
+0000121C                           253  HEXA
+0000121C  0686 0000000A            254      ADD.L       #$A,D6              * Add value
+00001222  60A8                     255      BRA         FOUND               * found, decrease strlen, shift value left    
+00001224                           256  HEXB
+00001224  0686 0000000B            257      ADD.L       #$B,D6              * Add value
+0000122A  60A0                     258      BRA         FOUND               * found, decrease strlen, shift value left
+0000122C                           259  HEXC
+0000122C  0686 0000000C            260      ADD.L       #$C,D6              * Add value
+00001232  6098                     261      BRA         FOUND               * found, decrease strlen, shift value left
+00001234                           262  HEXD
+00001234  0686 0000000D            263      ADD.L       #$D,D6              * Add value
+0000123A  6090                     264      BRA         FOUND               * found, decrease strlen, shift value left
+0000123C                           265  HEXE
+0000123C  0686 0000000E            266      ADD.L       #$E,D6              * Add value
+00001242  6088                     267      BRA         FOUND               * found, decrease strlen, shift value left
+00001244                           268  HEXF
+00001244  0686 0000000F            269      ADD.L       #$F,D6              * Add value
+0000124A  6080                     270      BRA         FOUND               * found, decrease strlen, shift value left 
+0000124C                           271     
+0000124C                           272  *---------- END - ASCII_TO_HEX -----------------------------------------------
+0000124C                           273  
+0000124C                           274  
+0000124C                           275  *---------- IS_HEX_EVEN ------------------------------------------------------
+0000124C                           276  * Check to see if the hex value given is even.
+0000124C                           277  *-----------------------------------------------------------------------------
+0000124C                           278  IS_HEX_EVEN      
+0000124C  3606                     279      MOVE.W      D6,D3
+0000124E  3A3C 0002                280      MOVE.W      #MOD,D5
+00001252  86C5                     281      DIVU        D5,D3
+00001254  123C 0003                282      MOVE.B      #3,D1
+00001258                           283      
+00001258                           284  REPEAT 
+00001258  E88B                     285      LSR.L       #4,D3               * Shift remainder to lower word
+0000125A  57C9 FFFC                286      DBEQ        D1,REPEAT           * UNTIL [D0] = - 1
+0000125E  4241                     287      CLR         D1                  * Clear
+00001260                           288      
+00001260  B6BC 00000000            289      CMP.L       #0,D3               * Is hex even?
+00001266  6600 000E                290      BNE         NOTEVEN             * No, clear and go back to get_hex
+0000126A  31C3 5050                291      MOVE.W      D3,REMAINDER        * Save remainder
+0000126E  11FC 0001 5021           292      MOVE.B      #1,HEXFLAG          * Set true
+00001274  4E75                     293      RTS                             * Return to main
+00001276                           294  
+00001276                           295  NOTEVEN
+00001276  11FC 0000 5021           296      MOVE.B      #0,HEXFLAG          * Set false
+0000127C  6000 FE48                297      BRA         CLEAR               * Clear values
+00001280                           298  
+00001280                           299  *---------- END - IS_HEX_EVEN ------------------------------------------------
+00001280                           300  
+00001280                           301  
+00001280                           302  *---------- PRINT_HEXVALUE ---------------------------------------------------
+00001280                           303  * Prints out to display whatever is in A1
+00001280                           304  *-----------------------------------------------------------------------------
+00001280                           305  PRINT_HEXVALUE
+00001280  103C 000E                306      MOVE.B      #14,D0              * Moves the Task 13 into D0
+00001284  4E4F                     307      TRAP        #15                 * Displays contents of A1
+00001286                           308      
+00001286                           309      
+00001286  103C 0003                310      MOVE.B      #3,D0               * Moves the Task 3 into D0
+0000128A  4E4F                     311      TRAP        #15                 * Displays contents of D1
+0000128C                           312      
+0000128C  4E75                     313      RTS                             * Return from subroutine                                  
+0000128E                           314  
+0000128E                           315  *---------- END - PRINT_HEXVALUE ---------------------------------------------
+0000128E                           316  
+0000128E                           317  *---------- NEW_LINE ---------------------------------------------------------
+0000128E                           318  * Prints a new line
+0000128E                           319  *-----------------------------------------------------------------------------
+0000128E                           320  NEW_LINE
+0000128E  43F9 0000135E            321      LEA         ENDL,A1             * Loads message into A1
+00001294  103C 000E                322      MOVE.B      #14,D0              * Moves the TRACK 14 into D0
+00001298  4E4F                     323      TRAP        #15                 * Displays New line
+0000129A  4E75                     324      RTS                             * Return from subroutine
+0000129C                           325  
+0000129C                           326  *---------- END - NEW_LINE ---------------------------------------------------
+0000129C                           327  
+0000129C                           328  
+0000129C                           329  ******************************************************************************
+0000129C                           330  *           VARIABLES AND CONSTANTS                                          *
+0000129C                           331  ******************************************************************************
+0000129C                           332  
+0000129C= 57 45 4C 43 4F 4D ...    333  INTRO           DC.B  'WELCOME!',CR,LF,'This is a 68K disassembler.',CR,LF,0
+000012C4= 50 6C 65 61 73 65 ...    334  PS1             DC.B  'Please enter the starting hex address (max 8 digits): $',0
+000012FC= 50 6C 65 61 73 65 ...    335  PS2             DC.B  'Please enter the ending hex address (max 8 digits)  : $',0
+00001334= 42 65 67 69 6E 6E ...    336  BMESSAGE        DC.B  'Beginning addres is: ',0
+0000134A= 45 6E 64 69 6E 67 ...    337  EMESSAGE        DC.B  'Ending address is: ',0
+0000135E= 0D 0A 00                 338  ENDL            DC.B  CR,LF,0
+00001361                           339  
+00001361                           340  HEXSTRING       DS.B  80            * Var for hex string
+000013B1                           341  
+000013B1= 31 30 30 30 20 20 ...    342  ILLEGAL         DC.B  '1000    DATA    $WXYZ',CR,LF,0
+000013C9                           343  
+000013C9                           344                  END   START         * last line of source
+
+No errors detected
+No warnings generated
+
+
+SYMBOL TABLE INFORMATION
+Symbol-name         Value
+-------------------------
+ASCII_TO_HEX        1110
+BADDR               3000
+BEGINADDR           5000
+BMESSAGE            1334
+CLEAR               10C6
+CR                  D
+EMESSAGE            134A
+ENADDR              3010
+ENDADDR             5010
+ENDL                135E
+FOUND               11CC
+GET_FIRST_ADDRESS   100A
+GET_HEXSTRING       10E0
+GET_SECOND_ADDRESS  105C
+HEXA                121C
+HEXB                1224
+HEXC                122C
+HEXD                1234
+HEXE                123C
+HEXEIGHT            1210
+HEXF                1244
+HEXFIVE             1204
+HEXFLAG             5021
+HEXFOUR             1200
+HEXNINE             1214
+HEXONE              11F4
+HEXSEVEN            120C
+HEXSIX              1208
+HEXSTRING           1361
+HEXTHREE            11FC
+HEXTWO              11F8
+HEXVALUE            5030
+HEXZERO             11EC
+ILLEGAL             13B1
+INTRO               129C
+IO_WELCOME          10B2
+IS_HEX_EVEN         124C
+LF                  A
+MOD                 2
+NEW_LINE            128E
+NOTEVEN             1276
+PRINT_HEXVALUE      1280
+PRTSTR              1
+PRTSTRCRLF          0
+PS1                 12C4
+PS2                 12FC
+READHEX             2
+REMAINDER           5050
+REPEAT              1258
+SHIFTLEFT           11E6
+STACK               7000
+START               1000
+STR_LEN             5020
