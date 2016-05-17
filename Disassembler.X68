@@ -56,6 +56,11 @@ TRUE    EQU         $01             ; value equivalent to 'true'
 START   ORG         $1000
         LEA         STACK, SP       ; SP is stored in A7
         JSR         IO_WELCOME      ; Run welcome subroutine
+        *commented code is based on sandbox io file
+*        JSR         IO_GET_FIRST_ADDRESS ; Get starting address
+*        JSR         IO_GET_SECOND_ADDRESS ; Get ending address
+*        MOVE.L      BEGINADDR, A5   ; Move start address to A5 for easier manipulation (location tbd)
+*        MOVE.L      ENDADDR, A6     ; Move end address to A6 for easier manipulation (location tbd)
         MOVE.L      STARTADDR, A5   ; Move start address to A5 for easier manipulation (location tbd)
         MOVE.L      ENDADDR, A6     ; Move end address to A6 for easier manipulation (location tbd)
 LOOP    MOVE.L      #TRUE, D0       ; Reset boolean flag register, signals validity of current word (boolean flag location tbd)
