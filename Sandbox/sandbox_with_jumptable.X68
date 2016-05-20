@@ -98,9 +98,16 @@ START:                  ; first instruction of program
 
 *example EQU     %1110111000000010  ; ASR.B  D1,D2 = 1110 111 0 00 0 00 010 where D1 = 0x111 or 7
 *example EQU     %1110111001000010  ; ASR.W  D1,D2 = 1110 111 0 01 0 00 010 where D1 = 0x111 or 7
-example EQU     %1110111010000010  ; ASR.L  D1,D2 = 1110 111 0 10 0 00 010 where D1 = 0x111 or 7
+*example EQU     %1110111010000010  ; ASR.L  D1,D2 = 1110 111 0 10 0 00 010 where D1 = 0x111 or 7
 
+*example EQU     %1000100011000011 ; DIVU.? D3,D4 = 1000 100 011 000 011
 
+*example EQU     %1000100000000011 ; OR.B D3,D4 = 1000 100 000 000 011
+*example EQU     %1000100100000011 ; OR.B D3,D4 = 1000 100 100 000 011
+*example EQU     %1000100001000011 ; OR.W D3,D4 = 1000 100 001 000 011
+*example EQU     %1000100101000011 ; OR.W D3,D4 = 1000 100 101 000 011
+*example EQU     %1000100010000011 ; OR.L D3,D4 = 1000 100 010 000 011
+example EQU     %1000100110000011 ; OR.L D3,D4 = 1000 100 110 000 011
 
 
 shift   EQU     12                 ; Shift 12 bits 
@@ -125,7 +132,7 @@ table   JMP     code0000        ; ADDI.B, ADDI.W, or ADDI.L
         JMP     code0101        ; ADDQ.B or ADDQ.W or ADDQ.L
         JMP     code0110
         JMP     code0111        ; MOVEQ.L
-        JMP     code1000
+        JMP     code1000        ; OR.B or OR.W or OR.L or DIVU (DIVU is either word or long depending on ea)
         JMP     code1001        ; SUB.B or SUB.W or SUB.L
         JMP     code1010
         JMP     code1011        ; CMP.B or CMP.W or CMP.L
@@ -139,8 +146,8 @@ table   JMP     code0000        ; ADDI.B, ADDI.W, or ADDI.L
 code0000 JSR   ADDI_BorADDI_WorADDI_L
 code0001 JSR   ISMOVEB
          JSR   DONE
-code0010 JSR   MOVEA_LorMOVE_L        ; MOVEA.L or MOVE.L
-code0011 JSR  MOVEA_WorMOVE_W        ; MOVEA.W or MOVE.W
+code0010 JSR   MOVEA_LorMOVE_L        
+code0011 JSR  MOVEA_WorMOVE_W        
 code0100 JSR    NOP_MOVEM_LEA_JSR_CLR_RTS
          JSR    DONE
 code0101 JSR    ADDQ_BorADDQ_WorADDQ_L
@@ -148,7 +155,8 @@ code0101 JSR    ADDQ_BorADDQ_WorADDQ_L
 code0110 STOP  #$2700
 code0111 JSR    ISMOVEQL
          JSR    DONE
-code1000 STOP  #$2700
+code1000 JSR    OR_BorOR_WorOR_LorDIVU
+         JSR    DONE
 code1001 JSR    SUB_BorSUB_WorSUB_L
          JSR    DONE
 code1010 STOP  #$2700
@@ -161,6 +169,51 @@ code1101 JSR    ADD_BorADD_WorADD_L
 code1110 JSR    ROd_LSd_ASd
          JSR    DONE
 code1111 STOP  #$2700
+
+*****************************  OR_BorOR_WorOR_LorDIVU ************************************
+OR_BorOR_WorOR_LorDIVU     LEA     STACK,SP            ; Load the SP
+                    LEA     tableOR_BorOR_WorOR_LorDIVU, A0            ; Index into the table
+                    CLR.L   D0                  ; Zero it
+                    MOVE.W  #example,D0         ; We'll play with it here
+                    MOVE.B  #7,D1           ; Shift 7 bits left 
+                    ASL.W   D1,D0            
+                    MOVE.B  #shift,D1           ; Shift 12 bits to the right  
+                    LSR.W   D1,D0               ; Move the bits (moves highest 4 bits to lowest 4 positions,
+                                    ; and the rest are zeroed out)           
+                    MOVE.B  #1,D1           ; Shift 1 bits right
+                    ASR.W   D1,D0 
+                    
+                    MULU    #6,D0               ; Form offset (move 6 bytes in memory for every 'JMP' command)
+                    JSR     0(A0,D0)            ; Jump indirect with index, i.e. jump to 'table' + displacement                
+
+tableOR_BorOR_WorOR_LorDIVU             JMP    OR_DIVUcode000   ; OR.B
+                                        JMP    OR_DIVUcode001   ; OR.W                                    
+                                        JMP    OR_DIVUcode010   ; OR.L
+                                 
+                                        JMP    OR_DIVUcode011   ; DIVU (either word or long from ea)
+                                        JMP    OR_DIVUcode100   ; OR.B
+                                        JMP    OR_DIVUcode101   ; OR.W
+                                        JMP    OR_DIVUcode110   ; OR.L
+                                        ;JMP    OR_DIVUcode111   
+
+
+OR_DIVUcode000      JSR     ISORB
+                    JSR     DONE
+OR_DIVUcode001      JSR     ISORW  
+                    JSR     DONE                                 
+OR_DIVUcode010      JSR     ISORL 
+                    JSR     DONE  
+OR_DIVUcode011      JSR     ISDIVU
+                    JSR     DONE
+OR_DIVUcode100      JSR     ISORB
+                    JSR     DONE
+OR_DIVUcode101      JSR     ISORW  
+                    JSR     DONE                                 
+OR_DIVUcode110      JSR     ISORL 
+                    JSR     DONE 
+
+   
+***************************** END  ADD_BorADD_WorADD_L ************************************
 
 *****************************someASR ************************************
 someASR    LEA     STACK,SP            ; Load the SP
@@ -960,6 +1013,37 @@ MOVEWcode110     JSR     ISMOVEW
 MOVEWcode111     JSR     ISMOVEW 
                 JSR    DONE
 *****************************END MOVEA_WorMOVE_W ************************************
+ISDIVU  MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
+            LEA MESSAGEDIVU, A1         
+            MOVE.B  #14, D0
+            TRAP    #15
+   
+            MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
+            RTS
+
+ISORB  MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
+            LEA MESSAGEORB, A1         
+            MOVE.B  #14, D0
+            TRAP    #15
+   
+            MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
+            RTS
+
+ISORW  MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
+            LEA MESSAGEORW, A1         
+            MOVE.B  #14, D0
+            TRAP    #15
+   
+            MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
+            RTS
+            
+ISORL  MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
+            LEA MESSAGEORL, A1         
+            MOVE.B  #14, D0
+            TRAP    #15
+   
+            MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
+            RTS 
 
 ISASRB  MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
             LEA MESSAGEASRB, A1         
@@ -1490,11 +1574,18 @@ MESSAGELSLB DC.B    'LSL.B',CR,LF, 0
 MESSAGELSLW DC.B    'LSL.W',CR,LF, 0
 MESSAGELSLL DC.B    'LSL.L',CR,LF, 0
 
+MESSAGEORB DC.B    'OR.B',CR,LF, 0 
+MESSAGEORW DC.B    'OR.W',CR,LF, 0
+MESSAGEORL DC.B    'OR.L',CR,LF, 0
+
+MESSAGEDIVU DC.B    'DIVU word or long from ea',CR,LF, 0
+
     SIMHALT             ; halt simulator
 
 * Put variables and constants here
 
     END    START        ; last line of source
+
 
 
 
