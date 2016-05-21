@@ -1,5 +1,4 @@
 * TODO:
-*    Make checks, ending address should not be less than beginning
 *    Hex to ASCII
 *    Display full screens of data and clear
 
@@ -7,6 +6,7 @@
 *    Make sure addresses are even
 *    ASCII to Hex
 *    Make sure all hex values (nearly none)
+*    Check that ending address is less than beginning address
 * 
 *
 
@@ -44,15 +44,15 @@ GET_FIRST_ADDRESS
     LEA         PS1,A1              * Loads message into A1
     JSR         GET_HEXSTRING       * Get string from user
     CMPI.B      #1,HEXFLAG          * Does HEXFLAG = 1
-    BNE         GET_FIRST_ADDRESS   * If yes, get hex again
+    BNE         GET_FIRST_ADDRESS   * If no, get hex again
    
     JSR         ASCII_TO_HEX        * Convert ascii to hex
     CMPI.B      #1,HEXFLAG          * Does HEXFLAG = 1
-    BNE         GET_FIRST_ADDRESS   * If yes, get hex again
+    BNE         GET_FIRST_ADDRESS   * If no, get hex again
     
     JSR         IS_HEX_EVEN         * Check that hex value is even
     CMPI.B      #1,HEXFLAG          * Does HEXFLAG = 1
-    BNE         GET_FIRST_ADDRESS   * If yes, get hex again
+    BNE         GET_FIRST_ADDRESS   * If no, get hex again
    
     MOVE.L      HEXVALUE,BEGINADDR  * Copy hex value to begin
     LEA         BMESSAGE,A1         * Load message in A1 for display
@@ -66,15 +66,15 @@ GET_SECOND_ADDRESS
     LEA         PS2,A1              * Loads message into A1
     JSR         GET_HEXSTRING       * Get string from user
     CMPI.B      #1,HEXFLAG          * Does HEXFLAG = 1
-    BNE         GET_SECOND_ADDRESS  * If yes, get hex again
+    BNE         GET_SECOND_ADDRESS  * If no, get hex again
    
     JSR         ASCII_TO_HEX        * Convert ascii to hex
     CMPI.B      #1,HEXFLAG          * Does HEXFLAG = 1
-    BNE         GET_SECOND_ADDRESS  * If yes, get hex again
+    BNE         GET_SECOND_ADDRESS  * If no, get hex again
     
     JSR         IS_HEX_EVEN         * Check that hex value is even
     CMPI.B      #1,HEXFLAG          * Does HEXFLAG = 1
-    BNE         GET_SECOND_ADDRESS  * If yes, get hex again
+    BNE         GET_SECOND_ADDRESS  * If no, get hex again
    
     MOVE.L      HEXVALUE,ENDADDR    * Copy hex value to begin
     LEA         EMESSAGE,A1         * Load message in A1 for display
@@ -83,6 +83,12 @@ GET_SECOND_ADDRESS
     JSR         NEW_LINE            * Space
     
     JSR         CLEAR               * Clear values for next hex
+    
+CHECK_BADDR_IS_LESS_THAN_EADDR
+    JSR         IS_LESSTHAN         *
+    CMPI.B      #1,HEXFLAG          * Does HEXFLAG = 1
+    BNE         GET_FIRST_ADDRESS   * If no, get hex again
+    
     
     SIMHALT                         * halt simulator
     
@@ -263,15 +269,34 @@ HEXF
 *---------- END - ASCII_TO_HEX -----------------------------------------------
 
 
+*---------- IS_LESSTHAN ------------------------------------------------------
+* Check to see if the starting hex address is less than the ending hex 
+* address.
+*-----------------------------------------------------------------------------
+IS_LESSTHAN
+    MOVE.L      BEGINADDR,D4        * Store beginning address in D4
+    MOVE.L      ENDADDR,D6          * Store ending address in D6
+    CMP.L       D6,D4               * Is D4 < D6
+    BLT         LT                  * Yes, mark true return to main
+    MOVE.B      #0,HEXFLAG          * No, mark false
+    BRA         CLEAR               * Clear values, return to main
+
+LT
+    MOVE.B      #1,HEXFLAG          * Mark true
+    RTS                             * Return to main
+
+*---------- END - IS_LESSTHAN ------------------------------------------------
+
+
 *---------- IS_HEX_EVEN ------------------------------------------------------
 * Check to see if the hex value given is even.
 *-----------------------------------------------------------------------------
 IS_HEX_EVEN      
-    MOVE.W      D6,D3
-    MOVE.W      #MOD,D5
-    DIVU        D5,D3
-    MOVE.B      #3,D1
-    
+    MOVE.W      D6,D3               * Move value to be modded into D3
+    MOVE.W      #MOD,D5             * Move mod value into D5
+    DIVU        D5,D3               * Divide D3 by D5
+    MOVE.B      #3,D1               * Set counter to shift value into word 
+                                    * position    
 REPEAT 
     LSR.L       #4,D3               * Shift remainder to lower word
     DBEQ        D1,REPEAT           * UNTIL [D0] = - 1
@@ -333,6 +358,7 @@ HEXSTRING       DS.B  80            * Var for hex string
 ILLEGAL         DC.B  '1000    DATA    $WXYZ',CR,LF,0
 
                 END   START         * last line of source
+
 
 
 
