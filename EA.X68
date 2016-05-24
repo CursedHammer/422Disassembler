@@ -44,7 +44,8 @@ EA_MULS_W:
         LSR.W       D2, D1          ; Perform shift (zeros shifted in)
 
         *get default ea
-        *check validity
+        JSR         EA_DEFAULT_COMBO
+        *check validity via jump table
 EA_NOP
 EA_OR
 EA_ROL
@@ -134,6 +135,7 @@ EA_DEFAULT_COMBO:
 
 
 *----------- Variables and Constants -----------------------
+
 
 
 
