@@ -12,6 +12,67 @@
 
 *----------- Subroutines: ----------------------------------
 
+*----------- OC_PARSE --------------------------------------
+OC_PARSE:
+        MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
+        LEA         initial_table,A0 ; Index into the table
+        CLR.L       D0              ; Zero it
+        *replace '#example' with indirect access of address register holding pointer
+        MOVE.W      #example,D0     ; We'll play with it here
+        MOVE.B      #12,D1          ; Shift 12 bits to the right
+        LSR.W       D1,D0           ; Move the bits (moves highest 4 bits to lowest 4 positions,
+                                    ; and the rest are zeroed out)
+        MULU        #6,D0           ; Form offset (move 6 bytes in memory for every 'JMP' command)
+        JSR         0(A0,D0)        ; Jump indirect with index, i.e. jump to 'table' + displacement
+
+initial_table:
+        JMP         code0000        ; ADDI.B, ADDI.W, or ADDI.L
+        JMP         code0001        ; MOVE.B
+        JMP         code0010        ; MOVEA.L or MOVE.L
+        JMP         code0011        ; MOVEA.W or MOVE.W
+        JMP         code0100        ; NOP or MOVEM.W or MOVEM.L or LEA or CLR.B or CLR.W or CLR.L or JSR or RTS or MULS.W
+        JMP         code0101        ; ADDQ.B or ADDQ.W or ADDQ.L
+        JMP         code0110
+        JMP         code0111        ; MOVEQ.L
+        JMP         code1000        ; OR.B or OR.W or OR.L or DIVU (DIVU is either word or long depending on ea)
+        JMP         code1001        ; SUB.B or SUB.W or SUB.L
+        JMP         code1010
+        JMP         code1011        ; CMP.B or CMP.W or CMP.L
+        JMP         code1100        ; AND_BorAND_WorAND_LorMULS_W
+        JMP         code1101        ; ADD.B or ADD.W or ADD.L
+        JMP         code1110        ; ROd_LSd_ASd
+        JMP         code1111
+
+code0000 JSR        ADDI_BorADDI_WorADDI_L
+code0001 JSR        ISMOVEB
+         JSR        DONE
+code0010 JSR        MOVEA_LorMOVE_L
+code0011 JSR        MOVEA_WorMOVE_W
+code0100 JSR        NOP_MOVEM_LEA_JSR_CLR_RTS
+         JSR        DONE
+code0101 JSR        ADDQ_BorADDQ_WorADDQ_L
+         JSR        DONE
+code0110 STOP       #$2700
+code0111 JSR        ISMOVEQL
+         JSR        DONE
+code1000 JSR        OR_BorOR_WorOR_LorDIVU
+         JSR        DONE
+code1001 JSR        SUB_BorSUB_WorSUB_L
+         JSR        DONE
+code1010 STOP       #$2700
+code1011 JSR        CMP_BorCMP_WorCMP_L
+         JSR        DONE
+code1100 JSR        AND_BorAND_WorAND_LorMULS_W
+         JSR        DONE
+code1101 JSR        ADD_BorADD_WorADD_L
+         JSR        DONE
+code1110 JSR        ROd_LSd_ASd
+         JSR        DONE
+code1111 STOP       #$2700
+*----------- Done ------------------------------------------
+DONE    MOVE.B      #9, D0
+        TRAP        #15
+
 *----------- OR_BorOR_WorOR_LorDIVU ------------------------
 OR_BorOR_WorOR_LorDIVU:
         LEA         tableOR_BorOR_WorOR_LorDIVU, A0 ; Index into the table
@@ -730,7 +791,7 @@ tableMOVEA_LorMOVE_L:
 MOVEcode000 JSR     ISMOVEL
             JSR     DONE
 MOVEAcode001 JSR    ISMOVEAL
-            JSR     DONE
+             JSR     DONE
 MOVEcode010 JSR     ISMOVEL
             JSR     DONE
 MOVEcode011 JSR     ISMOVEL
@@ -786,6 +847,9 @@ MOVEWcode111 JSR    ISMOVEW
 *----------- END MOVEA_WorMOVE_W ---------------------------
 
 *----------- All 'IS' Subroutines --------------------------
+; TODO: adjust workflow to:
+;   1) save message address to buffer pointer
+;   2) pass pointer to necessary EA Subroutines
 ISDIVU  MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
         LEA         MESSAGEDIVU, A1
         MOVE.B      #14, D0
