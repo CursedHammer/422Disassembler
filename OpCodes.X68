@@ -13,7 +13,6 @@
 
 *----------- OR_BorOR_WorOR_LorDIVU --------------------------
 OR_BorOR_WorOR_LorDIVU:
-        LEA         STACK,SP            ; Load the SP
         LEA         tableOR_BorOR_WorOR_LorDIVU, A0            ; Index into the table
         CLR.L       D0                  ; Zero it
         MOVE.W      #example,D0         ; We'll play with it here
@@ -58,7 +57,6 @@ OR_DIVUcode110 JSR  ISORL
 
 *----------- someASR --------------------------
 someASR:
-        LEA         STACK,SP            ; Load the SP
         LEA         tableSomeASR, A0            ; Index into the table
         CLR.L       D0                  ; Zero it
         MOVE.W      #example,D0         ; We'll play with it here
@@ -90,7 +88,6 @@ ASRcode10 JSR       ISASRL
 
 *----------- someASL --------------------------
 someASL:
-        LEA         STACK,SP            ; Load the SP
         LEA         tableSomeASL, A0            ; Index into the table
         CLR.L       D0                  ; Zero it
         MOVE.W      #example,D0         ; We'll play with it here
@@ -121,7 +118,6 @@ ASLcode10 JSR       ISASLL
 
 *----------- someLSR --------------------------
 someLSR:
-        LEA         STACK,SP            ; Load the SP
         LEA         tableSomeLSR, A0            ; Index into the table
         CLR.L       D0                  ; Zero it
         MOVE.W      #example,D0         ; We'll play with it here
@@ -152,7 +148,6 @@ LSRcode10 JSR       ISLSRL
 
 *----------- someLSL --------------------------
 someLSL:
-        LEA         STACK,SP            ; Load the SP
         LEA         tableSomeLSL, A0            ; Index into the table
         CLR.L       D0                  ; Zero it
         MOVE.W      #example,D0         ; We'll play with it here
@@ -183,7 +178,6 @@ LSLcode10 JSR       ISLSLL
 
 *----------- someROL --------------------------
 someROL:
-        LEA         STACK,SP            ; Load the SP
         LEA         tableSomeROL, A0            ; Index into the table
         CLR.L       D0                  ; Zero it
         MOVE.W      #example,D0         ; We'll play with it here
@@ -215,7 +209,6 @@ ROLcode10 JSR       ISROLL
 
 *----------- someROR --------------------------
 someROR:
-        LEA         STACK,SP            ; Load the SP
         LEA         tableSomeROR, A0            ; Index into the table
         CLR.L       D0                  ; Zero it
         MOVE.W      #example,D0         ; We'll play with it here
@@ -246,7 +239,6 @@ RORcode10 JSR       ISRORL
 
 *----------- ROL_ROR --------------------------
 ROL_ROR:
-        LEA         STACK,SP            ; Load the SP
         LEA         tableROL_ROR, A0            ; Index into the table
         CLR.L       D0                  ; Zero it
         MOVE.W      #example,D0         ; We'll play with it here
@@ -274,7 +266,6 @@ ROL_RORcode1 JSR    someROL
 
 *----------- LSL_LSR --------------------------
 LSL_LSR:
-        LEA         STACK,SP            ; Load the SP
         LEA         tableLSL_LSR, A0            ; Index into the table
         CLR.L       D0                  ; Zero it
         MOVE.W      #example,D0         ; We'll play with it here
@@ -302,7 +293,6 @@ LSL_LSRcode1 JSR    someLSL
 
 *----------- ASL_ASR --------------------------
 ASL_ASR:
-        LEA         STACK,SP            ; Load the SP
         LEA         tableASL_ASR, A0            ; Index into the table
         CLR.L       D0                  ; Zero it
         MOVE.W      #example,D0         ; We'll play with it here
@@ -330,7 +320,6 @@ ASL_ASRcode1 JSR    someASL
 
 *----------- ROd_LSd_ASd --------------------------
 ROd_LSd_ASd:
-        LEA         STACK,SP            ; Load the SP
         LEA         tableROd_LSd_ASd, A0            ; Index into the table
         CLR.L       D0                  ; Zero it
         MOVE.W      #example,D0         ; We'll play with it here
@@ -363,7 +352,6 @@ ROd_LSd_ASdcode11 JSR ROL_ROR
 
 *----------- AND_BorAND_WorAND_LorMULS_W --------------------------
 AND_BorAND_WorAND_LorMULS_W:
-        LEA         STACK,SP            ; Load the SP
         LEA         tableAND_BorAND_WorAND_LorMULS_W, A0            ; Index into the table
         CLR.L       D0                  ; Zero it
         MOVE.W      #example,D0         ; We'll play with it here
@@ -408,7 +396,6 @@ ANDcode111 JSR      ISMULSW
 
 *----------- ADD_BorADD_WorADD_L --------------------------
 ADD_BorADD_WorADD_L:
-        LEA         STACK,SP            ; Load the SP
         LEA         tableADD_BorADD_WorADD_L, A0            ; Index into the table
         CLR.L       D0                  ; Zero it
         MOVE.W      #example,D0         ; We'll play with it here
@@ -454,7 +441,6 @@ ADDcode111 JSR      ISADDAL
 
 *----------- SUB_BorSUB_WorSUB_L --------------------------
 SUB_BorSUB_WorSUB_L:
-        LEA         STACK,SP            ; Load the SP
         LEA         tableSUB_BorSUB_WorSUB_L, A0            ; Index into the table
         CLR.L       D0                  ; Zero it
         MOVE.W      #example,D0         ; We'll play with it here
@@ -497,7 +483,6 @@ SUBcode110 JSR      ISSUBL
 
 *----------- CMP_BorCMP_WorCMP_L --------------------------
 CMP_BorCMP_WorCMP_L:
-        LEA         STACK,SP            ; Load the SP
         LEA         tableCMP_BorCMP_WorCMP_L, A0            ; Index into the table
         CLR.L       D0                  ; Zero it
         MOVE.W      #example,D0         ; We'll play with it here
@@ -529,7 +514,6 @@ CMPcode010 JSR      ISCMPL
 
 *----------- ADDQ_BorADDQ_WorADDQ_L --------------------------
 ADDQ_BorADDQ_WorADDQ_L:
-        LEA         STACK,SP            ; Load the SP
         LEA         tableADDQ_BorADDQ_WorADDQ_L, A0            ; Index into the table
         CLR.L       D0                  ; Zero it
         MOVE.W      #example,D0         ; We'll play with it here
@@ -560,7 +544,6 @@ ADDQcode10 JSR      ISADDQL
 
 *----------- someCLR --------------------------
 someCLR:
-        LEA         STACK,SP            ; Load the SP
         LEA         tableSomeCLR, A0            ; Index into the table
         CLR.L       D0                  ; Zero it
         MOVE.W      #example,D0         ; We'll play with it here
@@ -591,7 +574,6 @@ CLRcode10 JSR       ISCLRL
 
 *----------- NOPorCLRorRTSorJSR --------------------------
 NOPorCLRorRTSorJSR:
-        LEA         STACK,SP            ; Load the SP
         LEA         tableNOPorCLRorRTSorJSR, A0            ; Index into the table
         CLR.L       D0                  ; Zero it
         MOVE.W      #example,D0         ; We'll play with it here
@@ -659,7 +641,6 @@ JSRorCLRcode1111 STOP  #$2700
 
 *----------- someMOVEM --------------------------
 someMOVEM:
-        LEA         STACK,SP            ; Load the SP
         LEA         tableSomeMOVEM, A0            ; Index into the table
         CLR.L       D0                  ; Zero it
         MOVE.W      #example,D0         ; We'll play with it here
@@ -687,7 +668,6 @@ MOVEMcode1 JSR      ISMOVEML
 
 *----------- NOP_MOVEM_LEA_JSR_CLR_RTS --------------------------
 NOP_MOVEM_LEA_JSR_CLR_RTS:
-        LEA         STACK,SP            ; Load the SP
         LEA         tableNOP_MOVEM_LEA_JSR_CLR_RTS, A0            ; Index into the table
         CLR.L       D0                  ; Zero it
         MOVE.W      #example,D0         ; We'll play with it here
@@ -750,7 +730,6 @@ LOTScode1111 STOP   #$2700
 
 *----------- ADDI_BorADDI_WorADDI_L --------------------------
 ADDI_BorADDI_WorADDI_L:
-        LEA         STACK,SP            ; Load the SP
         LEA         tableADDI_BorADDI_WorADDI_L,A0            ; Index into the table
         CLR.L       D0                  ; Zero it
         MOVE.W      #example,D0         ; We'll play with it here
@@ -780,7 +759,6 @@ ADDILcode10 JSR     ISADDIL
 
 *----------- MOVEA_LorMOVE_L --------------------------
 MOVEA_LorMOVE_L:
-        LEA         STACK,SP            ; Load the SP
         LEA         tableMOVEA_LorMOVE_L,A0            ; Index into the table
         CLR.L       D0                  ; Zero it
         MOVE.W      #example,D0         ; We'll play with it here
@@ -823,7 +801,6 @@ MOVEcode111 JSR     ISMOVEL
 
 *----------- MOVEA_WorMOVE_W --------------------------
 MOVEA_WorMOVE_W:
-        LEA         STACK,SP            ; Load the SP
         LEA         tableMOVEA_WorMOVE_W,A0            ; Index into the table
         CLR.L       D0                  ; Zero it
         MOVE.W      #example,D0         ; We'll play with it here
