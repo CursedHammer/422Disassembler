@@ -12,7 +12,7 @@
 
 *----------- Subroutines: ----------------------------------
 
-*----------- OR_BorOR_WorOR_LorDIVU --------------------------
+*----------- OR_BorOR_WorOR_LorDIVU ------------------------
 OR_BorOR_WorOR_LorDIVU:
         LEA         tableOR_BorOR_WorOR_LorDIVU, A0            ; Index into the table
         CLR.L       D0                  ; Zero it
@@ -51,9 +51,9 @@ OR_DIVUcode101 JSR  ISORW
                JSR  DONE
 OR_DIVUcode110 JSR  ISORL
                JSR  DONE
-*----------- END  ADD_BorADD_WorADD_L --------------------------
+*----------- END  ADD_BorADD_WorADD_L ----------------------
 
-*----------- someASR --------------------------
+*----------- someASR ---------------------------------------
 someASR:
         LEA         tableSomeASR, A0            ; Index into the table
         CLR.L       D0                  ; Zero it
@@ -79,9 +79,9 @@ ASRcode01 JSR       ISASRW
           JSR       DONE
 ASRcode10 JSR       ISASRL
           JSR       DONE
-*----------- END someLSL --------------------------
+*----------- END someLSL -----------------------------------
 
-*----------- someASL --------------------------
+*----------- someASL ---------------------------------------
 someASL:
         LEA         tableSomeASL, A0            ; Index into the table
         CLR.L       D0                  ; Zero it
@@ -107,9 +107,9 @@ ASLcode01 JSR       ISASLW
           JSR       DONE
 ASLcode10 JSR       ISASLL
           JSR       DONE
-*----------- END someLSL --------------------------
+*----------- END someLSL -----------------------------------
 
-*----------- someLSR --------------------------
+*----------- someLSR ---------------------------------------
 someLSR:
         LEA         tableSomeLSR, A0            ; Index into the table
         CLR.L       D0                  ; Zero it
@@ -135,9 +135,9 @@ LSRcode01 JSR       ISLSRW
           JSR       DONE
 LSRcode10 JSR       ISLSRL
           JSR       DONE
-*----------- END someLSR --------------------------
+*----------- END someLSR -----------------------------------
 
-*----------- someLSL --------------------------
+*----------- someLSL ---------------------------------------
 someLSL:
         LEA         tableSomeLSL, A0            ; Index into the table
         CLR.L       D0                  ; Zero it
@@ -163,9 +163,9 @@ LSLcode01 JSR       ISLSLW
           JSR       DONE
 LSLcode10 JSR       ISLSLL
           JSR       DONE
-*----------- END someLSL --------------------------
+*----------- END someLSL -----------------------------------
 
-*----------- someROL --------------------------
+*----------- someROL ---------------------------------------
 someROL:
         LEA         tableSomeROL, A0            ; Index into the table
         CLR.L       D0                  ; Zero it
@@ -191,10 +191,10 @@ ROLcode01 JSR       ISROLW
           JSR       DONE
 ROLcode10 JSR       ISROLL
           JSR       DONE
-*----------- END someROR --------------------------
+*----------- END someROR -----------------------------------
 
 
-*----------- someROR --------------------------
+*----------- someROR ---------------------------------------
 someROR:
         LEA         tableSomeROR, A0            ; Index into the table
         CLR.L       D0                  ; Zero it
@@ -220,9 +220,9 @@ RORcode01 JSR       ISRORW
           JSR       DONE
 RORcode10 JSR       ISRORL
           JSR       DONE
-*----------- END someROR --------------------------
+*----------- END someROR -----------------------------------
 
-*----------- ROL_ROR --------------------------
+*----------- ROL_ROR ---------------------------------------
 ROL_ROR:
         LEA         tableROL_ROR, A0            ; Index into the table
         CLR.L       D0                  ; Zero it
@@ -245,9 +245,9 @@ ROL_RORcode0 JSR    someROR
              JSR    DONE
 ROL_RORcode1 JSR    someROL
              JSR    DONE
-*----------- END ROL_ROR --------------------------
+*----------- END ROL_ROR -----------------------------------
 
-*----------- LSL_LSR --------------------------
+*----------- LSL_LSR ---------------------------------------
 LSL_LSR:
         LEA         tableLSL_LSR, A0            ; Index into the table
         CLR.L       D0                  ; Zero it
@@ -270,9 +270,9 @@ LSL_LSRcode0 JSR    someLSR
              JSR    DONE
 LSL_LSRcode1 JSR    someLSL
              JSR    DONE
-*----------- END LSL_LSR --------------------------
+*----------- END LSL_LSR -----------------------------------
 
-*----------- ASL_ASR --------------------------
+*----------- ASL_ASR ---------------------------------------
 ASL_ASR:
         LEA         tableASL_ASR, A0            ; Index into the table
         CLR.L       D0                  ; Zero it
@@ -295,9 +295,9 @@ ASL_ASRcode0 JSR    someASR
              JSR    DONE
 ASL_ASRcode1 JSR    someASL
              JSR    DONE
-*----------- END ASL_ASR --------------------------
+*----------- END ASL_ASR -----------------------------------
 
-*----------- ROd_LSd_ASd --------------------------
+*----------- ROd_LSd_ASd -----------------------------------
 ROd_LSd_ASd:
         LEA         tableROd_LSd_ASd, A0            ; Index into the table
         CLR.L       D0                  ; Zero it
@@ -325,9 +325,9 @@ ROd_LSd_ASdcode01 JSR LSL_LSR
 ROd_LSd_ASdcode10 STOP #$2700
 ROd_LSd_ASdcode11 JSR ROL_ROR
                   JSR DONE
-*----------- END  ROd_LSd_ASd --------------------------
+*----------- END  ROd_LSd_ASd ------------------------------
 
-*----------- AND_BorAND_WorAND_LorMULS_W --------------------------
+*----------- AND_BorAND_WorAND_LorMULS_W -------------------
 AND_BorAND_WorAND_LorMULS_W:
         LEA         tableAND_BorAND_WorAND_LorMULS_W, A0            ; Index into the table
         CLR.L       D0                  ; Zero it
@@ -367,9 +367,9 @@ ANDcode110 JSR      ISANDL
            JSR      DONE
 ANDcode111 JSR      ISMULSW
            JSR      DONE
-*----------- END  ADD_BorADD_WorADD_L --------------------------
+*----------- END  ADD_BorADD_WorADD_L ----------------------
 
-*----------- ADD_BorADD_WorADD_L --------------------------
+*----------- ADD_BorADD_WorADD_L ---------------------------
 ADD_BorADD_WorADD_L:
         LEA         tableADD_BorADD_WorADD_L, A0            ; Index into the table
         CLR.L       D0                  ; Zero it
@@ -410,9 +410,9 @@ ADDcode110 JSR      ISADDL
            JSR      DONE
 ADDcode111 JSR      ISADDAL
            JSR      DONE
-*----------- END  ADD_BorADD_WorADD_L --------------------------
+*----------- END  ADD_BorADD_WorADD_L ----------------------
 
-*----------- SUB_BorSUB_WorSUB_L --------------------------
+*----------- SUB_BorSUB_WorSUB_L ---------------------------
 SUB_BorSUB_WorSUB_L:
         LEA         tableSUB_BorSUB_WorSUB_L, A0            ; Index into the table
         CLR.L       D0                  ; Zero it
@@ -449,9 +449,9 @@ SUBcode101 JSR      ISSUBW
            JSR      DONE
 SUBcode110 JSR      ISSUBL
            JSR      DONE
-*----------- END  SUB_BorSUB_WorSUB_L --------------------------
+*----------- END  SUB_BorSUB_WorSUB_L ----------------------
 
-*----------- CMP_BorCMP_WorCMP_L --------------------------
+*----------- CMP_BorCMP_WorCMP_L ---------------------------
 CMP_BorCMP_WorCMP_L:
         LEA         tableCMP_BorCMP_WorCMP_L, A0            ; Index into the table
         CLR.L       D0                  ; Zero it
@@ -477,9 +477,9 @@ CMPcode001 JSR      ISCMPW
            JSR      DONE
 CMPcode010 JSR      ISCMPL
            JSR      DONE
-*----------- END CMP_BorCMP_WorCMP_L --------------------------
+*----------- END CMP_BorCMP_WorCMP_L -----------------------
 
-*----------- ADDQ_BorADDQ_WorADDQ_L --------------------------
+*----------- ADDQ_BorADDQ_WorADDQ_L ------------------------
 ADDQ_BorADDQ_WorADDQ_L:
         LEA         tableADDQ_BorADDQ_WorADDQ_L, A0            ; Index into the table
         CLR.L       D0                  ; Zero it
@@ -505,9 +505,9 @@ ADDQcode01 JSR      ISADDQW
            JSR      DONE
 ADDQcode10 JSR      ISADDQL
            JSR      DONE
-*----------- END ADDQ_BorADDQ_WorADDQ_L --------------------------
+*----------- END ADDQ_BorADDQ_WorADDQ_L --------------------
 
-*----------- someCLR --------------------------
+*----------- someCLR ---------------------------------------
 someCLR:
         LEA         tableSomeCLR, A0            ; Index into the table
         CLR.L       D0                  ; Zero it
@@ -533,9 +533,9 @@ CLRcode01 JSR       ISCLRW
           JSR       DONE
 CLRcode10 JSR       ISCLRL
           JSR       DONE
-*----------- END someCLR --------------------------
+*----------- END someCLR -----------------------------------
 
-*----------- NOPorCLRorRTSorJSR --------------------------
+*----------- NOPorCLRorRTSorJSR ----------------------------
 NOPorCLRorRTSorJSR:
         LEA         tableNOPorCLRorRTSorJSR, A0            ; Index into the table
         CLR.L       D0                  ; Zero it
@@ -597,9 +597,9 @@ JSRorCLRcode1101 STOP #$2700
 JSRorCLRcode1110 JSR ISJSR
                  JSR DONE
 JSRorCLRcode1111 STOP  #$2700
-*----------- END NOPorCLRorRTSorJSR --------------------------
+*----------- END NOPorCLRorRTSorJSR ------------------------
 
-*----------- someMOVEM --------------------------
+*----------- someMOVEM -------------------------------------
 someMOVEM:
         LEA         tableSomeMOVEM, A0            ; Index into the table
         CLR.L       D0                  ; Zero it
@@ -622,9 +622,9 @@ MOVEMcode0 JSR      ISMOVEMW
            JSR      DONE
 MOVEMcode1 JSR      ISMOVEML
            JSR       DONE
-*----------- END someMOVEM --------------------------
+*----------- END someMOVEM ---------------------------------
 
-*----------- NOP_MOVEM_LEA_JSR_CLR_RTS --------------------------
+*----------- NOP_MOVEM_LEA_JSR_CLR_RTS ---------------------
 NOP_MOVEM_LEA_JSR_CLR_RTS:
         LEA         tableNOP_MOVEM_LEA_JSR_CLR_RTS, A0            ; Index into the table
         CLR.L       D0                  ; Zero it
@@ -678,9 +678,9 @@ LOTScode1101 STOP   #$2700
 LOTScode1110 JSR    ISLEA
              JSR    DONE
 LOTScode1111 STOP   #$2700
-*----------- END NOP_MOVEM_LEA_JSR_CLR_RTS --------------------------
+*----------- END NOP_MOVEM_LEA_JSR_CLR_RTS -----------------
 
-*----------- ADDI_BorADDI_WorADDI_L --------------------------
+*----------- ADDI_BorADDI_WorADDI_L ------------------------
 ADDI_BorADDI_WorADDI_L:
         LEA         tableADDI_BorADDI_WorADDI_L,A0            ; Index into the table
         CLR.L       D0                  ; Zero it
@@ -703,9 +703,9 @@ ADDIWcode01 JSR     ISADDIW
             JSR     DONE
 ADDILcode10 JSR     ISADDIL
             JSR     DONE
-*----------- END ADDI_BorADDI_WorADDI_L --------------------------
+*----------- END ADDI_BorADDI_WorADDI_L --------------------
 
-*----------- MOVEA_LorMOVE_L --------------------------
+*----------- MOVEA_LorMOVE_L -------------------------------
 MOVEA_LorMOVE_L:
         LEA         tableMOVEA_LorMOVE_L,A0            ; Index into the table
         CLR.L       D0                  ; Zero it
@@ -743,9 +743,9 @@ MOVEcode110 JSR     ISMOVEL
             JSR     DONE
 MOVEcode111 JSR     ISMOVEL
             JSR     DONE
-*----------- END MOVEA_LorMOVE_L --------------------------
+*----------- END MOVEA_LorMOVE_L ---------------------------
 
-*----------- MOVEA_WorMOVE_W --------------------------
+*----------- MOVEA_WorMOVE_W -------------------------------
 MOVEA_WorMOVE_W:
         LEA         tableMOVEA_WorMOVE_W,A0            ; Index into the table
         CLR.L       D0                  ; Zero it
@@ -1209,7 +1209,7 @@ ISADDIB MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
         TRAP        #15
         MOVEM.W     (SP)+,  A0-A7/D0-D7         ; Restore registers
         RTS                          ; Exit subroutine
-        
+
 *~Font name~Courier New~
 *~Font size~10~
 *~Tab type~1~
