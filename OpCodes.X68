@@ -21,10 +21,9 @@ OR_BorOR_WorOR_LorDIVU:
         ASL.W       D1,D0
         MOVE.B      #shift,D1           ; Shift 12 bits to the right
         LSR.W       D1,D0               ; Move the bits (moves highest 4 bits to lowest 4 positions,
-                        ; and the rest are zeroed out)
+                            ; and the rest are zeroed out)
         MOVE.B      #1,D1           ; Shift 1 bits right
         ASR.W       D1,D0
-
         MULU        #6,D0               ; Form offset (move 6 bytes in memory for every 'JMP' command)
         JSR         0(A0,D0)            ; Jump indirect with index, i.e. jump to 'table' + displacement
 
@@ -32,7 +31,6 @@ tableOR_BorOR_WorOR_LorDIVU
         JMP         OR_DIVUcode000   ; OR.B
         JMP         OR_DIVUcode001   ; OR.W
         JMP         OR_DIVUcode010   ; OR.L
-
         JMP         OR_DIVUcode011   ; DIVU (either word or long from ea)
         JMP         OR_DIVUcode100   ; OR.B
         JMP         OR_DIVUcode101   ; OR.W
@@ -53,7 +51,6 @@ OR_DIVUcode101 JSR  ISORW
                JSR  DONE
 OR_DIVUcode110 JSR  ISORL
                JSR  DONE
-
 *----------- END  ADD_BorADD_WorADD_L --------------------------
 
 *----------- someASR --------------------------
@@ -68,7 +65,6 @@ someASR:
                         ; and the rest are zeroed out)
         MOVE.B      #2,D1           ; Shift 2 bits right
         ASR.W       D1,D0
-
         MULU        #6,D0               ; Form offset (move 6 bytes in memory for every 'JMP' command)
         JSR         0(A0,D0)            ; Jump indirect with index, i.e. jump to 'table' + displacement
 
@@ -83,9 +79,7 @@ ASRcode01 JSR       ISASRW
           JSR       DONE
 ASRcode10 JSR       ISASRL
           JSR       DONE
-
 *----------- END someLSL --------------------------
-
 
 *----------- someASL --------------------------
 someASL:
@@ -99,7 +93,6 @@ someASL:
                         ; and the rest are zeroed out)
         MOVE.B      #2,D1           ; Shift 2 bits right
         ASR.W       D1,D0
-
         MULU        #6,D0               ; Form offset (move 6 bytes in memory for every 'JMP' command)
         JSR         0(A0,D0)            ; Jump indirect with index, i.e. jump to 'table' + displacement
 
@@ -114,7 +107,6 @@ ASLcode01 JSR       ISASLW
           JSR       DONE
 ASLcode10 JSR       ISASLL
           JSR       DONE
-
 *----------- END someLSL --------------------------
 
 *----------- someLSR --------------------------
@@ -129,7 +121,6 @@ someLSR:
                         ; and the rest are zeroed out)
         MOVE.B      #2,D1           ; Shift 2 bits right
         ASR.W       D1,D0
-
         MULU        #6,D0               ; Form offset (move 6 bytes in memory for every 'JMP' command)
         JSR         0(A0,D0)            ; Jump indirect with index, i.e. jump to 'table' + displacement
 
@@ -144,7 +135,6 @@ LSRcode01 JSR       ISLSRW
           JSR       DONE
 LSRcode10 JSR       ISLSRL
           JSR       DONE
-
 *----------- END someLSR --------------------------
 
 *----------- someLSL --------------------------
@@ -159,7 +149,6 @@ someLSL:
                         ; and the rest are zeroed out)
         MOVE.B      #2,D1           ; Shift 2 bits right
         ASR.W       D1,D0
-
         MULU        #6,D0               ; Form offset (move 6 bytes in memory for every 'JMP' command)
         JSR         0(A0,D0)            ; Jump indirect with index, i.e. jump to 'table' + displacement
 
@@ -174,7 +163,6 @@ LSLcode01 JSR       ISLSLW
           JSR       DONE
 LSLcode10 JSR       ISLSLL
           JSR       DONE
-
 *----------- END someLSL --------------------------
 
 *----------- someROL --------------------------
@@ -189,7 +177,6 @@ someROL:
                         ; and the rest are zeroed out)
         MOVE.B      #2,D1           ; Shift 2 bits right
         ASR.W       D1,D0
-
         MULU        #6,D0               ; Form offset (move 6 bytes in memory for every 'JMP' command)
         JSR         0(A0,D0)            ; Jump indirect with index, i.e. jump to 'table' + displacement
 
@@ -204,7 +191,6 @@ ROLcode01 JSR       ISROLW
           JSR       DONE
 ROLcode10 JSR       ISROLL
           JSR       DONE
-
 *----------- END someROR --------------------------
 
 
@@ -220,7 +206,6 @@ someROR:
                         ; and the rest are zeroed out)
         MOVE.B      #2,D1           ; Shift 2 bits right
         ASR.W       D1,D0
-
         MULU        #6,D0               ; Form offset (move 6 bytes in memory for every 'JMP' command)
         JSR         0(A0,D0)            ; Jump indirect with index, i.e. jump to 'table' + displacement
 
@@ -235,7 +220,6 @@ RORcode01 JSR       ISRORW
           JSR       DONE
 RORcode10 JSR       ISRORL
           JSR       DONE
-
 *----------- END someROR --------------------------
 
 *----------- ROL_ROR --------------------------
@@ -250,7 +234,6 @@ ROL_ROR:
                     ; and the rest are zeroed out)
         MOVE.B      #3,D1           ; Shift 3 bits right
         ASR.W       D1,D0
-
         MULU        #6,D0               ; Form offset (move 6 bytes in memory for every 'JMP' command)
         JSR         0(A0,D0)            ; Jump indirect with index, i.e. jump to 'table' + displacement
 
@@ -262,7 +245,6 @@ ROL_RORcode0 JSR    someROR
              JSR    DONE
 ROL_RORcode1 JSR    someROL
              JSR    DONE
-
 *----------- END ROL_ROR --------------------------
 
 *----------- LSL_LSR --------------------------
@@ -277,7 +259,6 @@ LSL_LSR:
                         ; and the rest are zeroed out)
         MOVE.B      #3,D1           ; Shift 3 bits right
         ASR.W       D1,D0
-
         MULU        #6,D0               ; Form offset (move 6 bytes in memory for every 'JMP' command)
         JSR         0(A0,D0)            ; Jump indirect with index, i.e. jump to 'table' + displacement
 
@@ -289,7 +270,6 @@ LSL_LSRcode0 JSR    someLSR
              JSR    DONE
 LSL_LSRcode1 JSR    someLSL
              JSR    DONE
-
 *----------- END LSL_LSR --------------------------
 
 *----------- ASL_ASR --------------------------
@@ -304,7 +284,6 @@ ASL_ASR:
                         ; and the rest are zeroed out)
         MOVE.B      #3,D1           ; Shift 3 bits right
         ASR.W       D1,D0
-
         MULU        #6,D0               ; Form offset (move 6 bytes in memory for every 'JMP' command)
         JSR         0(A0,D0)            ; Jump indirect with index, i.e. jump to 'table' + displacement
 
@@ -316,7 +295,6 @@ ASL_ASRcode0 JSR    someASR
              JSR    DONE
 ASL_ASRcode1 JSR    someASL
              JSR    DONE
-
 *----------- END ASL_ASR --------------------------
 
 *----------- ROd_LSd_ASd --------------------------
@@ -331,7 +309,6 @@ ROd_LSd_ASd:
                         ; and the rest are zeroed out)
         MOVE.B          #2,D1           ; Shift 2 bits right
         ASR.W       D1,D0
-
         MULU        #6,D0               ; Form offset (move 6 bytes in memory for every 'JMP' command)
         JSR         0(A0,D0)            ; Jump indirect with index, i.e. jump to 'table' + displacement
 
@@ -348,7 +325,6 @@ ROd_LSd_ASdcode01 JSR LSL_LSR
 ROd_LSd_ASdcode10 STOP #$2700
 ROd_LSd_ASdcode11 JSR ROL_ROR
                   JSR DONE
-
 *----------- END  ROd_LSd_ASd --------------------------
 
 *----------- AND_BorAND_WorAND_LorMULS_W --------------------------
@@ -363,7 +339,6 @@ AND_BorAND_WorAND_LorMULS_W:
                                 ; and the rest are zeroed out)
         MOVE.B      #1,D1           ; Shift 1 bits right
         ASR.W       D1,D0
-
         MULU        #6,D0               ; Form offset (move 6 bytes in memory for every 'JMP' command)
         JSR         0(A0,D0)            ; Jump indirect with index, i.e. jump to 'table' + displacement
 
@@ -392,7 +367,6 @@ ANDcode110 JSR      ISANDL
            JSR      DONE
 ANDcode111 JSR      ISMULSW
            JSR      DONE
-
 *----------- END  ADD_BorADD_WorADD_L --------------------------
 
 *----------- ADD_BorADD_WorADD_L --------------------------
@@ -407,7 +381,6 @@ ADD_BorADD_WorADD_L:
                                         ; and the rest are zeroed out)
         MOVE.B      #1,D1               ; Shift 1 bits right
         ASR.W       D1,D0
-
         MULU        #6,D0               ; Form offset (move 6 bytes in memory for every 'JMP' command)
         JSR         0(A0,D0)            ; Jump indirect with index, i.e. jump to 'table' + displacement
 
@@ -437,7 +410,6 @@ ADDcode110 JSR      ISADDL
            JSR      DONE
 ADDcode111 JSR      ISADDAL
            JSR      DONE
-
 *----------- END  ADD_BorADD_WorADD_L --------------------------
 
 *----------- SUB_BorSUB_WorSUB_L --------------------------
@@ -452,7 +424,6 @@ SUB_BorSUB_WorSUB_L:
                     ; and the rest are zeroed out)
         MOVE.B      #1,D1           ; Shift 1 bits right
         ASR.W       D1,D0
-
         MULU        #6,D0               ; Form offset (move 6 bytes in memory for every 'JMP' command)
         JSR         0(A0,D0)            ; Jump indirect with index, i.e. jump to 'table' + displacement
 
@@ -460,7 +431,6 @@ tableSUB_BorSUB_WorSUB_L:
         JMP         SUBcode000   *SUB.B
         JMP         SUBcode001   *SUB.W
         JMP         SUBcode010   *SUB.L
-
         JMP         SUBcode011
         JMP         SUBcode100   *SUB.B
         JMP         SUBcode101   *SUB.W
@@ -479,7 +449,6 @@ SUBcode101 JSR      ISSUBW
            JSR      DONE
 SUBcode110 JSR      ISSUBL
            JSR      DONE
-
 *----------- END  SUB_BorSUB_WorSUB_L --------------------------
 
 *----------- CMP_BorCMP_WorCMP_L --------------------------
@@ -494,7 +463,6 @@ CMP_BorCMP_WorCMP_L:
                         ; and the rest are zeroed out)
         MOVE.B          #1,D1           ; Shift 1 bits right
         ASR.W       D1,D0
-
         MULU        #6,D0               ; Form offset (move 6 bytes in memory for every 'JMP' command)
         JSR         0(A0,D0)            ; Jump indirect with index, i.e. jump to 'table' + displacement
 
@@ -509,9 +477,7 @@ CMPcode001 JSR      ISCMPW
            JSR      DONE
 CMPcode010 JSR      ISCMPL
            JSR      DONE
-
 *----------- END CMP_BorCMP_WorCMP_L --------------------------
-
 
 *----------- ADDQ_BorADDQ_WorADDQ_L --------------------------
 ADDQ_BorADDQ_WorADDQ_L:
@@ -525,7 +491,6 @@ ADDQ_BorADDQ_WorADDQ_L:
                         ; and the rest are zeroed out)
         MOVE.B      #2,D1           ; Shift 2 bits right
         ASR.W       D1,D0
-
         MULU        #6,D0               ; Form offset (move 6 bytes in memory for every 'JMP' command)
         JSR         0(A0,D0)            ; Jump indirect with index, i.e. jump to 'table' + displacement
 
@@ -540,7 +505,6 @@ ADDQcode01 JSR      ISADDQW
            JSR      DONE
 ADDQcode10 JSR      ISADDQL
            JSR      DONE
-
 *----------- END ADDQ_BorADDQ_WorADDQ_L --------------------------
 
 *----------- someCLR --------------------------
@@ -555,7 +519,6 @@ someCLR:
                         ; and the rest are zeroed out)
         MOVE.B      #2,D1           ; Shift 2 bits right
         ASR.W       D1,D0
-
         MULU        #6,D0               ; Form offset (move 6 bytes in memory for every 'JMP' command)
         JSR         0(A0,D0)            ; Jump indirect with index, i.e. jump to 'table' + displacement
 
@@ -570,7 +533,6 @@ CLRcode01 JSR       ISCLRW
           JSR       DONE
 CLRcode10 JSR       ISCLRL
           JSR       DONE
-
 *----------- END someCLR --------------------------
 
 *----------- NOPorCLRorRTSorJSR --------------------------
@@ -592,8 +554,6 @@ NOPorCLRorRTSorJSR:
         MOVE.B      #shift,D1           ; Shift 12 bits to the right
         LSR.W       D1,D0               ; Move the bits (moves highest 4 bits to lowest 4 positions,
                         ; and the rest are zeroed out)
-
-
         MULU        #6,D0               ; Form offset (move 6 bytes in memory for every 'JMP' command)
         JSR         0(A0,D0)            ; Jump indirect with index, i.e. jump to 'table' + displacement
 
@@ -637,7 +597,6 @@ JSRorCLRcode1101 STOP #$2700
 JSRorCLRcode1110 JSR ISJSR
                  JSR DONE
 JSRorCLRcode1111 STOP  #$2700
-
 *----------- END NOPorCLRorRTSorJSR --------------------------
 
 *----------- someMOVEM --------------------------
@@ -652,7 +611,6 @@ someMOVEM:
                         ; and the rest are zeroed out)
         MOVE.B      #3,D1           ; Shift 3 bits right
         ASR.W       D1,D0
-
         MULU        #6,D0               ; Form offset (move 6 bytes in memory for every 'JMP' command)
         JSR         0(A0,D0)            ; Jump indirect with index, i.e. jump to 'table' + displacement
 
@@ -664,7 +622,6 @@ MOVEMcode0 JSR      ISMOVEMW
            JSR      DONE
 MOVEMcode1 JSR      ISMOVEML
            JSR       DONE
-
 *----------- END someMOVEM --------------------------
 
 *----------- NOP_MOVEM_LEA_JSR_CLR_RTS --------------------------
@@ -674,14 +631,11 @@ NOP_MOVEM_LEA_JSR_CLR_RTS:
         MOVE.W      #example,D0         ; We'll play with it here
         MOVE.B      #7,D1           ; Shift 7 bits right
         ASR.W       D1,D0
-
         MOVE.B      #13,D1           ; Shift 13 bits left
         ASL.W       D1,D0
         MOVE.B      #shift,D1           ; Shift 12 bits to the right
         LSR.W       D1,D0               ; Move the bits (moves highest 4 bits to lowest 4 positions,
                         ; and the rest are zeroed out)
-
-
         MULU        #6,D0               ; Form offset (move 6 bytes in memory for every 'JMP' command)
         JSR         0(A0,D0)            ; Jump indirect with index, i.e. jump to 'table' + displacement
 
@@ -702,8 +656,6 @@ tableNOP_MOVEM_LEA_JSR_CLR_RTS:
         JMP         LOTScode1101
         JMP         LOTScode1110
         JMP         LOTScode1111
-
-
 
 LOTScode0000 JSR    ISMULSL
 LOTScode0001 STOP   #$2700
@@ -726,7 +678,6 @@ LOTScode1101 STOP   #$2700
 LOTScode1110 JSR    ISLEA
              JSR    DONE
 LOTScode1111 STOP   #$2700
-
 *----------- END NOP_MOVEM_LEA_JSR_CLR_RTS --------------------------
 
 *----------- ADDI_BorADDI_WorADDI_L --------------------------
@@ -738,8 +689,6 @@ ADDI_BorADDI_WorADDI_L:
         ASL.W       D1,D0
         MOVE.B      #13,D1
         ASR.W       D1,D0
-
-
         MULU        #6,D0               ; Form offset (move 6 bytes in memory for every 'JMP' command)
         JSR         0(A0,D0)            ; Jump indirect with index, i.e. jump to 'table' + displacement
 
@@ -748,14 +697,12 @@ tableADDI_BorADDI_WorADDI_L:
         JMP         ADDIWcode01
         JMP         ADDILcode10
 
-
 ADDIBcode00 JSR     ISADDIB
             JSR     DONE
 ADDIWcode01 JSR     ISADDIW
             JSR     DONE
 ADDILcode10 JSR     ISADDIL
             JSR     DONE
-
 *----------- END ADDI_BorADDI_WorADDI_L --------------------------
 
 *----------- MOVEA_LorMOVE_L --------------------------
@@ -767,8 +714,6 @@ MOVEA_LorMOVE_L:
         ASL.W       D1,D0            ; 0011 1010 0100 0100 to 0010 0000 0000 0000
         MOVE.B      #13,D1           ; Shift 13 bits right
         ASR.W       D1,D0             ; 0010 0000 0000 0000 to 0000 0000 0000 0001
-
-
         MULU        #6,D0               ; Form offset (move 6 bytes in memory for every 'JMP' command)
         JSR         0(A0,D0)            ; Jump indirect with index, i.e. jump to 'table' + displacement
 
@@ -809,8 +754,6 @@ MOVEA_WorMOVE_W:
         ASL.W       D1,D0            ; 0011 1010 0100 0100 to 0010 0000 0000 0000
         MOVE.B      #13,D1           ; Shift 13 bits right
         ASR.W       D1,D0             ; 0010 0000 0000 0000 to 0000 0000 0000 0001
-
-
         MULU        #6,D0               ; Form offset (move 6 bytes in memory for every 'JMP' command)
         JSR         0(A0,D0)            ; Jump indirect with index, i.e. jump to 'table' + displacement
 
@@ -840,7 +783,9 @@ MOVEWcode110 JSR    ISMOVEW
              JSR    DONE
 MOVEWcode111 JSR    ISMOVEW
              JSR    DONE
-*----------- END MOVEA_WorMOVE_W --------------------------
+*----------- END MOVEA_WorMOVE_W ---------------------------
+
+*----------- All 'IS' Subroutines --------------------------
 ISDIVU  MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
         LEA         MESSAGEDIVU, A1
         MOVE.B      #14, D0
@@ -1264,10 +1209,7 @@ ISADDIB MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
         TRAP        #15
         MOVEM.W     (SP)+,  A0-A7/D0-D7         ; Restore registers
         RTS                          ; Exit subroutine
-
-*----------- Variables and Constants -----------------------
-
-
+        
 *~Font name~Courier New~
 *~Font size~10~
 *~Tab type~1~
