@@ -68,7 +68,7 @@ START:                  ; first instruction of program
 
 *example EQU     %1100100111000011 ; MULS.W D3, D4 = 1100 100 111 000 011
 
-*example EQU     %0100110000000011 ; MULS.L D3, D4 = 01001 1 0000 000 011
+example EQU     %0100110000000011 ; MULS.L D3, D4 = 01001 1 0000 000 011
 
 *example EQU     %0100100010010100 ; MOVEM.W (A4), (D16A6) = 0100 1000 10 010 100
 *example EQU     %0100110010101110 ; MOVEM.W (D16A6), (A4) = 0100 1100 10 101 110
@@ -101,7 +101,7 @@ START:                  ; first instruction of program
 *example EQU     %1110111010000010  ; ASR.L  D1,D2 = 1110 111 0 10 0 00 010 where D1 = 0x111 or 7
 
 *example EQU     %1000100011000011 ; DIVU.W D3,D4 = 1000 100 011 000 011
-example EQU     %0100110001000011 ; DIVU.L D3,D4 = 0100 110001 000 011
+*example EQU     %0100110001000011 ; DIVU.L D3,D4 = 0100 110001 000 011
 
 *example EQU     %1000100000000011 ; OR.B D3,D4 = 1000 100 000 000 011
 *example EQU     %1000100100000011 ; OR.B D3,D4 = 1000 100 100 000 011
@@ -1618,6 +1618,7 @@ MESSAGEDIVUL DC.B    'DIVU.L',CR,LF, 0
 * Put variables and constants here
 
     END    START        ; last line of source
+
 
 
 
