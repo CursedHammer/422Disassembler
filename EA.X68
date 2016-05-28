@@ -10,7 +10,6 @@
 *-- Definitions Used for Code ------------------------------
         INCLUDE 'EAMessages.X68'
 
-
 *-- Subroutines: -------------------------------------------
 EA_ADD
 EA_ADDA
@@ -32,12 +31,17 @@ EA_MOVEA
 EA_MOVEM
 EA_MOVEQ
 
+*---------- MULS.W Effective Addresses ---------------------
+* Parses and prints the effective addressing information for
+* the MULS.W opcode
+*-----------------------------------------------------------
+
 EA_MULS_W:
         MOVEM.W     A0-A6/D0-D7, -(SP) ; Save registers
 
         *get default ea
-        JSR         EA_DEFAULT_COMBO
-        LEA         EA_MULS_W_JMP, A0 ; Set index '0' for jump table
+        JSR         EA_DEFAULT_COMBO ; mode: D6, register: d7
+        LEA         MULS_W_MODE, A0 ; Set index '0' for jump table
         MULU        #6, D6          ; Form offset (move 6 bytes in memory for every 'JMP' command)
         JSR         0(A0, D6)       ; Jump indirect with index, i.e. jump to 'table' + displacement
         *check validity based on mode value
@@ -51,36 +55,59 @@ MULS_W_MODE:
         JMP         MULS_W_MODE_110 ; Invalid: Address Register Indirect with Index (8-Bit Displacement)
         JMP         MULS_W_MODE_111 ; The rest (not all valid, validated by register number)
 
-MULS_W_MODE_000:
+MULS_W_MODE_000: ; Dn
         JSR         EA_PRINT_DN     ; Print data register direct operand
         JMP         MULS_W_DEST     ; Go to: print destination operand
-MULS_W_MODE_001:
+MULS_W_MODE_001: ; Invalid: An
         JSR         EA_INVALID      ; Address register direct is invalid mode
-        JMP         MULS_W_END      ; End subroutine
-MULS_W_MODE_010:
+        JMP         MULS_W_END
+MULS_W_MODE_010: ; (An)
         JSR         EA_PRINT_AN_IND ; Print address register indirect
-MULS_W_MODE_011 ; (An)+
-MULS_W_MODE_100 ; -(An)
-MULS_W_MODE_101:
+        JMP         MULS_W_DEST
+MULS_W_MODE_011: ; (An)+
+        JSR         EA_PRINT_POSTINC ; Print address register indirect with post increment
+        JMP         MULS_W_DEST
+MULS_W_MODE_100: ; -(An)
+        JSR         EA_PRINT_PREDEC ; Print address register indirect with pre decrement
+        JMP         MULS_W_DEST     ; Continue with parsing destination operand
+MULS_W_MODE_101: ; Invalid: Address Register Indirect with Displacement Mode
         JSR         EA_INVALID      ; Opcode word is Invalid
-        JMP         MULS_W_END      ; End subroutine
-MULS_W_MODE_110:
+        JMP         MULS_W_END
+MULS_W_MODE_110: ; Invalid: Address Register Indirect with Index (8-Bit Displacement)
         JSR         EA_INVALID      ; Opcode word is Invalid
-        JMP         MULS_W_END      ; End subroutine
-MULS_W_MODE_111 ; The rest (not all valid, validated by register number)
+        JMP         MULS_W_END
+MULS_W_MODE_111: ; The rest (not all valid, validated by register number)
+        CMP.B       #$00, D7        ; Test for absolute word address
+        BEQ         MULS_W_ABS_W
+        CMP.B       #$01, D7        ; Test for absolute long address
+        BEQ         MULS_W_ABS_L
+        CMP.B       #$04, D7        ; Test for immediate data
+        BEQ         MULS_W_IMM
+        JSR         EA_INVALID      ; Else: invalid
+        JMP         MULS_W_END
 
+MULS_W_ABS_W:
+        JSR         EA_PRINT_ABS_W  ; Print absolute word address operand
+        JMP         MULS_W_DEST     ; Continue with parsing destination operand
+MULS_W_ABS_L:
+        JSR         EA_PRINT_ABS_L  ; Print absolute long address operand
+        JMP         MULS_W_DEST     ; Continue with parsing destination operand
+MULS_W_IMM:
+        JSR         EA_PRINT_IMM    ; Print immediate data
+        JMP         MULS_W_DEST     ; Continue with parsing destination operand
 
 MULS_W_DEST:
         *print EA_MSG_COMMA
         *Get destination register
-        MOVE.W      (A5), D1        ; Load word at current pointer to D1
+        MOVE.W      (A5), D7        ; Load word at current pointer to D1
         MOVE.B      #4, D2          ; Clear upper 4 bits of opcode word
-        LSL.W       D2, D1          ; Perform shift (zeros shifted in)
-        MOVE.B      #13, D2         ; 'Right-align' bits 9-11 to determine mode bits
-        LSR.W       D2, D1          ; Perform shift (zeros shifted in)
-TODO
+        LSL.W       D2, D7          ; Perform shift (zeros shifted in)
+        MOVE.B      #13, D2         ; 'Right-align' bits 9-11 to determine register
+        LSR.W       D2, D7          ; Perform shift (zeros shifted in)
+        JSR         EA_PRINT_DN     ; Print data register direct operand
 MULS_W_END:
-TODO
+        MOVEM.L     (SP)+, A0-A4/D0-D5 ; Restore registers
+        RTS
 
 EA_NOP
 EA_OR
@@ -96,11 +123,7 @@ EA_SUB
 *-- Generic Subroutines ------------------------------------
 
 *---------- Invalid OpCode ---------------------------------
-* Executes an early RTS, after setting the validity flag to
-* 'False' and restoring registers. Not really a subroutine:
-* is utilized by JMP instructions from EA subroutines,
-* so that the RTS is effective at returning from the parent
-* EA subroutine
+*
 *-----------------------------------------------------------
 EA_INVALID:
         *print or indicate invalidity
@@ -112,7 +135,7 @@ EA_INVALID:
 * POST: mode bits in D6, register bits in D7
 *-----------------------------------------------------------
 EA_DEFAULT_COMBO:
-        MOVEM.W     A0-A4/D0-D5, -(SP) ; Save registers (excluding D6 and D7, used
+        MOVEM.L     A0-A4/D0-D5, -(SP) ; Save registers (excluding D6 and D7, used
                                        ; to return results, A5-A7 are addresses and SP)
         CLR.B       D6              ; Clear space for mode bits
         CLR.B       D7              ; Clear space for register bits
