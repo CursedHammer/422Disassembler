@@ -92,7 +92,7 @@ tableOR_BorOR_WorOR_LorDIVU
         JMP         OR_DIVUcode000  ; OR.B
         JMP         OR_DIVUcode001  ; OR.W
         JMP         OR_DIVUcode010  ; OR.L
-        JMP         OR_DIVUcode011  ; DIVU (either word or long from ea)
+        JMP         OR_DIVUcode011  ; DIVU.W
         JMP         OR_DIVUcode100  ; OR.B
         JMP         OR_DIVUcode101  ; OR.W
         JMP         OR_DIVUcode110  ; OR.L
@@ -104,7 +104,7 @@ OR_DIVUcode001 JSR  ISORW
                JSR  DONE
 OR_DIVUcode010 JSR  ISORL
                JSR  DONE
-OR_DIVUcode011 JSR  ISDIVU
+OR_DIVUcode011 JSR  ISDIVUW
                JSR  DONE
 OR_DIVUcode100 JSR  ISORB
                JSR  DONE
@@ -113,6 +113,29 @@ OR_DIVUcode101 JSR  ISORW
 OR_DIVUcode110 JSR  ISORL
                JSR  DONE
 *----------- END  ADD_BorADD_WorADD_L ----------------------
+
+*****************************  MULSLorDIVUL ************************************
+MULSLorDIVUL        LEA     STACK,SP            ; Load the SP
+                    LEA     tableMULSLorDIVUL, A0            ; Index into the table
+                    CLR.L   D0                  ; Zero it
+                    MOVE.W  #example,D0         ; We'll play with it here
+                    MOVE.B  #6,D1           ; Shift 6 bits left 
+                    ASL.W   D1,D0            
+                    MOVE.B  #shift,D1           ; Shift 12 bits to the right  
+                    LSR.W   D1,D0               ; Move the bits (moves highest 4 bits to lowest 4 positions,
+                    
+                    MULU    #6,D0               ; Form offset (move 6 bytes in memory for every 'JMP' command)
+                    JSR     0(A0,D0)            ; Jump indirect with index, i.e. jump to 'table' + displacement                
+
+tableMULSLorDIVUL             JMP    MULSLorDIVULcode0   ;  MULS.L
+                              JMP    MULSLorDIVULcode1   ;  DIVU.L                                   
+
+MULSLorDIVULcode0   JSR     ISMULSL
+                    JSR     DONE
+MULSLorDIVULcode1   JSR     ISDIVUL 
+                    JSR     DONE                                 
+***************************** END  MULSLorDIVUL ************************************
+
 
 *----------- someASR ---------------------------------------
 someASR:
@@ -718,7 +741,8 @@ tableNOP_MOVEM_LEA_JSR_CLR_RTS:
         JMP         LOTScode1110
         JMP         LOTScode1111
 
-LOTScode0000 JSR    ISMULSL
+LOTScode0000 JSR    MULSLorDIVUL
+             JSR    DONE
 LOTScode0001 STOP   #$2700
 LOTScode0010 JSR    someMOVEM
              JSR    DONE
@@ -850,12 +874,21 @@ MOVEWcode111 JSR    ISMOVEW
 ; TODO: adjust workflow to:
 ;   1) save message address to buffer pointer
 ;   2) pass pointer to necessary EA Subroutines
-ISDIVU  MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
-        LEA         MESSAGEDIVU, A1
-        MOVE.B      #14, D0
-        TRAP        #15
-        MOVEM.W     (SP)+, A0-A7/D0-D7 ; Restore registers
-        RTS
+ISDIVUL     MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
+            LEA MESSAGEDIVUL, A1         
+            MOVE.B  #14, D0
+            TRAP    #15
+   
+            MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
+            RTS
+
+ISDIVUW     MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
+            LEA MESSAGEDIVUW, A1         
+            MOVE.B  #14, D0
+            TRAP    #15
+   
+            MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
+            RTS
 
 ISORB   MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
         LEA         MESSAGEORB, A1
@@ -1273,6 +1306,8 @@ ISADDIB MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
         TRAP        #15
         MOVEM.W     (SP)+,  A0-A7/D0-D7 ; Restore registers
         RTS                         ; Exit subroutine
+
+
 
 *~Font name~Courier New~
 *~Font size~10~
