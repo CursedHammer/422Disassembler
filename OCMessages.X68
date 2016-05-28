@@ -94,7 +94,9 @@ MESSAGEORB DC.B    'OR.B',CR,LF, 0
 MESSAGEORW DC.B    'OR.W',CR,LF, 0
 MESSAGEORL DC.B    'OR.L',CR,LF, 0
 
-MESSAGEDIVU DC.B    'DIVU word or long from ea',CR,LF, 0
+MESSAGEDIVUW DC.B    'DIVU.W',CR,LF, 0
+MESSAGEDIVUL DC.B    'DIVU.L',CR,LF, 0
+
 
 *~Font name~Courier New~
 *~Font size~10~

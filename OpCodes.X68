@@ -92,7 +92,7 @@ tableOR_BorOR_WorOR_LorDIVU
         JMP         OR_DIVUcode000  ; OR.B
         JMP         OR_DIVUcode001  ; OR.W
         JMP         OR_DIVUcode010  ; OR.L
-        JMP         OR_DIVUcode011  ; DIVU (either word or long from ea)
+        JMP         OR_DIVUcode011  ; DIVU.W
         JMP         OR_DIVUcode100  ; OR.B
         JMP         OR_DIVUcode101  ; OR.W
         JMP         OR_DIVUcode110  ; OR.L
@@ -104,7 +104,7 @@ OR_DIVUcode001 JSR  ISORW
                JSR  DONE
 OR_DIVUcode010 JSR  ISORL
                JSR  DONE
-OR_DIVUcode011 JSR  ISDIVU
+OR_DIVUcode011 JSR  ISDIVUW
                JSR  DONE
 OR_DIVUcode100 JSR  ISORB
                JSR  DONE
@@ -718,7 +718,8 @@ tableNOP_MOVEM_LEA_JSR_CLR_RTS:
         JMP         LOTScode1110
         JMP         LOTScode1111
 
-LOTScode0000 JSR    ISMULSL
+LOTScode0000 JSR    MULSLorDIVUL
+             JSR    DONE
 LOTScode0001 STOP   #$2700
 LOTScode0010 JSR    someMOVEM
              JSR    DONE
@@ -850,12 +851,21 @@ MOVEWcode111 JSR    ISMOVEW
 ; TODO: adjust workflow to:
 ;   1) save message address to buffer pointer
 ;   2) pass pointer to necessary EA Subroutines
-ISDIVU  MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
-        LEA         MESSAGEDIVU, A1
-        MOVE.B      #14, D0
-        TRAP        #15
-        MOVEM.W     (SP)+, A0-A7/D0-D7 ; Restore registers
-        RTS
+ISDIVUL     MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
+            LEA MESSAGEDIVUL, A1         
+            MOVE.B  #14, D0
+            TRAP    #15
+   
+            MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
+            RTS
+
+ISDIVUW     MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
+            LEA MESSAGEDIVUW, A1         
+            MOVE.B  #14, D0
+            TRAP    #15
+   
+            MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
+            RTS
 
 ISORB   MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
         LEA         MESSAGEORB, A1
@@ -1273,6 +1283,7 @@ ISADDIB MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
         TRAP        #15
         MOVEM.W     (SP)+,  A0-A7/D0-D7 ; Restore registers
         RTS                         ; Exit subroutine
+
 
 *~Font name~Courier New~
 *~Font size~10~
