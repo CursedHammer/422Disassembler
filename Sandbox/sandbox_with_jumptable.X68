@@ -100,14 +100,14 @@ START:                  ; first instruction of program
 *example EQU     %1110111001000010  ; ASR.W  D1,D2 = 1110 111 0 01 0 00 010 where D1 = 0x111 or 7
 *example EQU     %1110111010000010  ; ASR.L  D1,D2 = 1110 111 0 10 0 00 010 where D1 = 0x111 or 7
 
-*example EQU     %1000100011000011 ; DIVU.? D3,D4 = 1000 100 011 000 011
+example EQU     %1000100011000011 ; DIVU.W D3,D4 = 1000 100 011 000 011
 
 *example EQU     %1000100000000011 ; OR.B D3,D4 = 1000 100 000 000 011
 *example EQU     %1000100100000011 ; OR.B D3,D4 = 1000 100 100 000 011
 *example EQU     %1000100001000011 ; OR.W D3,D4 = 1000 100 001 000 011
 *example EQU     %1000100101000011 ; OR.W D3,D4 = 1000 100 101 000 011
 *example EQU     %1000100010000011 ; OR.L D3,D4 = 1000 100 010 000 011
-example EQU     %1000100110000011 ; OR.L D3,D4 = 1000 100 110 000 011
+*example EQU     %1000100110000011 ; OR.L D3,D4 = 1000 100 110 000 011
 
 
 shift   EQU     12                 ; Shift 12 bits 
@@ -132,7 +132,7 @@ table   JMP     code0000        ; ADDI.B, ADDI.W, or ADDI.L
         JMP     code0101        ; ADDQ.B or ADDQ.W or ADDQ.L
         JMP     code0110
         JMP     code0111        ; MOVEQ.L
-        JMP     code1000        ; OR.B or OR.W or OR.L or DIVU (DIVU is either word or long depending on ea)
+        JMP     code1000        ; OR.B or OR.W or OR.L or DIVU.W
         JMP     code1001        ; SUB.B or SUB.W or SUB.L
         JMP     code1010
         JMP     code1011        ; CMP.B or CMP.W or CMP.L
@@ -203,7 +203,7 @@ OR_DIVUcode001      JSR     ISORW
                     JSR     DONE                                 
 OR_DIVUcode010      JSR     ISORL 
                     JSR     DONE  
-OR_DIVUcode011      JSR     ISDIVU
+OR_DIVUcode011      JSR     ISDIVUW
                     JSR     DONE
 OR_DIVUcode100      JSR     ISORB
                     JSR     DONE
@@ -1013,8 +1013,8 @@ MOVEWcode110     JSR     ISMOVEW
 MOVEWcode111     JSR     ISMOVEW 
                 JSR    DONE
 *****************************END MOVEA_WorMOVE_W ************************************
-ISDIVU  MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
-            LEA MESSAGEDIVU, A1         
+ISDIVUW  MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
+            LEA MESSAGEDIVUW, A1         
             MOVE.B  #14, D0
             TRAP    #15
    
@@ -1578,13 +1578,14 @@ MESSAGEORB DC.B    'OR.B',CR,LF, 0
 MESSAGEORW DC.B    'OR.W',CR,LF, 0
 MESSAGEORL DC.B    'OR.L',CR,LF, 0
 
-MESSAGEDIVU DC.B    'DIVU word or long from ea',CR,LF, 0
+MESSAGEDIVUW DC.B    'DIVU.W',CR,LF, 0
 
     SIMHALT             ; halt simulator
 
 * Put variables and constants here
 
     END    START        ; last line of source
+
 
 
 
