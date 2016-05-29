@@ -482,7 +482,9 @@ EA_PRINT_DN_JMP:
         JMP         EA_PRINT_DN_110 ; D6
         JMP         EA_PRINT_DN_111 ; D7
 *print value TODO
-EA_PRINT_DN_000 ; D0
+EA_PRINT_DN_000: ; D0
+        MOVE.L      #DREG0, A4
+        JSR         WRITE_LINE
 EA_PRINT_DN_001 ; D1
 EA_PRINT_DN_010 ; D2
 EA_PRINT_DN_011 ; D3
@@ -624,12 +626,16 @@ PREDEC_110 ; -(A6)
 PREDEC_111 ; -(A7)
 
 EA_PRINT_PD_END:
-RTS
+        RTS
 *---------- Absolute Long Address --------------------------
 * Example Description
 *-----------------------------------------------------------
 EA_PRINT_ABS_L:
-*TODO
+        MOVEA.L     A2, A1          ; copy pointer to temp
+        ADDA.W      #$2, A1         ; Advance temp pointer to next word
+        MOVE.L      (A1), D0        ; store value in a register (todo, register tbd)
+        *print value TODO
+        RTS
 *---------- Absolute Word Address --------------------------
 * Example Description
 *-----------------------------------------------------------
