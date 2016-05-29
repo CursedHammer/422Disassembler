@@ -16,23 +16,23 @@
 * the ADD opcode
 *-----------------------------------------------------------
 EA_ADD:
-    MOVEM.W     A0-A6/D0-D7, -(SP) ; Save registers
-
+    MOVEM.W     A0-A6/D0-D7, -(SP)  ; Save registers
+    JSR         EA_OPMODE_COMBO     ; opmode: D6, register: D7
     *get default ea
-    JSR         EA_DEFAULT_COMBO ; mode: D6, register: d7
-    LEA         MULS_W_MODE, A0 ; Set index '0' for jump table
-    MULU        #6, D6          ; Form offset (move 6 bytes in memory for every 'JMP' command)
-    JSR         0(A0, D6)       ; Jump indirect with index, i.e. jump to 'table' + displacement
+    JSR         EA_DEFAULT_COMBO    ; mode: D6, register: D7
+    LEA         MULS_W_MODE, A0     ; Set index '0' for jump table
+    MULU        #6, D6              ; Form offset (move 6 bytes in memory for every 'JMP' command)
+    JSR         0(A0, D6)           ; Jump indirect with index, i.e. jump to 'table' + displacement
     *check validity based on mode value
 ADD_MODE:
-    JMP         MULS_W_MODE_000 ; Dn
-    JMP         MULS_W_MODE_001 ; Invalid: An
-    JMP         MULS_W_MODE_010 ; (An)
-    JMP         MULS_W_MODE_011 ; (An)+
-    JMP         MULS_W_MODE_100 ; -(An)
-    JMP         MULS_W_MODE_101 ; Invalid: Address Register Indirect with Displacement Mode
-    JMP         MULS_W_MODE_110 ; Invalid: Address Register Indirect with Index (8-Bit Displacement)
-    JMP         MULS_W_MODE_111 ; The rest (not all valid, validated by register number)
+    JMP         ADD_MODE_000 ; Dn
+    JMP         ADD_MODE_001 ; Invalid: An
+    JMP         ADD_MODE_010 ; (An)
+    JMP         ADD_MODE_011 ; (An)+
+    JMP         ADD_MODE_100 ; -(An)
+    JMP         ADD_MODE_101 ; Invalid: Address Register Indirect with Displacement Mode
+    JMP         ADD_MODE_110 ; Invalid: Address Register Indirect with Index (8-Bit Displacement)
+    JMP         ADD_MODE_111 ; The rest (not all valid, validated by register number)
 EA_ADDA
 EA_ADDI
 EA_ADDQ
@@ -61,7 +61,7 @@ EA_MULS_W:
         MOVEM.W     A0-A6/D0-D7, -(SP) ; Save registers
 
         *get default ea
-        JSR         EA_DEFAULT_COMBO ; mode: D6, register: d7
+        JSR         EA_DEFAULT_COMBO ; mode: D6, register: D7
         LEA         MULS_W_MODE, A0 ; Set index '0' for jump table
         MULU        #6, D6          ; Form offset (move 6 bytes in memory for every 'JMP' command)
         JSR         0(A0, D6)       ; Jump indirect with index, i.e. jump to 'table' + displacement
@@ -127,7 +127,7 @@ MULS_W_DEST:
         LSR.W       D2, D7          ; Perform shift (zeros shifted in)
         JSR         EA_PRINT_DN     ; Print data register direct operand
 MULS_W_END:
-        MOVEM.L     (SP)+, A0-A4/D0-D5 ; Restore registers
+        MOVEM.L     (SP)+, A0-A6/D0-D5 ; Restore registers
         RTS
 
 EA_NOP
@@ -175,7 +175,7 @@ EA_DEFAULT_COMBO:
         LSR.W       D2, D1          ; Perform shift (zeros shifted in)
         MOVE.B      D1, D7          ; Save register bits to D7
 
-        MOVEM.L     (SP)+, A0-A4/D0-D5 ; Restore registers
+        MOVEM.L     (SP)+, A0-A6/D0-D5 ; Restore registers
         RTS                         ; Return from subroutine
 
 *---------- Parse Opmode Combo ----------------------------
@@ -184,27 +184,27 @@ EA_DEFAULT_COMBO:
 * POST: opmode bits in D6, register bits in D7
 *-----------------------------------------------------------
 EA_OPMODE_COMBO:
-        MOVEM.L     A0-A4/D0-D5, -(SP) ; Save registers (excluding D6 and D7, used
+        MOVEM.L     A0-A6/D0-D5, -(SP) ; Save registers (excluding D6 and D7, used
                                        ; to return results, and A7 for SP)
         CLR.B       D6              ; Clear space for mode bits
         CLR.B       D7              ; Clear space for register bits
 * Get Opmode
         MOVE.L      (A2), D1        ; Load opcode to data register 1
-        MOVE.B      #10, D2         ; Clear upper 10 bits of opcode word
+        MOVE.B      #7, D2          ; Clear upper 7 bits of opcode word
         LSL.W       D2, D1          ; Perform shift (zeros shifted in)
-        MOVE.B      #13, D2         ; 'Right-align' bits 3-5 to determine mode bits
+        MOVE.B      #13, D2         ; 'Right-align' bits 6-8 to determine opmode bits
         LSR.W       D2, D1          ; Perform shift (zeros shifted in)
-        MOVE.B      D1, D6          ; Save mode bits to D6
+        MOVE.B      D1, D6          ; Save opmode bits to D6
 * Get Register
         MOVE.L      (A2), D1        ; Reload opcode to data register 1
-        MOVE.B      #13, D2         ; Clear upper 13 bits of opcode word
+        MOVE.B      #4, D2          ; Clear upper 4 bits of opcode word
         LSL.W       D2, D1          ; Perform shift (zeros shifted in)
-        MOVE.B      #13, D2         ; 'Right-align' bits 0-2 to determine register bits
+        MOVE.B      #13, D2         ; 'Right-align' bits 9-11 to determine register bits
         LSR.W       D2, D1          ; Perform shift (zeros shifted in)
         MOVE.B      D1, D7          ; Save register bits to D7
 
-        MOVEM.L     (SP)+, A0-A4/D0-D5 ; Restore registers
-            RTS                         ; Return from subroutine
+        MOVEM.L     (SP)+, A0-A6/D0-D5 ; Restore registers
+        RTS                         ; Return from subroutine
 
 *-- Read & Print Subroutines -------------------------------
 
