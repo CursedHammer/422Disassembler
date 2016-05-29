@@ -150,8 +150,78 @@ ADD_END:
         MOVEM.L     (SP)+, A0-A6/D0-D5 ; Restore registers
         RTS
 
+*---------- ADDA Effective Addresses ------------------------
+* Parses and prints the effective addressing information for
+* the ADD opcode
+*-----------------------------------------------------------
+EA_ADDA:
+        MOVEM.W     A0-A6/D0-D7, -(SP)  ; Save registers
+        JSR         EA_DEFAULT_COMBO    ; Mode: D6, register: D7
+        LEA         ADDA_MODE, A0       ; Set index '0' for jump table
+        MULU        #6, D6              ; Form offset (move 6 bytes in memory for every 'JMP' command)
+        JSR         0(A0, D6)           ; Jump indirect with index, i.e. jump to 'table' + displacement
+*--- Check validity based on mode value
+ADDA_MODE:
+        JMP         ADDA_MODE_000   ; Dn
+        JMP         ADDA_MODE_001   ; An
+        JMP         ADDA_MODE_010   ; (An)
+        JMP         ADDA_MODE_011   ; (An)+
+        JMP         ADDA_MODE_100   ; -(An)
+        JMP         ADDA_MODE_101   ; Invalid: Address Register Indirect with Displacement Mode
+        JMP         ADDA_MODE_110   ; Invalid: Address Register Indirect with Index (8-Bit Displacement)
+        JMP         ADDA_MODE_111   ; The rest (not all valid, validated by register number)
+*-----------------------------------
+*--- EA mode jump table options ----
+ADDA_MODE_000: ; Dn
+        JSR         EA_PRINT_DN     ; Print data register direct operand
+        JMP         ADDA_MODE_END   ; End evaluation of ea mode
+ADDA_MODE_001: ; An
+        JSR         EA_PRINT_AN     ; Address register direct is invalid mode
+        JMP         ADDA_MODE_END   ; End evaluation of ea mode
+ADDA_MODE_010: ; (An)
+        JSR         EA_PRINT_AN_IND ; Print address register indirect
+        JMP         ADDA_MODE_END   ; End evaluation of ea mode
+ADDA_MODE_011: ; (An)+
+        JSR         EA_PRINT_POSTINC ; Print address register indirect with post increment
+        JMP         ADDA_MODE_END   ; End evaluation of ea mode
+ADDA_MODE_100: ; -(An)
+        JSR         EA_PRINT_PREDEC ; Print address register indirect with pre decrement
+        JMP         ADDA_MODE_END   ; End evaluation of ea mode
+ADDA_MODE_101: ; Invalid: Address Register Indirect with Displacement Mode
+        JMP         ADDA_MODE_INVALID
+ADDA_MODE_110: ; Invalid: Address Register Indirect with Index (8-Bit Displacement)
+        JMP         ADDA_MODE_INVALID
+ADDA_MODE_111: ; The rest (not all valid, validated by register number)
+        CMP.B       #$00, D7        ; Test for absolute word address
+        BEQ         ADDA_ABS_W
+        CMP.B       #$01, D7        ; Test for absolute long address
+        BEQ         ADDA_ABS_L
+        CMP.B       #$04, D7        ; Test for immediate data
+        BEQ         ADDA_IMM
+        JMP         ADDA_MODE_INVALID ; else, invalid
+*-----------------------------------
+*--- Valid options for mode 111 ----
+ADD_ABS_W:
+        JSR         EA_PRINT_ABS_W  ; Print absolute word address operand
+        JMP         ADDA_MODE_END
+ADD_ABS_L:
+        JSR         EA_PRINT_ABS_L  ; Print absolute long address operand
+        JMP         ADDA_MODE_END
+ADD_IMM:
+        JSR         EA_PRINT_IMM    ; Print immediate data
+        JMP         ADDA_MODE_END
+*-----------------------------------
+ADDA_MODE_INVALID:
+        JSR         EA_INVALID      ; Opcode word is Invalid
+        JMP         ADDA_END
+ADDA_MODE_END:
+        *PRINT COMMA TODO
+        JSR         EA_OPMODE_COMBO ; Opmode: D6, register: D7
+        JSR         EA_PRINT_AN     ; Print address register
+ADDA_END:
+        MOVEM.L     (SP)+, A0-A6/D0-D5 ; Restore registers
+        RTS
 
-EA_ADDA
 EA_ADDI
 EA_ADDQ
 EA_AND
