@@ -24,20 +24,20 @@
 *           DEFINITIONS                                                      *
 ******************************************************************************
 
-STACK       EQU   $7000
+STACK     EQU   $7000
 
-BEGINADDR   EQU   $5000
-ENDADDR     EQU   $5010
-STR_LEN     EQU   $5020
-HEXFLAG     EQU   $5021
-HEXVALUE    EQU   $5030
-REMAINDER   EQU   $5050
-MOD         EQU   2
+BEGINADDR EQU   $5000
+ENDADDR   EQU   $5010
+STR_LEN   EQU   $5020
+HEXFLAG   EQU   $5021
+HEXVALUE  EQU   $5030
+REMAINDER EQU   $5050
+MOD       EQU   2
 
-CR          EQU   $0D
-LF          EQU   $0A 
+CR        EQU   $0D
+LF        EQU   $0A 
 
-            ORG   $1000 
+          ORG   $1000 
 
 ******************************************************************************
 *           BEGIN CODE                                                       *
@@ -119,12 +119,12 @@ FINISHED
 *-----------------------------------------------------------------------------
 
 IO_WELCOME: 
-            LEA     INTRO,A1        ; Loads message into A1
-            MOVE.B  #14,D0          ; Moves the Task 14 into D0
-            TRAP    #15             ; Displays Intro Message 
-        
-            JSR     NEW_LINE        ; Call Subroutine        
-            RTS                     ; Return from subroutine
+    LEA         INTRO,A1            * Loads message into A1
+    MOVE.B      #14,D0              * Moves the Task 14 into D0
+    TRAP        #15                 * Displays Intro Message 
+      
+    JSR         NEW_LINE            * Call Subroutine        
+    RTS                             * Return from subroutine
         
 *---------- END - IO_WELCOME -------------------------------------------------
 
@@ -390,20 +390,20 @@ ADDRESS_ERR
 *           VARIABLES AND CONSTANTS                                          *
 ******************************************************************************
 
-INTRO           DC.B  'WELCOME!',CR,LF,'THIS IS A 68K DISASSEMBLER.',CR,LF,0
-PS1             DC.B  'PLEASE ENTER THE STARTING HEX ADDRESS',CR,LF,'(MAX 8 DIGITS AND MUST BE EVEN): $',0
-PS2             DC.B  'PLEASE ENTER THE ENDING HEX ADDRESS',CR,LF,'(MAX 8 DIGITS AND MUST BE EVEN): $',0
-BMESSAGE        DC.B  CR,LF,'BEGINNING ADDRESS GIVEN IS: ',0
-EMESSAGE        DC.B  CR,LF,'ENDING ADDRESS GIVEN IS   : ',0
-ENDL            DC.B  CR,LF,0
+INTRO           DC.B 'WELCOME!',CR,LF,'THIS IS A 68K DISASSEMBLER.',CR,LF,0
+PS1             DC.B 'PLEASE ENTER THE STARTING HEX ADDRESS',CR,LF,'(MAX 8 DIGITS AND MUST BE EVEN): $',0
+PS2             DC.B 'PLEASE ENTER THE ENDING HEX ADDRESS',CR,LF,'(MAX 8 DIGITS AND MUST BE EVEN): $',0
+BMESSAGE        DC.B CR,LF,'BEGINNING ADDRESS GIVEN IS: ',0
+EMESSAGE        DC.B CR,LF,'ENDING ADDRESS GIVEN IS   : ',0
+ENDL            DC.B CR,LF,0
 
-ADR_ERR_NOTLT   DC.B  'THE BEGINNING ADDRESS MUST BE LESS THAN THE ENDING ADDRESS.',CR,LF,'PRESS ANY KEY TO TRY AGAIN...',0
+ADR_ERR_NOTLT   DC.B 'THE BEGINNING ADDRESS MUST BE LESS THAN THE ENDING ADDRESS.',CR,LF,'PRESS ANY KEY TO TRY AGAIN...',0
 
-HEXSTRING       DS.B  80            * Var for hex string
+HEXSTRING       DS.B 80             * Var for hex string
 
-ILLEGAL         DC.B  '1000    DATA    $WXYZ',CR,LF,0
+ILLEGAL         DC.B '1000    DATA    $WXYZ',CR,LF,0
 
-                END   START         * last line of source
+                END  START          * Last line of source
 
 
 

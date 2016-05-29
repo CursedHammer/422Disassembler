@@ -1,4 +1,4 @@
-*-----------------------------------------------------------
+******************************************************************************
 * Title      : 68k Disassembler
 * Written by : Brandon Authier (Hblkr), Jack S. Eldridge
 *              (JackScottie), Marijn Burger (marijnburger)
@@ -47,40 +47,63 @@
 *                JSR
 *                RTS
 *
-*-----------------------------------------------------------
+******************************************************************************
 
-STACK   EQU         $7000           ; Largest location in memory...will need to
-                                    ; change this based on memory range for code to read
-TRUE    EQU         $01             ; value equivalent to 'true'
+******************************************************************************
+*           DEFINITIONS                                                      *
+******************************************************************************
+STACK     EQU   $7000               * Beginning address for stack pointer
 
-START   ORG         $1000
-        LEA         STACK, SP       ; SP is stored in A7
-        JSR         IO_WELCOME      ; Run welcome subroutine
-        ; get addresses and do address validation
-        MOVE.L      BEGINADDR, A6   ; Move start address to A6 for easier manipulation
-LOOP    JSR         OC_PARSE        ; Determine if there is an initial opcode match
-        ; decrement row count
-        ; if at 0, prompt for next page
-        ; else, continue
-LOOP_CHECK CMPA     A6, ENDADDR      ; Check if pointer is at end of address range
-        BLT         END_LOOP ; For debugging, if pointer advances too far
-        ; in case this resets status register, do another compare TODO
-        BNE         LOOP            ; If not at end address, restart loop
-        ; If at end of address range, check if user wants to continue
-        ; if user wants to continue, restart
-        ; else, end
+BEGINADDR EQU   $5000               * Variable to hold beginning address value
+ENDADDR   EQU   $5010               * Variable to hold ending address value
 
-        STOP        #$3000          ; End program
-*       JMP         START           ; Restart program (optional workflow)
+TRUE      EQU   $01                 * Value equivalent to 'true'
+
+          ORG   $1000               * Program begins at address 1000
+            
+******************************************************************************
+*           BEGIN CODE                                                       *
+******************************************************************************
+
+*---------- START ------------------------------------------------------------
+* Begins program's logical flow. Similar to main in C/C++
+*-----------------------------------------------------------------------------
+START
+    LEA         STACK, SP           * SP is stored in A7
+    JSR         IO_WELCOME          * Run welcome subroutine
+    * get addresses and do address validation
+    MOVE.L      BEGINADDR, A6       * Move start address to A6 for easier manipulation
+LOOP
+    JSR         OC_PARSE            * Determine if there is an initial opcode match
+    * decrement row count
+    * if at 0, prompt for next page
+    * else, continue
+LOOP_CHECK 
+    CMPA        A6, ENDADDR         * Check if pointer is at end of address range
+    BLT         END_LOOP            * For debugging, if pointer advances too far
+    ; in case this resets status register, do another compare TODO
+    BNE         LOOP                * If not at end address, restart loop
+    ; If at end of address range, check if user wants to continue
+    ; if user wants to continue, restart
+    ; else, end
+
+    STOP        #$3000              * End program
+*    JMP         START               * Restart program (optional workflow)
 
 
-*---------- Subroutine Files -------------------------------
+******************************************************************************
+*           SUB ROUTINES FILES                                               *
+******************************************************************************
 
-        INCLUDE 'IO.X68'
-        INCLUDE 'OpCodes.X68'
-        INCLUDE 'EA.X68'
+    INCLUDE 'IO.X68'
+    INCLUDE 'OpCodes.X68'
+    INCLUDE 'EA.X68'
 
-*---------- Variables and Constants ------------------------
+
+******************************************************************************
+*           VARIABLES AND CONSTANTS                                          *
+******************************************************************************
+
 
 
 *---------- Reserved Registers -----------------------------
@@ -91,7 +114,9 @@ LOOP_CHECK CMPA     A6, ENDADDR      ; Check if pointer is at end of address ran
 *-----------------------------------------------------------
 
 *---------- End --------------------------------------------
-        END        START            ; last line of source
+               END  START          * Last line of source
+
+
 *~Font name~Courier New~
 *~Font size~10~
 *~Tab type~1~
