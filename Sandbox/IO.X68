@@ -1,6 +1,15 @@
+******************************************************************************
+* Title      : I/O Subroutines
+* Written by : Brandon Authier (Hblkr), Jack S. Eldridge
+*              (JackScottie), Marijn Burger (marijnburger)
+* Date       : 3 May 2016
+* Description: Support file containing the I/O subroutines
+*              for the disassembler.
+******************************************************************************
+*
 * TODO:
 *    Hex to ASCII
-
+*
 * DONE:
 *    Make sure addresses are even
 *    ASCII to Hex
@@ -8,7 +17,8 @@
 *    Check that ending address is less than beginning address
 *    Display full screens of data and clear
 * 
-*
+******************************************************************************
+
 
 ******************************************************************************
 *           DEFINITIONS                                                      *
