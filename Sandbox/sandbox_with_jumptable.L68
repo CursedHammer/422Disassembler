@@ -1,6 +1,6 @@
 00001000 Starting Address
 Assembler used: EASy68K Editor/Assembler v5.15.04
-Created On: 5/29/2016 3:12:52 PM
+Created On: 5/29/2016 3:16:11 PM
 
 00000000                             1  *-----------------------------------------------------------
 00000000                             2  * Title      : NOP check
@@ -116,9 +116,9 @@ Created On: 5/29/2016 3:12:52 PM
 00001000                           112  
 00001000                           113  *example EQU     %0110010000000000 ; BCC = 0110 0100 0000 0000
 00001000                           114  *example EQU     %0110111000000000 ; BGT = 0110 1110 0000 0000
-00001000                           115  *example EQU     %0110111100000000  ; BLE = 0110 1111 0000 0000
+00001000  =00006F00                115  example EQU     %0110111100000000  ; BLE = 0110 1111 0000 0000
 00001000                           116  
-00001000  =0000AF00                117  example EQU     %1010111100000000  ; INVALID
+00001000                           117  *example EQU     %1010111100000000  ; INVALID
 00001000                           118  
 00001000  =0000000C                119  shift   EQU     12                 ; Shift 12 bits
 00001000                           120  
@@ -127,7 +127,7 @@ Created On: 5/29/2016 3:12:52 PM
 00001000  4FF8 7000                123          LEA     STACK,SP            ; Load the SP
 00001004  41F9 0000101E            124          LEA     table,A0            ; Index into the table
 0000100A  4280                     125          CLR.L   D0                  ; Zero it
-0000100C  303C AF00                126          MOVE.W  #example,D0         ; We'll play with it here
+0000100C  303C 6F00                126          MOVE.W  #example,D0         ; We'll play with it here
 00001010  123C 000C                127          MOVE.B  #shift,D1           ; Shift 12 bits to the right
 00001014  E268                     128          LSR.W   D1,D0               ; Move the bits (moves highest 4 bits to lowest 4 positions,
 00001016                           129                                      ; and the rest are zeroed out)
@@ -187,7 +187,7 @@ Created On: 5/29/2016 3:12:52 PM
 00001124  4FF8 7000                183  BCCorBGTorBLE       LEA     STACK,SP            ; Load the SP
 00001128  41F9 0000114E            184                      LEA     tableBCCorBGTorBLE, A0            ; Index into the table
 0000112E  4280                     185                      CLR.L   D0                  ; Zero it
-00001130  303C AF00                186                      MOVE.W  #example,D0         ; We'll play with it here
+00001130  303C 6F00                186                      MOVE.W  #example,D0         ; We'll play with it here
 00001134  123C 0006                187                      MOVE.B  #6,D1           ; Shift 6 bits left
 00001138  E360                     188                      ASL.W   D1,D0
 0000113A  123C 000C                189                      MOVE.B  #shift,D1           ; Shift 12 bits to the right
@@ -221,7 +221,7 @@ Created On: 5/29/2016 3:12:52 PM
 00001186  4FF8 7000                217  MULSLorDIVUL        LEA     STACK,SP            ; Load the SP
 0000118A  41F9 000011AA            218                      LEA     tableMULSLorDIVUL, A0            ; Index into the table
 00001190  4280                     219                      CLR.L   D0                  ; Zero it
-00001192  303C AF00                220                      MOVE.W  #example,D0         ; We'll play with it here
+00001192  303C 6F00                220                      MOVE.W  #example,D0         ; We'll play with it here
 00001196  123C 0006                221                      MOVE.B  #6,D1           ; Shift 6 bits left
 0000119A  E360                     222                      ASL.W   D1,D0
 0000119C  123C 000C                223                      MOVE.B  #shift,D1           ; Shift 12 bits to the right
@@ -243,7 +243,7 @@ Created On: 5/29/2016 3:12:52 PM
 000011C6  4FF8 7000                239  OR_BorOR_WorOR_LorDIVU     LEA     STACK,SP            ; Load the SP
 000011CA  41F9 000011F0            240                      LEA     tableOR_BorOR_WorOR_LorDIVU, A0            ; Index into the table
 000011D0  4280                     241                      CLR.L   D0                  ; Zero it
-000011D2  303C AF00                242                      MOVE.W  #example,D0         ; We'll play with it here
+000011D2  303C 6F00                242                      MOVE.W  #example,D0         ; We'll play with it here
 000011D6  123C 0007                243                      MOVE.B  #7,D1           ; Shift 7 bits left
 000011DA  E360                     244                      ASL.W   D1,D0
 000011DC  123C 000C                245                      MOVE.B  #shift,D1           ; Shift 12 bits to the right
@@ -288,7 +288,7 @@ Created On: 5/29/2016 3:12:52 PM
 00001252  4FF8 7000                284  someASR    LEA     STACK,SP            ; Load the SP
 00001256  41F9 0000127C            285                      LEA     tableSomeASR, A0            ; Index into the table
 0000125C  4280                     286                      CLR.L   D0                  ; Zero it
-0000125E  303C AF00                287                      MOVE.W  #example,D0         ; We'll play with it here
+0000125E  303C 6F00                287                      MOVE.W  #example,D0         ; We'll play with it here
 00001262  123C 0008                288                      MOVE.B  #8,D1           ; Shift 8 bits left
 00001266  E360                     289                      ASL.W   D1,D0
 00001268  123C 000C                290                      MOVE.B  #shift,D1           ; Shift 12 bits to the right
@@ -318,7 +318,7 @@ Created On: 5/29/2016 3:12:52 PM
 000012A6  4FF8 7000                314  someASL    LEA     STACK,SP            ; Load the SP
 000012AA  41F9 000012D0            315                      LEA     tableSomeASL, A0            ; Index into the table
 000012B0  4280                     316                      CLR.L   D0                  ; Zero it
-000012B2  303C AF00                317                      MOVE.W  #example,D0         ; We'll play with it here
+000012B2  303C 6F00                317                      MOVE.W  #example,D0         ; We'll play with it here
 000012B6  123C 0008                318                      MOVE.B  #8,D1           ; Shift 8 bits left
 000012BA  E360                     319                      ASL.W   D1,D0
 000012BC  123C 000C                320                      MOVE.B  #shift,D1           ; Shift 12 bits to the right
@@ -348,7 +348,7 @@ Created On: 5/29/2016 3:12:52 PM
 000012FA  4FF8 7000                344  someLSR    LEA     STACK,SP            ; Load the SP
 000012FE  41F9 00001324            345                      LEA     tableSomeLSR, A0            ; Index into the table
 00001304  4280                     346                      CLR.L   D0                  ; Zero it
-00001306  303C AF00                347                      MOVE.W  #example,D0         ; We'll play with it here
+00001306  303C 6F00                347                      MOVE.W  #example,D0         ; We'll play with it here
 0000130A  123C 0008                348                      MOVE.B  #8,D1           ; Shift 8 bits left
 0000130E  E360                     349                      ASL.W   D1,D0
 00001310  123C 000C                350                      MOVE.B  #shift,D1           ; Shift 12 bits to the right
@@ -378,7 +378,7 @@ Created On: 5/29/2016 3:12:52 PM
 0000134E  4FF8 7000                374  someLSL    LEA     STACK,SP            ; Load the SP
 00001352  41F9 00001378            375                      LEA     tableSomeLSL, A0            ; Index into the table
 00001358  4280                     376                      CLR.L   D0                  ; Zero it
-0000135A  303C AF00                377                      MOVE.W  #example,D0         ; We'll play with it here
+0000135A  303C 6F00                377                      MOVE.W  #example,D0         ; We'll play with it here
 0000135E  123C 0008                378                      MOVE.B  #8,D1           ; Shift 8 bits left
 00001362  E360                     379                      ASL.W   D1,D0
 00001364  123C 000C                380                      MOVE.B  #shift,D1           ; Shift 12 bits to the right
@@ -408,7 +408,7 @@ Created On: 5/29/2016 3:12:52 PM
 000013A2  4FF8 7000                404  someROL    LEA     STACK,SP            ; Load the SP
 000013A6  41F9 000013CC            405                      LEA     tableSomeROL, A0            ; Index into the table
 000013AC  4280                     406                      CLR.L   D0                  ; Zero it
-000013AE  303C AF00                407                      MOVE.W  #example,D0         ; We'll play with it here
+000013AE  303C 6F00                407                      MOVE.W  #example,D0         ; We'll play with it here
 000013B2  123C 0008                408                      MOVE.B  #8,D1           ; Shift 8 bits left
 000013B6  E360                     409                      ASL.W   D1,D0
 000013B8  123C 000C                410                      MOVE.B  #shift,D1           ; Shift 12 bits to the right
@@ -438,7 +438,7 @@ Created On: 5/29/2016 3:12:52 PM
 000013F6  4FF8 7000                434  someROR     LEA     STACK,SP            ; Load the SP
 000013FA  41F9 00001420            435                      LEA     tableSomeROR, A0            ; Index into the table
 00001400  4280                     436                      CLR.L   D0                  ; Zero it
-00001402  303C AF00                437                      MOVE.W  #example,D0         ; We'll play with it here
+00001402  303C 6F00                437                      MOVE.W  #example,D0         ; We'll play with it here
 00001406  123C 0008                438                      MOVE.B  #8,D1           ; Shift 8 bits left
 0000140A  E360                     439                      ASL.W   D1,D0
 0000140C  123C 000C                440                      MOVE.B  #shift,D1           ; Shift 12 bits to the right
@@ -468,7 +468,7 @@ Created On: 5/29/2016 3:12:52 PM
 0000144A  4FF8 7000                464  ROL_ROR     LEA     STACK,SP            ; Load the SP
 0000144E  41F9 00001474            465                      LEA     tableROL_ROR, A0            ; Index into the table
 00001454  4280                     466                      CLR.L   D0                  ; Zero it
-00001456  303C AF00                467                      MOVE.W  #example,D0         ; We'll play with it here
+00001456  303C 6F00                467                      MOVE.W  #example,D0         ; We'll play with it here
 0000145A  123C 0007                468                      MOVE.B  #7,D1           ; Shift 7 bits left
 0000145E  E360                     469                      ASL.W   D1,D0
 00001460  123C 000C                470                      MOVE.B  #shift,D1           ; Shift 12 bits to the right
@@ -499,7 +499,7 @@ Created On: 5/29/2016 3:12:52 PM
 0000148C  4FF8 7000                495  LSL_LSR     LEA     STACK,SP            ; Load the SP
 00001490  41F9 000014B6            496                      LEA     tableLSL_LSR, A0            ; Index into the table
 00001496  4280                     497                      CLR.L   D0                  ; Zero it
-00001498  303C AF00                498                      MOVE.W  #example,D0         ; We'll play with it here
+00001498  303C 6F00                498                      MOVE.W  #example,D0         ; We'll play with it here
 0000149C  123C 0007                499                      MOVE.B  #7,D1           ; Shift 7 bits left
 000014A0  E360                     500                      ASL.W   D1,D0
 000014A2  123C 000C                501                      MOVE.B  #shift,D1           ; Shift 12 bits to the right
@@ -530,7 +530,7 @@ Created On: 5/29/2016 3:12:52 PM
 000014CE  4FF8 7000                526  ASL_ASR     LEA     STACK,SP            ; Load the SP
 000014D2  41F9 000014F8            527                      LEA     tableASL_ASR, A0            ; Index into the table
 000014D8  4280                     528                      CLR.L   D0                  ; Zero it
-000014DA  303C AF00                529                      MOVE.W  #example,D0         ; We'll play with it here
+000014DA  303C 6F00                529                      MOVE.W  #example,D0         ; We'll play with it here
 000014DE  123C 0007                530                      MOVE.B  #7,D1           ; Shift 7 bits left
 000014E2  E360                     531                      ASL.W   D1,D0
 000014E4  123C 000C                532                      MOVE.B  #shift,D1           ; Shift 12 bits to the right
@@ -561,7 +561,7 @@ Created On: 5/29/2016 3:12:52 PM
 00001510  4FF8 7000                557  ROd_LSd_ASd     LEA     STACK,SP            ; Load the SP
 00001514  41F9 0000153A            558                      LEA     tableROd_LSd_ASd, A0            ; Index into the table
 0000151A  4280                     559                      CLR.L   D0                  ; Zero it
-0000151C  303C AF00                560                      MOVE.W  #example,D0         ; We'll play with it here
+0000151C  303C 6F00                560                      MOVE.W  #example,D0         ; We'll play with it here
 00001520  123C 000B                561                      MOVE.B  #11,D1           ; Shift 11 bits left
 00001524  E360                     562                      ASL.W   D1,D0
 00001526  123C 000C                563                      MOVE.B  #shift,D1           ; Shift 12 bits to the right
@@ -595,7 +595,7 @@ Created On: 5/29/2016 3:12:52 PM
 0000156C  4FF8 7000                591  AND_BorAND_WorAND_LorMULS_W     LEA     STACK,SP            ; Load the SP
 00001570  41F9 00001596            592                      LEA     tableAND_BorAND_WorAND_LorMULS_W, A0            ; Index into the table
 00001576  4280                     593                      CLR.L   D0                  ; Zero it
-00001578  303C AF00                594                      MOVE.W  #example,D0         ; We'll play with it here
+00001578  303C 6F00                594                      MOVE.W  #example,D0         ; We'll play with it here
 0000157C  123C 0007                595                      MOVE.B  #7,D1           ; Shift 7 bits left
 00001580  E360                     596                      ASL.W   D1,D0
 00001582  123C 000C                597                      MOVE.B  #shift,D1           ; Shift 12 bits to the right
@@ -641,7 +641,7 @@ Created On: 5/29/2016 3:12:52 PM
 00001606  4FF8 7000                637  ADD_BorADD_WorADD_L     LEA     STACK,SP            ; Load the SP
 0000160A  41F9 00001630            638                      LEA     tableADD_BorADD_WorADD_L, A0            ; Index into the table
 00001610  4280                     639                      CLR.L   D0                  ; Zero it
-00001612  303C AF00                640                      MOVE.W  #example,D0         ; We'll play with it here
+00001612  303C 6F00                640                      MOVE.W  #example,D0         ; We'll play with it here
 00001616  123C 0007                641                      MOVE.B  #7,D1           ; Shift 7 bits left
 0000161A  E360                     642                      ASL.W   D1,D0
 0000161C  123C 000C                643                      MOVE.B  #shift,D1           ; Shift 12 bits to the right
@@ -687,7 +687,7 @@ Created On: 5/29/2016 3:12:52 PM
 000016A0  4FF8 7000                683  SUB_BorSUB_WorSUB_L     LEA     STACK,SP            ; Load the SP
 000016A4  41F9 000016CA            684                      LEA     tableSUB_BorSUB_WorSUB_L, A0            ; Index into the table
 000016AA  4280                     685                      CLR.L   D0                  ; Zero it
-000016AC  303C AF00                686                      MOVE.W  #example,D0         ; We'll play with it here
+000016AC  303C 6F00                686                      MOVE.W  #example,D0         ; We'll play with it here
 000016B0  123C 0007                687                      MOVE.B  #7,D1           ; Shift 7 bits left
 000016B4  E360                     688                      ASL.W   D1,D0
 000016B6  123C 000C                689                      MOVE.B  #shift,D1           ; Shift 12 bits to the right
@@ -732,7 +732,7 @@ Created On: 5/29/2016 3:12:52 PM
 0000172C  4FF8 7000                728  CMP_BorCMP_WorCMP_L     LEA     STACK,SP            ; Load the SP
 00001730  41F9 00001756            729                      LEA     tableCMP_BorCMP_WorCMP_L, A0            ; Index into the table
 00001736  4280                     730                      CLR.L   D0                  ; Zero it
-00001738  303C AF00                731                      MOVE.W  #example,D0         ; We'll play with it here
+00001738  303C 6F00                731                      MOVE.W  #example,D0         ; We'll play with it here
 0000173C  123C 0007                732                      MOVE.B  #7,D1           ; Shift 7 bits left
 00001740  E360                     733                      ASL.W   D1,D0
 00001742  123C 000C                734                      MOVE.B  #shift,D1           ; Shift 12 bits to the right
@@ -762,7 +762,7 @@ Created On: 5/29/2016 3:12:52 PM
 00001780  4FF8 7000                758  ADDQ_BorADDQ_WorADDQ_L     LEA     STACK,SP            ; Load the SP
 00001784  41F9 000017AA            759                      LEA     tableADDQ_BorADDQ_WorADDQ_L, A0            ; Index into the table
 0000178A  4280                     760                      CLR.L   D0                  ; Zero it
-0000178C  303C AF00                761                      MOVE.W  #example,D0         ; We'll play with it here
+0000178C  303C 6F00                761                      MOVE.W  #example,D0         ; We'll play with it here
 00001790  123C 0008                762                      MOVE.B  #8,D1           ; Shift 8 bits left
 00001794  E360                     763                      ASL.W   D1,D0
 00001796  123C 000C                764                      MOVE.B  #shift,D1           ; Shift 12 bits to the right
@@ -792,7 +792,7 @@ Created On: 5/29/2016 3:12:52 PM
 000017D4  4FF8 7000                788  someCLR     LEA     STACK,SP            ; Load the SP
 000017D8  41F9 000017FE            789                      LEA     tableSomeCLR, A0            ; Index into the table
 000017DE  4280                     790                      CLR.L   D0                  ; Zero it
-000017E0  303C AF00                791                      MOVE.W  #example,D0         ; We'll play with it here
+000017E0  303C 6F00                791                      MOVE.W  #example,D0         ; We'll play with it here
 000017E4  123C 0008                792                      MOVE.B  #8,D1           ; Shift 8 bits left
 000017E8  E360                     793                      ASL.W   D1,D0
 000017EA  123C 000C                794                      MOVE.B  #shift,D1           ; Shift 12 bits to the right
@@ -821,7 +821,7 @@ Created On: 5/29/2016 3:12:52 PM
 00001828  4FF8 7000                817  NOPorCLRorRTSorJSR     LEA     STACK,SP            ; Load the SP
 0000182C  41F9 00001860            818                      LEA     tableNOPorCLRorRTSorJSR, A0            ; Index into the table
 00001832  4280                     819                      CLR.L   D0                  ; Zero it
-00001834  303C AF00                820                      MOVE.W  #example,D0         ; We'll play with it here
+00001834  303C 6F00                820                      MOVE.W  #example,D0         ; We'll play with it here
 00001838                           821  
 00001838  323C 4E71                822                      MOVE.W  #%0100111001110001,D1  ; 0100111001110001 = NOP
 0000183C  B240                     823                      CMP.W   D0, D1
@@ -902,7 +902,7 @@ Created On: 5/29/2016 3:12:52 PM
 0000194E  4FF8 7000                898  someMOVEM     LEA     STACK,SP            ; Load the SP
 00001952  41F9 00001978            899                      LEA     tableSomeMOVEM, A0            ; Index into the table
 00001958  4280                     900                      CLR.L   D0                  ; Zero it
-0000195A  303C AF00                901                      MOVE.W  #example,D0         ; We'll play with it here
+0000195A  303C 6F00                901                      MOVE.W  #example,D0         ; We'll play with it here
 0000195E  123C 0009                902                      MOVE.B  #9,D1           ; Shift 9 bits left
 00001962  E360                     903                      ASL.W   D1,D0
 00001964  123C 000C                904                      MOVE.B  #shift,D1           ; Shift 12 bits to the right
@@ -930,7 +930,7 @@ Created On: 5/29/2016 3:12:52 PM
 00001994  4FF8 7000                926  NOP_MOVEM_LEA_JSR_CLR_RTS     LEA     STACK,SP            ; Load the SP
 00001998  41F9 000019BE            927                      LEA     tableNOP_MOVEM_LEA_JSR_CLR_RTS, A0            ; Index into the table
 0000199E  4280                     928                      CLR.L   D0                  ; Zero it
-000019A0  303C AF00                929                      MOVE.W  #example,D0         ; We'll play with it here
+000019A0  303C 6F00                929                      MOVE.W  #example,D0         ; We'll play with it here
 000019A4  123C 0007                930                      MOVE.B  #7,D1           ; Shift 7 bits right
 000019A8  E260                     931                      ASR.W   D1,D0
 000019AA                           932  
@@ -1002,7 +1002,7 @@ Created On: 5/29/2016 3:12:52 PM
 00001AA8  4FF8 7000                998  ADDI_BorADDI_WorADDI_L     LEA     STACK,SP            ; Load the SP
 00001AAC  41F9 00001ACC            999                      LEA     tableADDI_BorADDI_WorADDI_L,A0            ; Index into the table
 00001AB2  4280                    1000                      CLR.L   D0                  ; Zero it
-00001AB4  303C AF00               1001                      MOVE.W  #example,D0         ; We'll play with it here
+00001AB4  303C 6F00               1001                      MOVE.W  #example,D0         ; We'll play with it here
 00001AB8  123C 0007               1002                      MOVE.B  #7,D1           ; Shift 7 bits left
 00001ABC  E360                    1003                      ASL.W   D1,D0
 00001ABE  123C 000D               1004                      MOVE.B  #13,D1
@@ -1033,7 +1033,7 @@ Created On: 5/29/2016 3:12:52 PM
 00001B02  4FF8 7000               1029  MOVEA_LorMOVE_L     LEA     STACK,SP            ; Load the SP
 00001B06  41F9 00001B26           1030                      LEA     tableMOVEA_LorMOVE_L,A0            ; Index into the table
 00001B0C  4280                    1031                      CLR.L   D0                  ; Zero it
-00001B0E  303C AF00               1032                      MOVE.W  #example,D0         ; We'll play with it here
+00001B0E  303C 6F00               1032                      MOVE.W  #example,D0         ; We'll play with it here
 00001B12  123C 0007               1033                      MOVE.B  #7,D1           ; Shift 7 bits left
 00001B16  E360                    1034                      ASL.W   D1,D0            ; 0011 1010 0100 0100 to 0010 0000 0000 0000
 00001B18  123C 000D               1035                      MOVE.B  #13,D1           ; Shift 13 bits right
@@ -1074,7 +1074,7 @@ Created On: 5/29/2016 3:12:52 PM
 00001BB6  4FF8 7000               1070  MOVEA_WorMOVE_W     LEA     STACK,SP            ; Load the SP
 00001BBA  41F9 00001BDA           1071                      LEA     tableMOVEA_WorMOVE_W,A0            ; Index into the table
 00001BC0  4280                    1072                      CLR.L   D0                  ; Zero it
-00001BC2  303C AF00               1073                      MOVE.W  #example,D0         ; We'll play with it here
+00001BC2  303C 6F00               1073                      MOVE.W  #example,D0         ; We'll play with it here
 00001BC6  123C 0007               1074                      MOVE.B  #7,D1           ; Shift 7 bits left
 00001BCA  E360                    1075                      ASL.W   D1,D0            ; 0011 1010 0100 0100 to 0010 0000 0000 0000
 00001BCC  123C 000D               1076                      MOVE.B  #13,D1           ; Shift 13 bits right
@@ -1801,7 +1801,7 @@ CODE1110            1110
 CODE1111            111C
 CR                  D
 DONE                2200
-EXAMPLE             AF00
+EXAMPLE             6F00
 ISADDAL             1F40
 ISADDAW             1F2A
 ISADDB              1F56
