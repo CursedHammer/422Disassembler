@@ -1,6 +1,6 @@
 00001000 Starting Address
 Assembler used: EASy68K Editor/Assembler v5.15.04
-Created On: 5/28/2016 5:28:28 PM
+Created On: 5/28/2016 5:36:20 PM
 
 00000000                             1  *-----------------------------------------------------------
 00000000                             2  * Title      : NOP check
@@ -210,7 +210,7 @@ Created On: 5/28/2016 5:28:28 PM
 0000117A  4EB9 00001D4A            206  BCCorBGTorBLEcode11    JSR     ISBLE
 00001180  4EB9 0000229E            207                         JSR     DONE
 00001186                           208     
-00001186                           209  ***************************** END  ADD_BorADD_WorADD_L ************************************
+00001186                           209  ***************************** END  BCCorBGTorBLE ************************************
 00001186                           210  
 00001186                           211  *****************************  MULSLorDIVUL ************************************
 00001186  4FF8 7000                212  MULSLorDIVUL        LEA     STACK,SP            ; Load the SP
