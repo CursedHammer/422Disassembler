@@ -59,7 +59,8 @@ code1000 JSR        OR_BorOR_WorOR_LorDIVU
          JSR        DONE
 code1001 JSR        SUB_BorSUB_WorSUB_L
          JSR        DONE
-code1010 STOP       #$2700
+code1010 JSR    OPCODE_INVALID              ;INVALID
+		 RTS
 code1011 JSR        CMP_BorCMP_WorCMP_L
          JSR        DONE
 code1100 JSR        AND_BorAND_WorAND_LorMULS_W
@@ -68,7 +69,8 @@ code1101 JSR        ADD_BorADD_WorADD_L
          JSR        DONE
 code1110 JSR        ROd_LSd_ASd
          JSR        DONE
-code1111 STOP       #$2700
+code1111 JSR    OPCODE_INVALID              ;INVALID
+		 RTS
 *----------- Done ------------------------------------------
 DONE    MOVEM.W     (SP)+,  A0-A7/D0-D7 ; Restore registers
         RTS
@@ -98,7 +100,8 @@ tableBCCorBGTorBLE   JMP    BCCorBGTorBLEcode00   ; BCC
 
 BCCorBGTorBLEcode00    JSR     ISBCC
                        RTS
-BCCorBGTorBLEcode01    STOP    #$2700
+BCCorBGTorBLEcode01    JSR    OPCODE_INVALID              ;INVALID
+					   RTS
 BCCorBGTorBLEcode10    JSR     ISBGT
                        RTS
 BCCorBGTorBLEcode11    JSR     ISBLE
@@ -439,7 +442,8 @@ ROd_LSd_ASdcode00 JSR ASL_ASR
                   RTS
 ROd_LSd_ASdcode01 JSR LSL_LSR
                   RTS
-ROd_LSd_ASdcode10 STOP #$2700
+ROd_LSd_ASdcode10 JSR    OPCODE_INVALID              ;INVALID
+				  RTS
 ROd_LSd_ASdcode11 JSR ROL_ROR
                   RTS
 *----------- END  ROd_LSd_ASd ------------------------------
@@ -475,7 +479,8 @@ ANDcode001 JSR      ISANDW
            RTS
 ANDcode010 JSR      ISANDL
            RTS
-ANDcode011 STOP     #$2700
+ANDcode011 JSR    OPCODE_INVALID              ;INVALID
+		   RTS
 ANDcode100 JSR      ISANDB
            RTS
 ANDcode101 JSR      ISANDW
@@ -559,7 +564,8 @@ SUBcode001 JSR      ISSUBW
            RTS
 SUBcode010 JSR      ISSUBL
            RTS
-SUBcode011 STOP     #$2700
+SUBcode011 JSR    OPCODE_INVALID              ;INVALID
+           RTS
 SUBcode100 JSR      ISSUBB
            RTS
 SUBcode101 JSR      ISSUBW
@@ -696,24 +702,38 @@ RTScommand JSR      ISRTS
            RTS
 NOPcommand JSR      ISNOP
            RTS
-JSRorCLRcode0000 STOP #$2700
-JSRorCLRcode0001 STOP #$2700
+JSRorCLRcode0000 JSR    OPCODE_INVALID              ;INVALID
+				 RTS
+JSRorCLRcode0001 JSR    OPCODE_INVALID              ;INVALID
+				 RTS
 JSRorCLRcode0010 JSR someCLR
                  RTS
-JSRorCLRcode0011 STOP #$2700
-JSRorCLRcode0100 STOP #$2700
-JSRorCLRcode0101 STOP #$2700
-JSRorCLRcode0110 STOP #$2700
-JSRorCLRcode0111 STOP #$2700
-JSRorCLRcode1000 STOP #$2700
-JSRorCLRcode1001 STOP #$2700
-JSRorCLRcode1010 STOP #$2700
-JSRorCLRcode1011 STOP #$2700
-JSRorCLRcode1100 STOP #$2700
-JSRorCLRcode1101 STOP #$2700
+JSRorCLRcode0011 JSR    OPCODE_INVALID              ;INVALID
+				 RTS
+JSRorCLRcode0100 JSR    OPCODE_INVALID              ;INVALID
+			     RTS
+JSRorCLRcode0101 JSR    OPCODE_INVALID              ;INVALID
+				 RTS
+JSRorCLRcode0110 JSR    OPCODE_INVALID              ;INVALID
+				 RTS
+JSRorCLRcode0111 JSR    OPCODE_INVALID              ;INVALID
+				 RTS
+JSRorCLRcode1000 JSR    OPCODE_INVALID              ;INVALID
+                 RTS
+JSRorCLRcode1001 JSR    OPCODE_INVALID              ;INVALID
+				 RTS
+JSRorCLRcode1010 JSR    OPCODE_INVALID              ;INVALID
+				 RTS
+JSRorCLRcode1011 JSR    OPCODE_INVALID              ;INVALID
+				 RTS
+JSRorCLRcode1100 JSR    OPCODE_INVALID              ;INVALID
+				 RTS
+JSRorCLRcode1101 JSR    OPCODE_INVALID              ;INVALID
+				 RTS
 JSRorCLRcode1110 JSR ISJSR
                  RTS
-JSRorCLRcode1111 STOP  #$2700
+JSRorCLRcode1111 JSR    OPCODE_INVALID              ;INVALID
+				 RTS
 *----------- END NOPorCLRorRTSorJSR ------------------------
 
 *----------- someMOVEM -------------------------------------
@@ -776,26 +796,36 @@ tableNOP_MOVEM_LEA_JSR_CLR_RTS:
 
 LOTScode0000 JSR    MULSLorDIVUL
              RTS
-LOTScode0001 STOP   #$2700
+LOTScode0001 JSR    OPCODE_INVALID              ;INVALID
+             RTS
 LOTScode0010 JSR    someMOVEM
              RTS
-LOTScode0011 STOP   #$2700
-LOTScode0100 STOP   #$2700
-LOTScode0101 STOP   #$2700
+LOTScode0011 JSR    OPCODE_INVALID              ;INVALID
+			 RTS
+LOTScode0100 JSR    OPCODE_INVALID              ;INVALID
+			 RTS
+LOTScode0101 JSR    OPCODE_INVALID              ;INVALID
+			 RTS
 LOTScode0110 JSR    ISLEA
              RTS
-LOTScode0111 STOP   #$2700
+LOTScode0111 JSR    OPCODE_INVALID              ;INVALID
+			 RTS
 LOTScode1000 JSR    NOPorCLRorRTSorJSR
              RTS
-LOTScode1001 STOP   #$2700
+LOTScode1001 JSR    OPCODE_INVALID              ;INVALID
+			 RTS
 LOTScode1010 JSR    NOPorCLRorRTSorJSR
              RTS
-LOTScode1011 STOP   #$2700
-LOTScode1100 STOP   #$2700
-LOTScode1101 STOP   #$2700
+LOTScode1011 JSR    OPCODE_INVALID              ;INVALID
+			 RTS
+LOTScode1100 JSR    OPCODE_INVALID              ;INVALID
+			 RTS
+LOTScode1101 JSR    OPCODE_INVALID              ;INVALID
+			 RTS
 LOTScode1110 JSR    ISLEA
              RTS
-LOTScode1111 STOP   #$2700
+LOTScode1111 JSR    OPCODE_INVALID              ;INVALID
+			 RTS
 *----------- END NOP_MOVEM_LEA_JSR_CLR_RTS -----------------
 
 *----------- ADDI_BorADDI_WorADDI_L ------------------------
@@ -907,6 +937,14 @@ MOVEWcode111 JSR    ISMOVEW
 ; TODO: adjust workflow to:
 ;   1) save message address to buffer pointer
 ;   2) pass pointer to necessary EA Subroutines
+OPCODE_INVALID  MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
+            LEA MESSAGEOPCODE_INVALID, A1
+            MOVE.B  #14, D0
+            TRAP    #15
+
+            MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
+            RTS
+            
 ISBCC  MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
             LEA MESSAGEBCC, A1
             MOVE.B  #14, D0
@@ -1362,6 +1400,7 @@ ISADDIB MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
         TRAP        #15
         MOVEM.W     (SP)+,  A0-A7/D0-D7 ; Restore registers
         RTS                         ; Exit subroutine
+
 
 
 

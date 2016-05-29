@@ -112,9 +112,9 @@ START:                  ; first instruction of program
 
 *example EQU     %0110010000000000 ; BCC = 0110 0100 0000 0000
 *example EQU     %0110111000000000 ; BGT = 0110 1110 0000 0000
-*example EQU     %0110111100000000  ; BLE = 0110 1111 0000 0000
+example EQU     %0110111100000000  ; BLE = 0110 1111 0000 0000
 
-example EQU     %1010111100000000  ; INVALID
+*example EQU     %1010111100000000  ; INVALID
 
 shift   EQU     12                 ; Shift 12 bits
 
