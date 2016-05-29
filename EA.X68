@@ -11,7 +11,28 @@
         INCLUDE 'EAMessages.X68'
 
 *-- Subroutines: -------------------------------------------
-EA_ADD
+*---------- ADD Effective Addresses ------------------------
+* Parses and prints the effective addressing information for
+* the ADD opcode
+*-----------------------------------------------------------
+EA_ADD:
+    MOVEM.W     A0-A6/D0-D7, -(SP) ; Save registers
+
+    *get default ea
+    JSR         EA_DEFAULT_COMBO ; mode: D6, register: d7
+    LEA         MULS_W_MODE, A0 ; Set index '0' for jump table
+    MULU        #6, D6          ; Form offset (move 6 bytes in memory for every 'JMP' command)
+    JSR         0(A0, D6)       ; Jump indirect with index, i.e. jump to 'table' + displacement
+    *check validity based on mode value
+ADD_MODE:
+    JMP         MULS_W_MODE_000 ; Dn
+    JMP         MULS_W_MODE_001 ; Invalid: An
+    JMP         MULS_W_MODE_010 ; (An)
+    JMP         MULS_W_MODE_011 ; (An)+
+    JMP         MULS_W_MODE_100 ; -(An)
+    JMP         MULS_W_MODE_101 ; Invalid: Address Register Indirect with Displacement Mode
+    JMP         MULS_W_MODE_110 ; Invalid: Address Register Indirect with Index (8-Bit Displacement)
+    JMP         MULS_W_MODE_111 ; The rest (not all valid, validated by register number)
 EA_ADDA
 EA_ADDI
 EA_ADDQ
@@ -55,7 +76,6 @@ MULS_W_MODE:
         JMP         MULS_W_MODE_110 ; Invalid: Address Register Indirect with Index (8-Bit Displacement)
         JMP         MULS_W_MODE_111 ; The rest (not all valid, validated by register number)
 
-*--- Code for different mode values
 MULS_W_MODE_000: ; Dn
         JSR         EA_PRINT_DN     ; Print data register direct operand
         JMP         MULS_W_DEST     ; Go to: print destination operand
@@ -86,9 +106,7 @@ MULS_W_MODE_111: ; The rest (not all valid, validated by register number)
         BEQ         MULS_W_IMM
         JSR         EA_INVALID      ; Else: invalid
         JMP         MULS_W_END
-*-----------------------------------
 
-*--- Possibilities for mode 111 ----
 MULS_W_ABS_W:
         JSR         EA_PRINT_ABS_W  ; Print absolute word address operand
         JMP         MULS_W_DEST     ; Continue with parsing destination operand
@@ -98,7 +116,6 @@ MULS_W_ABS_L:
 MULS_W_IMM:
         JSR         EA_PRINT_IMM    ; Print immediate data
         JMP         MULS_W_DEST     ; Continue with parsing destination operand
-*-----------------------------------
 
 MULS_W_DEST:
         *print EA_MSG_COMMA
@@ -113,7 +130,7 @@ MULS_W_END:
         MOVEM.L     (SP)+, A0-A4/D0-D5 ; Restore registers
         RTS
 
-
+EA_NOP
 EA_OR
 EA_ROL
 EA_ROR
@@ -130,7 +147,7 @@ EA_SUB
 *
 *-----------------------------------------------------------
 EA_INVALID:
-        *print or indicate invalidity TODO
+        *print or indicate invalidity
         RTS
 
 *---------- Parse Default Combo ----------------------------
@@ -144,7 +161,7 @@ EA_DEFAULT_COMBO:
         CLR.B       D6              ; Clear space for mode bits
         CLR.B       D7              ; Clear space for register bits
 * Get Mode
-        MOVE.L      (A5), D1        ; Load opcode to data register 1 (MAY NOT BE IN A5, TODO)
+        MOVE.L      (A5), D1        ; Load opcode to data register 1
         MOVE.B      #10, D2         ; Clear upper 10 bits of opcode word
         LSL.W       D2, D1          ; Perform shift (zeros shifted in)
         MOVE.B      #13, D2         ; 'Right-align' bits 3-5 to determine mode bits
@@ -155,34 +172,6 @@ EA_DEFAULT_COMBO:
         MOVE.B      #13, D2         ; Clear upper 13 bits of opcode word
         LSL.W       D2, D1          ; Perform shift (zeros shifted in)
         MOVE.B      #13, D2         ; 'Right-align' bits 0-2 to determine register bits
-        LSR.W       D2, D1          ; Perform shift (zeros shifted in)
-        MOVE.B      D1, D7          ; Save register bits to D7
-
-        MOVEM.L     (SP)+, A0-A4/D0-D5 ; Restore registers
-        RTS                         ; Return from subroutine
-
-*---------- Parse Secondary Combo --------------------------
-* Parses and separates values in the mode/register data
-* combo found in bits 6-11 in many opcode words.
-* POST: mode bits in D6, register bits in D7
-*-----------------------------------------------------------
-EA_SECOND_COMBO:
-        MOVEM.L     A0-A4/D0-D5, -(SP) ; Save registers (excluding D6 and D7, used
-                                       ; to return results, A5-A7 are addresses and SP)
-        CLR.B       D6              ; Clear space for mode bits
-        CLR.B       D7              ; Clear space for register bits
-* Get Mode
-        MOVE.L      (A5), D1        ; Load opcode to data register 1 (MAY NOT BE IN A5, TODO)
-        MOVE.B      #4, D2          ; Clear upper 7 bits of opcode word
-        LSL.W       D2, D1          ; Perform shift (zeros shifted in)
-        MOVE.B      #13, D2         ; 'Right-align' bits 6-8 to determine mode bits
-        LSR.W       D2, D1          ; Perform shift (zeros shifted in)
-        MOVE.B      D1, D6          ; Save mode bits to D6
-* Get Register
-        MOVE.L      (A5), D1        ; Reload opcode to data register 1
-        MOVE.B      #4, D2          ; Clear upper 4 bits of opcode word
-        LSL.W       D2, D1          ; Perform shift (zeros shifted in)
-        MOVE.B      #13, D2         ; 'Right-align' bits 9-11 to determine register bits
         LSR.W       D2, D1          ; Perform shift (zeros shifted in)
         MOVE.B      D1, D7          ; Save register bits to D7
 
@@ -208,7 +197,7 @@ EA_PRINT_DN_JMP:
         JMP         EA_PRINT_DN_101 ; D5
         JMP         EA_PRINT_DN_110 ; D6
         JMP         EA_PRINT_DN_111 ; D7
-*print value TODO
+*print value
 EA_PRINT_DN_000 ; D0
 EA_PRINT_DN_001 ; D1
 EA_PRINT_DN_010 ; D2
@@ -238,7 +227,7 @@ AN_JMP:
         JMP         AN_101          ; A5
         JMP         AN_110          ; A6
         JMP         AN_111          ; A7
-*print value TODO
+*print value
 AN_000 ; A0
 AN_001 ; A1
 AN_010 ; A2
@@ -267,7 +256,7 @@ IND_JMP:
         JMP         IND_101         ; (A5)
         JMP         IND_110         ; (A6)
         JMP         IND_111         ; (A7)
-*print value TODO
+*print value
 IND_000 ; (A0)
 IND_001 ; (A1)
 IND_010 ; (A2)
@@ -300,7 +289,7 @@ POSTINC_JMP:
         JMP         POSTINC_101 ; (A5)+
         JMP         POSTINC_110 ; (A6)+
         JMP         POSTINC_111 ; (A7)+
-*print value TODO
+*print value
 POSTINC_000 ; (A0)+
 POSTINC_001 ; (A1)+
 POSTINC_010 ; (A2)+
@@ -328,7 +317,7 @@ PREDEC_JMP:
         JMP         PREDEC_101 ; -(A5)
         JMP         PREDEC_110 ; -(A6)
         JMP         PREDEC_111 ; -(A7)
-*print value TODO
+*print value
 PREDEC_000 ; -(A0)
 PREDEC_001 ; -(A1)
 PREDEC_010 ; -(A2)
@@ -339,12 +328,12 @@ PREDEC_110 ; -(A6)
 PREDEC_111 ; -(A7)
 
 EA_PRINT_PD_END:
-        RTS
+RTS
 *---------- Absolute Long Address --------------------------
 * Example Description
 *-----------------------------------------------------------
 EA_PRINT_ABS_L:
-        ADDA.W      #$0002, *POINTER
+
 *---------- Absolute Word Address --------------------------
 * Example Description
 *-----------------------------------------------------------
