@@ -1,0 +1,232 @@
+00001000 Starting Address
+Assembler used: EASy68K Editor/Assembler v5.15.04
+Created On: 5/28/2016 6:38:15 PM
+
+00000000                             1  *-----------------------------------------------------------
+00000000                             2  * Title      : Store String in Memory
+00000000                             3  * Written by : Brandon Authier
+00000000                             4  * Date       : 28 May 2016
+00000000                             5  * Description: Writes strings to memory buffer and then can
+00000000                             6  *              be printed to user.
+00000000                             7  *
+00000000                             8  *              A4 is used as the temporary holder for the
+00000000                             9  *              string to be written to the buffer.
+00000000                            10  *
+00000000                            11  *              A2 is used to track the BUFFER.
+00000000                            12  *
+00000000                            13  *              The BUFFER is addressed at $2000 (Will change)
+00000000                            14  *
+00000000                            15  *              D3 is used to the Row Count, RCOUNT.
+00000000                            16  * 
+00000000                            17  *-----------------------------------------------------------
+00000000                            18  
+00000000  =0000000D                 19  CR      EQU     $0D                 * Carriage return
+00000000  =0000000A                 20  LF      EQU     $0A                 * Line feed
+00000000                            21  
+00000000  =00002000                 22  BUFFER  EQU     $2000               * Buffer address for string
+00000000  =0000001E                 23  RCOUNT  EQU     30                  * Counters
+00000000                            24     
+00001000                            25          ORG     $1000               * Program beginning address
+00001000                            26          
+00001000                            27  START
+00001000  163C 001E                 28      MOVE.B      #RCOUNT,D3          * Move row counter to D3
+00001004                            29          
+00001004                            30  WRITE_LINE
+00001004  45F8 2000                 31      LEA         BUFFER,A2           * Load BUFFER address to A2 for use
+00001008                            32  
+00001008                            33  *   Write Strings to Memory Creating a Line
+00001008                            34  *   =======================================    
+00001008  287C 000010FB             35      MOVE.L      #MV,A4              * Move the string 'MOVE' to A4
+0000100E  613A                      36      BSR.S       WRITE2MEM           * Write string to memory
+00001010  287C 0000110F             37      MOVE.L      #LONG,A4            * Move the string '.L  ' to A4
+00001016  6132                      38      BSR.S       WRITE2MEM           * Write string to memory
+00001018  287C 0000111A             39      MOVE.L      #DREG1,A4           * Move the string 'D1' to A4
+0000101E  612A                      40      BSR.S       WRITE2MEM           * Write string to memory
+00001020  287C 0000114D             41      MOVE.L      #COMMA,A4           * Move the string ',' to A4
+00001026  6122                      42      BSR.S       WRITE2MEM           * Write string to memory
+00001028  287C 00001123             43      MOVE.L      #DREG4,A4           * Move the string 'D4' to A4
+0000102E  611A                      44      BSR.S       WRITE2MEM           * Write string to memory
+00001030  612C                      45      BSR.S       WRITE_ENDL          * Write end of line to memory          
+00001032                            46  *   ----------- Finished Writing the Whole Line -------------------
+00001032                            47  
+00001032                            48  *   Print Buffer
+00001032                            49  *   ============ 
+00001032  6138                      50      BSR.S       PRINTLN             * Subroutine to print buffer
+00001034                            51  *   ----------- Print Buffer -----------------------------------
+00001034                            52  
+00001034                            53  *   Clean Buffer
+00001034                            54  *   ============ 
+00001034  45F8 2000                 55      LEA         BUFFER,A2           * Reset A2 for buffer cleaning
+00001038  6140                      56      BSR.S       CLEAN_BUFF          * Subroutine to reset buffer to all F's
+0000103A                            57  *   ----------- Buffer Cleaned --------------------------------------------
+0000103A                            58  
+0000103A                            59  *   Is New Page Needed?
+0000103A                            60  *   This is a for loop type wrapper that executes 30 times then asks the 
+0000103A                            61  *   user to press enter to continue which clears the screen. 
+0000103A                            62  *   It loops infinitely in this way.
+0000103A                            63  *   ====================================================================
+0000103A  5303                      64      SUBI.B      #1,D3               * Decrement RCOUNT by 1
+0000103C  0C03 0000                 65      CMPI.B      #0,D3               * Is RCOUNT = 0
+00001040  6700 004C                 66      BEQ         NEW_PAGE            * If yes, prompt user and make new page
+00001044  61BE                      67      BSR.S       WRITE_LINE          * If no, keep writing lines
+00001046                            68  
+00001046                            69  *   Pause Program
+00001046                            70  *   =============    
+00001046  6000 006C                 71      BRA         PAUSE               * Pause program (SIMHALT)
+0000104A                            72  
+0000104A                            73  *   Subroutines
+0000104A                            74  *   ===========    
+0000104A                            75  WRITE2MEM
+0000104A  0C14 0000                 76      CMP.B       #$00,(A4)           * Check if byte is string terminator
+0000104E  6700 0006                 77      BEQ         SKIP_WRITE          * If yes, skip write and return
+00001052  14DC                      78      MOVE.B      (A4)+,(A2)+         * If no, write byte to memory
+00001054  60F4                      79      BRA         WRITE2MEM           * Keep writing, not end of string
+00001056                            80  SKIP_WRITE
+00001056  287C 00000000             81      MOVEA.L     #$00000000,A4       * Clean up A4
+0000105C  4E75                      82      RTS                             * Return to main
+0000105E                            83      
+0000105E                            84  WRITE_ENDL
+0000105E  14FC 000D                 85      MOVE.B      #CR,(A2)+           * Move carriage return into memory
+00001062  14FC 000A                 86      MOVE.B      #LF,(A2)+           * Move line feed into memory
+00001066  14FC 0000                 87      MOVE.B      #$00,(A2)+          * Move string terminator into memory
+0000106A  4E75                      88      RTS
+0000106C                            89      
+0000106C                            90  PRINTLN
+0000106C  45F8 2000                 91      LEA         BUFFER,A2           * Reset A2 to BUFFER address beginning
+00001070  43D2                      92      LEA         (A2),A1             * Load BUFFER address into A1
+00001072  103C 000E                 93      MOVE.B      #14,D0              * Task 14, no CR or LF
+00001076  4E4F                      94      TRAP        #15                 * Display string held in BUFFER
+00001078  4E75                      95      RTS                             * Return to main
+0000107A                            96      
+0000107A                            97  CLEAN_BUFF
+0000107A  0C92 FFFFFFFF             98      CMPI.L      #$FFFFFFFF,(A2)     * 
+00001080  6700 000A                 99      BEQ         BUFFDONE            * Buffer has been cleaned
+00001084  24FC FFFFFFFF            100      MOVE.L      #$FFFFFFFF,(A2)+    * Fill with F's
+0000108A  60EE                     101      BRA         CLEAN_BUFF          * Continue cleaning buffer
+0000108C                           102  BUFFDONE
+0000108C  4E75                     103      RTS                             * Return to main
+0000108E                           104      
+0000108E                           105  NEW_PAGE
+0000108E  4283                     106      CLR.L       D3                  * Clear counter
+00001090  43F9 000010BC            107      LEA         ENTER,A1            * Load enter message into A1
+00001096  103C 000E                108      MOVE.B      #14,D0              * Moves the Task 14 into D0
+0000109A  4E4F                     109      TRAP        #15                 * Displays contents of A1
+0000109C  103C 0005                110      MOVE.B      #5,D0               * Read single character from 
+000010A0  4E4F                     111      TRAP        #15                 * The keyboard into D1.B
+000010A2  6000 0002                112      BRA.W       CLEARSCRN           * Clear the screen.
+000010A6                           113  
+000010A6                           114  CLEARSCRN     
+000010A6  103C 000B                115      MOVE.B      #11,D0              * Task 11 for clearing screen
+000010AA  323C FF00                116      MOVE.W      #$FF00,D1           * FF00, Clear screen
+000010AE  4E4F                     117      TRAP        #15                 * Clears output
+000010B0  6000 FF4E                118      BRA.W       START               * Loop back to start
+000010B4                           119      
+000010B4                           120  PAUSE
+000010B4  FFFF FFFF                121          SIMHALT                     * Halt simulator
+000010B8  6000 00A2                122          BRA     QUIT                * End program
+000010BC                           123  
+000010BC                           124  * Put variables and constants here
+000010BC                           125  
+000010BC                           126  * Display
+000010BC= 2D 2D 2D 2D 2D 2D ...    127  ENTER           DC.B '------------------------- Press Enter ------------------------',0
+000010FB                           128  
+000010FB                           129  
+000010FB                           130  * Op Commands
+000010FB= 4D 4F 56 45 00           131  MV              DC.B 'MOVE',0
+00001100= 41 44 44 20 00           132  AD              DC.B 'ADD ',0
+00001105                           133  
+00001105                           134  * Lengths
+00001105= 2E 42 20 20 00           135  BYTE            DC.B '.B  ',0
+0000110A= 2E 57 20 20 00           136  WORD            DC.B '.W  ',0
+0000110F= 2E 4C 20 20 00           137  LONG            DC.B '.L  ',0
+00001114= 0D 0A 00                 138  ENDL            DC.B CR,LF,0
+00001117                           139  
+00001117                           140  * Registers
+00001117= 44 30 00                 141  DREG0           DC.B 'D0',0
+0000111A= 44 31 00                 142  DREG1           DC.B 'D1',0
+0000111D= 44 32 00                 143  DREG2           DC.B 'D2',0
+00001120= 44 33 00                 144  DREG3           DC.B 'D3',0
+00001123= 44 34 00                 145  DREG4           DC.B 'D4',0
+00001126= 44 35 00                 146  DREG5           DC.B 'D5',0
+00001129= 44 36 00                 147  DREG6           DC.B 'D6',0
+0000112C= 44 37 00                 148  DREG7           DC.B 'D7',0
+0000112F= 41 30 00                 149  AREG0           DC.B 'A0',0
+00001132= 41 31 00                 150  AREG1           DC.B 'A1',0
+00001135= 41 32 00                 151  AREG2           DC.B 'A2',0
+00001138= 41 33 00                 152  AREG3           DC.B 'A3',0
+0000113B= 41 34 00                 153  AREG4           DC.B 'A4',0
+0000113E= 41 35 00                 154  AREG5           DC.B 'A5',0
+00001141= 41 36 00                 155  AREG6           DC.B 'A6',0
+00001144= 41 37 00                 156  AREG7           DC.B 'A7',0
+00001147                           157  
+00001147                           158  * Signs
+00001147= 23 00                    159  POUND           DC.B '#',0
+00001149= 24 00                    160  DOLLAR          DC.B '$',0
+0000114B= 25 00                    161  PERCENT         DC.B '%',0
+0000114D= 2C 00                    162  COMMA           DC.B ',',0
+0000114F= 28 00                    163  OPAREN          DC.B '(',0
+00001151= 29 00                    164  CPAREN          DC.B ')',0
+00001153= 2B 00                    165  PLUS            DC.B '+',0
+00001155= 2D 00                    166  MINUS           DC.B '-',0
+00001157                           167  
+00001157                           168  * Spacing
+00001157= 20 20 20 20 00           169  TAB             DC.B '    ',0
+0000115C                           170  
+0000115C                           171  QUIT
+0000115C                           172          END     START        ; last line of source
+
+No errors detected
+No warnings generated
+
+
+SYMBOL TABLE INFORMATION
+Symbol-name         Value
+-------------------------
+AD                  1100
+AREG0               112F
+AREG1               1132
+AREG2               1135
+AREG3               1138
+AREG4               113B
+AREG5               113E
+AREG6               1141
+AREG7               1144
+BUFFDONE            108C
+BUFFER              2000
+BYTE                1105
+CLEAN_BUFF          107A
+CLEARSCRN           10A6
+COMMA               114D
+CPAREN              1151
+CR                  D
+DOLLAR              1149
+DREG0               1117
+DREG1               111A
+DREG2               111D
+DREG3               1120
+DREG4               1123
+DREG5               1126
+DREG6               1129
+DREG7               112C
+ENDL                1114
+ENTER               10BC
+LF                  A
+LONG                110F
+MINUS               1155
+MV                  10FB
+NEW_PAGE            108E
+OPAREN              114F
+PAUSE               10B4
+PERCENT             114B
+PLUS                1153
+POUND               1147
+PRINTLN             106C
+QUIT                115C
+RCOUNT              1E
+SKIP_WRITE          1056
+START               1000
+TAB                 1157
+WORD                110A
+WRITE2MEM           104A
+WRITE_ENDL          105E
+WRITE_LINE          1004

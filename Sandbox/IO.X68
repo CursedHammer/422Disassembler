@@ -1,14 +1,24 @@
+******************************************************************************
+* Title      : I/O Subroutines
+* Written by : Brandon Authier (Hblkr), Jack S. Eldridge
+*              (JackScottie), Marijn Burger (marijnburger)
+* Date       : 3 May 2016
+* Description: Support file containing the I/O subroutines
+*              for the disassembler.
+******************************************************************************
+*
 * TODO:
 *    Hex to ASCII
-*    Display full screens of data and clear
-
+*
 * DONE:
 *    Make sure addresses are even
 *    ASCII to Hex
 *    Make sure all hex values (nearly none)
 *    Check that ending address is less than beginning address
+*    Display full screens of data and clear
 * 
-*
+******************************************************************************
+
 
 ******************************************************************************
 *           DEFINITIONS                                                      *
@@ -27,7 +37,7 @@ MOD         EQU   2
 CR          EQU   $0D
 LF          EQU   $0A 
 
-            ORG   $1000
+            ORG   $1000 
 
 ******************************************************************************
 *           BEGIN CODE                                                       *
@@ -37,8 +47,9 @@ LF          EQU   $0A
 * Begins program's logical flow. Similar to main in C/C++
 *-----------------------------------------------------------------------------           
 START       
-    LEA    STACK, SP                * SP is stored in A7
-    JSR    IO_WELCOME               * Run welcome subroutine
+    LEA         STACK, SP           * SP is stored in A7
+    JSR         CLEARSCRN
+    JSR         IO_WELCOME          * Run welcome subroutine
             
 GET_FIRST_ADDRESS
     LEA         PS1,A1              * Loads message into A1
@@ -57,7 +68,7 @@ GET_FIRST_ADDRESS
     MOVE.L      HEXVALUE,BEGINADDR  * Copy hex value to begin
     LEA         BMESSAGE,A1         * Load message in A1 for display
     MOVE.L      (HEXVALUE),D1       * Load hex value into A1 for display 
-    JSR         PRINT_HEXVALUE      * Display hex value
+    *JSR         PRINT_HEXVALUE      * Display hex value
     JSR         NEW_LINE            * Space
     
     JSR         CLEAR               * Clear values for next hex
@@ -79,7 +90,7 @@ GET_SECOND_ADDRESS
     MOVE.L      HEXVALUE,ENDADDR    * Copy hex value to begin
     LEA         EMESSAGE,A1         * Load message in A1 for display
     MOVE.L      (HEXVALUE),D1       * Load hex value into A1 for display
-    JSR         PRINT_HEXVALUE      * Display hex value
+    *JSR         PRINT_HEXVALUE      * Display hex value
     JSR         NEW_LINE            * Space
     
     JSR         CLEAR               * Clear values for next hex
@@ -87,9 +98,13 @@ GET_SECOND_ADDRESS
 CHECK_BADDR_IS_LESS_THAN_EADDR
     JSR         IS_LESSTHAN         *
     CMPI.B      #1,HEXFLAG          * Does HEXFLAG = 1
-    BNE         GET_FIRST_ADDRESS   * If no, get hex again
-    
-    
+    BEQ         FINISHED            * If yes, finished
+    LEA         ADR_ERR_NOTLT,A1    * Else, load error message
+    BSR.W       ADDRESS_ERR
+    BSR.W       START      
+
+
+FINISHED    
     SIMHALT                         * halt simulator
     
 *---------- END - START ------------------------------------------------------
@@ -319,7 +334,7 @@ NOTEVEN
 * Prints out to display whatever is in A1
 *-----------------------------------------------------------------------------
 PRINT_HEXVALUE
-    MOVE.B      #14,D0              * Moves the Task 13 into D0
+    MOVE.B      #14,D0              * Moves the Task 14 into D0
     TRAP        #15                 * Displays contents of A1
     
     
@@ -341,23 +356,56 @@ NEW_LINE
 
 *---------- END - NEW_LINE ---------------------------------------------------
 
+*---------- CLEARSCRN --------------------------------------------------------
+* Clear all output on screen
+*-----------------------------------------------------------------------------
+CLEARSCRN     
+    MOVE.B      #11,D0              * Task 11 for clearing screen
+    MOVE.W      #$FF00,D1           * FF00, Clear screen
+    TRAP        #15                 * Wait for keystroke
+    RTS                             * Return from subroutine
+
+*---------- END - CLEARSCRN --------------------------------------------------
+
+
+******************************************************************************
+*           ERROR SUBROUTINES                                                *
+******************************************************************************
+
+*---------- ADDRESS_ERR ------------------------------------------------------
+* Clear all output on screen
+*-----------------------------------------------------------------------------
+ADDRESS_ERR
+    BSR.W       CLEARSCRN           * Clear output before displaying error
+    MOVE.B      #13,D0              * Moves the Task 13 into D0
+    TRAP        #15                 * Displays contents of A1
+    MOVE.B      #5,D0               * Read single character from 
+    TRAP        #15                 * The keyboard into D1.B
+    RTS                             * Return from subroutine
+
+*---------- END - CLEARSCRN --------------------------------------------------
+
 
 ******************************************************************************
 *           VARIABLES AND CONSTANTS                                          *
 ******************************************************************************
 
-INTRO           DC.B  'WELCOME!',CR,LF,'This is a 68K disassembler.',CR,LF,0
-PS1             DC.B  'Please enter the starting hex address (max 8 digits): $',0
-PS2             DC.B  'Please enter the ending hex address (max 8 digits)  : $',0
-BMESSAGE        DC.B  'Beginning addres is: ',0
-EMESSAGE        DC.B  'Ending address is: ',0
+INTRO           DC.B  'WELCOME!',CR,LF,'THIS IS A 68K DISASSEMBLER.',CR,LF,0
+PS1             DC.B  'PLEASE ENTER THE STARTING HEX ADDRESS',CR,LF,'(MAX 8 DIGITS AND MUST BE EVEN): $',0
+PS2             DC.B  'PLEASE ENTER THE ENDING HEX ADDRESS',CR,LF,'(MAX 8 DIGITS AND MUST BE EVEN): $',0
+BMESSAGE        DC.B  CR,LF,'BEGINNING ADDRESS GIVEN IS: ',0
+EMESSAGE        DC.B  CR,LF,'ENDING ADDRESS GIVEN IS   : ',0
 ENDL            DC.B  CR,LF,0
+
+ADR_ERR_NOTLT   DC.B  'THE BEGINNING ADDRESS MUST BE LESS THAN THE ENDING ADDRESS.',CR,LF,'PRESS ANY KEY TO TRY AGAIN...',0
 
 HEXSTRING       DS.B  80            * Var for hex string
 
 ILLEGAL         DC.B  '1000    DATA    $WXYZ',CR,LF,0
 
                 END   START         * last line of source
+
+
 
 
 
