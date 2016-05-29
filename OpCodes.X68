@@ -17,8 +17,7 @@ OC_PARSE:
         MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
         LEA         initial_table,A0 ; Index into the table
         CLR.L       D0              ; Zero it
-        *replace '#example' with indirect access of address register holding pointer
-        MOVE.W      #example,D0     ; We'll play with it here
+        MOVE.W      (A2),D0         ; We'll play with it here
         MOVE.B      #12,D1          ; Shift 12 bits to the right
         LSR.W       D1,D0           ; Move the bits (moves highest 4 bits to lowest 4 positions,
                                     ; and the rest are zeroed out)
@@ -79,32 +78,32 @@ BCCorBGTorBLE       LEA     STACK,SP            ; Load the SP
                     LEA     tableBCCorBGTorBLE, A0            ; Index into the table
                     CLR.L   D0                  ; Zero it
                     MOVE.W  #example,D0         ; We'll play with it here
-                    MOVE.B  #6,D1           ; Shift 6 bits left 
-                    ASL.W   D1,D0            
-                    MOVE.B  #shift,D1           ; Shift 12 bits to the right  
+                    MOVE.B  #6,D1           ; Shift 6 bits left
+                    ASL.W   D1,D0
+                    MOVE.B  #shift,D1           ; Shift 12 bits to the right
                     LSR.W   D1,D0               ; Move the bits (moves highest 4 bits to lowest 4 positions,
-                                    ; and the rest are zeroed out)           
+                                    ; and the rest are zeroed out)
                     MOVE.B  #2,D1           ; Shift 2 bits right
-                    ASR.W   D1,D0 
-                    
+                    ASR.W   D1,D0
+
                     MULU    #6,D0               ; Form offset (move 6 bytes in memory for every 'JMP' command)
-                    JSR     0(A0,D0)            ; Jump indirect with index, i.e. jump to 'table' + displacement                
+                    JSR     0(A0,D0)            ; Jump indirect with index, i.e. jump to 'table' + displacement
 
 tableBCCorBGTorBLE   JMP    BCCorBGTorBLEcode00   ; BCC
-                     JMP    BCCorBGTorBLEcode01   ;                                     
+                     JMP    BCCorBGTorBLEcode01   ;
                      JMP    BCCorBGTorBLEcode10   ; BGT
                      JMP    BCCorBGTorBLEcode11   ; BLE
-  
+
 
 
 BCCorBGTorBLEcode00    JSR     ISBCC
                        JSR     DONE
-BCCorBGTorBLEcode01    STOP    #$2700  
+BCCorBGTorBLEcode01    STOP    #$2700
 BCCorBGTorBLEcode10    JSR     ISBGT
-                       JSR     DONE  
+                       JSR     DONE
 BCCorBGTorBLEcode11    JSR     ISBLE
                        JSR     DONE
-   
+
 ***************************** END  BCCorBGTorBLE ************************************
 
 *----------- OR_BorOR_WorOR_LorDIVU ------------------------
@@ -153,21 +152,21 @@ MULSLorDIVUL        LEA     STACK,SP            ; Load the SP
                     LEA     tableMULSLorDIVUL, A0            ; Index into the table
                     CLR.L   D0                  ; Zero it
                     MOVE.W  #example,D0         ; We'll play with it here
-                    MOVE.B  #6,D1           ; Shift 6 bits left 
-                    ASL.W   D1,D0            
-                    MOVE.B  #shift,D1           ; Shift 12 bits to the right  
+                    MOVE.B  #6,D1           ; Shift 6 bits left
+                    ASL.W   D1,D0
+                    MOVE.B  #shift,D1           ; Shift 12 bits to the right
                     LSR.W   D1,D0               ; Move the bits (moves highest 4 bits to lowest 4 positions,
-                    
+
                     MULU    #6,D0               ; Form offset (move 6 bytes in memory for every 'JMP' command)
-                    JSR     0(A0,D0)            ; Jump indirect with index, i.e. jump to 'table' + displacement                
+                    JSR     0(A0,D0)            ; Jump indirect with index, i.e. jump to 'table' + displacement
 
 tableMULSLorDIVUL             JMP    MULSLorDIVULcode0   ;  MULS.L
-                              JMP    MULSLorDIVULcode1   ;  DIVU.L                                   
+                              JMP    MULSLorDIVULcode1   ;  DIVU.L
 
 MULSLorDIVULcode0   JSR     ISMULSL
                     JSR     DONE
-MULSLorDIVULcode1   JSR     ISDIVUL 
-                    JSR     DONE                                 
+MULSLorDIVULcode1   JSR     ISDIVUL
+                    JSR     DONE
 ***************************** END  MULSLorDIVUL ************************************
 
 
@@ -909,41 +908,41 @@ MOVEWcode111 JSR    ISMOVEW
 ;   1) save message address to buffer pointer
 ;   2) pass pointer to necessary EA Subroutines
 ISBCC  MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
-            LEA MESSAGEBCC, A1         
+            LEA MESSAGEBCC, A1
             MOVE.B  #14, D0
             TRAP    #15
-   
+
             MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
             RTS
 ISBGT  MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
-            LEA MESSAGEBGT, A1         
+            LEA MESSAGEBGT, A1
             MOVE.B  #14, D0
             TRAP    #15
-   
+
             MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
             RTS
-            
+
 ISBLE  MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
-            LEA MESSAGEBLE, A1         
+            LEA MESSAGEBLE, A1
             MOVE.B  #14, D0
             TRAP    #15
-   
+
             MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
             RTS
-            
+
 ISDIVUL     MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
-            LEA MESSAGEDIVUL, A1         
+            LEA MESSAGEDIVUL, A1
             MOVE.B  #14, D0
             TRAP    #15
-   
+
             MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
             RTS
 
 ISDIVUW     MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
-            LEA MESSAGEDIVUW, A1         
+            LEA MESSAGEDIVUW, A1
             MOVE.B  #14, D0
             TRAP    #15
-   
+
             MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
             RTS
 
