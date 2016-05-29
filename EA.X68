@@ -221,30 +221,79 @@ ADDA_MODE_END:
 ADDA_END:
         MOVEM.L     (SP)+, A0-A6/D0-D5 ; Restore registers
         RTS
-
-EA_ADDI
-EA_ADDQ
-EA_AND
-EA_ASL
-EA_ASR
-EA_BCC
-EA_CLR
-EA_CMP
-EA_DIVU
-EA_JSR
-EA_LEA
-EA_LSL
-EA_LSR
-EA_MOVE
-EA_MOVEA
-EA_MOVEM
-EA_MOVEQ
+*-----------------------------------------------------------
+EA_ADDI:
+        JSR         EA_INVALID
+        RTS
+*-----------------------------------------------------------
+EA_ADDQ:
+        JSR         EA_INVALID
+        RTS
+*-----------------------------------------------------------
+EA_AND:
+        JSR         EA_INVALID
+        RTS
+*-----------------------------------------------------------
+EA_ASL:
+        JSR         EA_INVALID
+        RTS
+*-----------------------------------------------------------
+EA_ASR:
+        JSR         EA_INVALID
+        RTS
+*-----------------------------------------------------------
+EA_BCC:
+        JSR         EA_INVALID
+        RTS
+*-----------------------------------------------------------
+EA_CLR:
+        JSR         EA_INVALID
+        RTS
+*-----------------------------------------------------------
+EA_CMP:
+        JSR         EA_INVALID
+        RTS
+*-----------------------------------------------------------
+EA_DIVU:
+        JSR         EA_INVALID
+        RTS
+*-----------------------------------------------------------
+EA_JSR:
+        JSR         EA_INVALID
+        RTS
+*-----------------------------------------------------------
+EA_LEA:
+        JSR         EA_INVALID
+        RTS
+*-----------------------------------------------------------
+EA_LSL:
+        JSR         EA_INVALID
+        RTS
+*-----------------------------------------------------------
+EA_LSR:
+        JSR         EA_INVALID
+        RTS
+*-----------------------------------------------------------
+EA_MOVE:
+        JSR         EA_INVALID
+        RTS
+*-----------------------------------------------------------
+EA_MOVEA:
+        JSR         EA_INVALID
+        RTS
+*-----------------------------------------------------------
+EA_MOVEM:
+        JSR         EA_INVALID
+        RTS
+*-----------------------------------------------------------
+EA_MOVEQ:
+        JSR         EA_INVALID
+        RTS
 
 *---------- MULS.W Effective Addresses ---------------------
 * Parses and prints the effective addressing information for
 * the MULS.W opcode
 *-----------------------------------------------------------
-
 EA_MULS_W:
         MOVEM.W     A0-A6/D0-D7, -(SP) ; Save registers
 
@@ -319,12 +368,30 @@ MULS_W_END:
         MOVEM.L     (SP)+, A0-A6/D0-D5 ; Restore registers
         RTS
 
-EA_NOP
-EA_OR
-EA_ROL
-EA_ROR
-EA_RTS
-EA_SUB
+EA_NOP:
+        JSR         EA_INVALID
+        RTS
+*-----------------------------------------------------------
+EA_OR:
+        JSR         EA_INVALID
+        RTS
+*-----------------------------------------------------------
+EA_ROL:
+        JSR         EA_INVALID
+        RTS
+*-----------------------------------------------------------
+EA_ROR:
+        JSR         EA_INVALID
+        RTS
+*-----------------------------------------------------------
+EA_RTS:
+        JSR         EA_INVALID
+        RTS
+*-----------------------------------------------------------
+EA_SUB:
+        JSR         EA_INVALID
+        RTS
+*-----------------------------------------------------------
 
 *---------- Example Subroutine -----------------------------
 * Example Description
