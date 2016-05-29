@@ -27,6 +27,9 @@ START:                  ; first instruction of program
 *example EQU     %0100001010000111 ; CLR.L  = 0100 0010 1000 0111
 *example EQU     %0100001000000111 ; CLR.B  = 0100 0010 0000 0111
 *example EQU     %0100001001000111 ; CLR.W  = 0100 0010 0100 0111
+
+example EQU     %0100001011000111 ; INVALID = 0100 0010 1100 0111
+
 *example EQU     %0111111011111111 ; MOVEQ.L #%11111111, D7 = 0111 1110 1111 1111
 *example EQU     %0100111010010110 ; JSR (A6)  = 0100 1110 1001 0110
 *example EQU     %0101111000000011 ; ADDQ.B    #%111, D3 = 0101 1110 0000 0011
@@ -35,6 +38,8 @@ START:                  ; first instruction of program
 *example EQU     %1011100000000011 ; CMP.B D3, D4 = 1011 100 000 000 011
 *example EQU     %1011100001000011 ; CMP.W D3, D4 = 1011 100 001 000 011
 *example EQU     %1011100010000011 ; CMP.L D3, D4 = 1011 100 010 000 011
+
+*example EQU     %1011100011000011 ;         INVALID 1011 100 011 000 011
 
 *example EQU     %1001100100000011 ; SUB.B D3, D4 = 1001 100 100 000 011
 *example EQU     %1001011000000100 ; SUB.B D4, D3 = 1001 011 000 000 100
@@ -112,7 +117,7 @@ START:                  ; first instruction of program
 
 *example EQU     %0110010000000000 ; BCC = 0110 0100 0000 0000
 *example EQU     %0110111000000000 ; BGT = 0110 1110 0000 0000
-example EQU     %0110111100000000  ; BLE = 0110 1111 0000 0000
+*example EQU     %0110111100000000  ; BLE = 0110 1111 0000 0000
 
 *example EQU     %1010111100000000  ; INVALID
 
@@ -259,7 +264,7 @@ tableOR_BorOR_WorOR_LorDIVU             JMP    OR_DIVUcode000   ; OR.B
                                         JMP    OR_DIVUcode100   ; OR.B
                                         JMP    OR_DIVUcode101   ; OR.W
                                         JMP    OR_DIVUcode110   ; OR.L
-                                        ;JMP    OR_DIVUcode111    ; NEED TO ADD THIS IN WITH A STOP !!!!
+                                        JMP    OR_DIVUcode111    ; INVALID
 
 
 OR_DIVUcode000      JSR     ISORB
@@ -276,7 +281,8 @@ OR_DIVUcode101      JSR     ISORW
                     RTS
 OR_DIVUcode110      JSR     ISORL
                     RTS
-
+OR_DIVUcode111      JSR    OPCODE_INVALID              ;INVALID
+		            RTS                
 
 ***************************** END  ADD_BorADD_WorADD_L ************************************
 
@@ -299,6 +305,8 @@ someASR    LEA     STACK,SP            ; Load the SP
 tableSomeASR        JMP     ASRcode00   *ASR.B
                     JMP     ASRcode01   *ASR.W
                     JMP     ASRcode10   *ASR.L
+                    JMP     ASRcode11   ; INVALID
+
 
 ASRcode00   JSR     ISASRB
             RTS
@@ -306,6 +314,8 @@ ASRcode01   JSR     ISASRW
             RTS
 ASRcode10   JSR     ISASRL
             RTS
+ASRcode11   JSR    OPCODE_INVALID              ;INVALID
+		    RTS
 
 *****************************END someLSL ************************************
 
@@ -329,6 +339,8 @@ someASL    LEA     STACK,SP            ; Load the SP
 tableSomeASL        JMP     ASLcode00   *ASL.B
                     JMP     ASLcode01   *ASL.W
                     JMP     ASLcode10   *ASL.L
+                    JMP     ASLcode11   ; INVALID
+
 
 ASLcode00   JSR     ISASLB
             RTS
@@ -336,7 +348,8 @@ ASLcode01   JSR     ISASLW
             RTS
 ASLcode10   JSR     ISASLL
             RTS
-
+ASLcode11   JSR    OPCODE_INVALID              ;INVALID
+		    RTS
 *****************************END someLSL ************************************
 
 
@@ -359,14 +372,16 @@ someLSR    LEA     STACK,SP            ; Load the SP
 tableSomeLSR        JMP     LSRcode00   *LSR.B
                     JMP     LSRcode01   *LSR.W
                     JMP     LSRcode10   *LSR.L
-
+                    JMP     LSRcode11   ; INVALID
+                    
 LSRcode00   JSR     ISLSRB
             RTS
 LSRcode01   JSR     ISLSRW
             RTS
 LSRcode10   JSR     ISLSRL
             RTS
-
+LSRcode11   JSR    OPCODE_INVALID              ;INVALID
+		    RTS
 *****************************END someLSR ************************************
 
 
@@ -389,6 +404,7 @@ someLSL    LEA     STACK,SP            ; Load the SP
 tableSomeLSL        JMP     LSLcode00   *LSL.B
                     JMP     LSLcode01   *LSL.W
                     JMP     LSLcode10   *LSL.L
+                    JMP     LSLcode11   ; INVALID
 
 LSLcode00   JSR     ISLSLB
             RTS
@@ -396,7 +412,8 @@ LSLcode01   JSR     ISLSLW
             RTS
 LSLcode10   JSR     ISLSLL
             RTS
-
+LSLcode11   JSR    OPCODE_INVALID              ;INVALID
+		    RTS
 *****************************END someLSL ************************************
 
 
@@ -419,6 +436,7 @@ someROL    LEA     STACK,SP            ; Load the SP
 tableSomeROL        JMP     ROLcode00   *ROL.B
                     JMP     ROLcode01   *ROL.W
                     JMP     ROLcode10   *ROL.L
+                    JMP     ROLcode11   ; INVALID
 
 ROLcode00   JSR     ISROLB
             RTS
@@ -426,7 +444,8 @@ ROLcode01   JSR     ISROLW
             RTS
 ROLcode10   JSR     ISROLL
             RTS
-
+ROLcode11   JSR    OPCODE_INVALID              ;INVALID
+		    RTS
 *****************************END someROR ************************************
 
 
@@ -449,6 +468,7 @@ someROR     LEA     STACK,SP            ; Load the SP
 tableSomeROR        JMP     RORcode00   *ROR.B
                     JMP     RORcode01   *ROR.W
                     JMP     RORcode10   *ROR.L
+                    JMP     RORcode11   ; INVALID
 
 RORcode00   JSR     ISRORB
             RTS
@@ -456,7 +476,8 @@ RORcode01   JSR     ISRORW
             RTS
 RORcode10   JSR     ISRORL
             RTS
-
+RORcode11   JSR    OPCODE_INVALID              ;INVALID
+		    RTS
 *****************************END someROR ************************************
 
 
@@ -703,7 +724,7 @@ tableSUB_BorSUB_WorSUB_L         JMP    SUBcode000   *SUB.B
                                  JMP    SUBcode100   *SUB.B
                                  JMP    SUBcode101   *SUB.W
                                  JMP    SUBcode110   *SUB.L
-
+                                 JMP    SUBcode111   ; INVALID
 
 
 SUBcode000   JSR     ISSUBB
@@ -720,7 +741,8 @@ SUBcode101   JSR     ISSUBW
              RTS
 SUBcode110   JSR     ISSUBL
              RTS
-
+SUBcode111   JSR    OPCODE_INVALID              ;INVALID
+		     RTS
 ***************************** END  SUB_BorSUB_WorSUB_L ************************************
 
 
@@ -729,28 +751,32 @@ CMP_BorCMP_WorCMP_L     LEA     STACK,SP            ; Load the SP
                     LEA     tableCMP_BorCMP_WorCMP_L, A0            ; Index into the table
                     CLR.L   D0                  ; Zero it
                     MOVE.W  #example,D0         ; We'll play with it here
-                    MOVE.B  #7,D1           ; Shift 7 bits left
+                    MOVE.B  #8,D1           ; Shift 8 bits left
                     ASL.W   D1,D0
                     MOVE.B  #shift,D1           ; Shift 12 bits to the right
                     LSR.W   D1,D0               ; Move the bits (moves highest 4 bits to lowest 4 positions,
                                     ; and the rest are zeroed out)
-                    MOVE.B  #1,D1           ; Shift 1 bits right
+                    MOVE.B  #2,D1           ; Shift 2 bits right
                     ASR.W   D1,D0
 
                     MULU    #6,D0               ; Form offset (move 6 bytes in memory for every 'JMP' command)
                     JMP     0(A0,D0)            ; Jump indirect with index, i.e. jump to 'table' + displacement
 
-tableCMP_BorCMP_WorCMP_L         JMP    CMPcode000   *CMP.B
-                                 JMP    CMPcode001   *CMP.W
-                                 JMP    CMPcode010   *CMP.L
+tableCMP_BorCMP_WorCMP_L         JMP    CMPcode00   *CMP.B
+                                 JMP    CMPcode01   *CMP.W
+                                 JMP    CMPcode10   *CMP.L
+                                 JMP    CMPcode11   ; INVALID
 
-CMPcode000   JSR     ISCMPB
-            RTS
-CMPcode001   JSR     ISCMPW
-            RTS
-CMPcode010   JSR     ISCMPL
-            RTS
 
+CMPcode00   JSR     ISCMPB
+            RTS
+CMPcode01   JSR     ISCMPW
+            RTS
+CMPcode10   JSR     ISCMPL
+            RTS
+CMPcode11   JSR    OPCODE_INVALID              ;INVALID
+		    RTS
+ 
 ***************************** END CMP_BorCMP_WorCMP_L ************************************
 
 
@@ -773,6 +799,7 @@ ADDQ_BorADDQ_WorADDQ_L     LEA     STACK,SP            ; Load the SP
 tableADDQ_BorADDQ_WorADDQ_L         JMP     ADDQcode00   *ADDQ.B
                                     JMP     ADDQcode01   *ADDQ.W
                                     JMP     ADDQcode10   *ADDQ.L
+                                    JMP     ADDQcode11   ; INVALID
 
 ADDQcode00   JSR     ISADDQB
             RTS
@@ -780,7 +807,8 @@ ADDQcode01   JSR     ISADDQW
             RTS
 ADDQcode10   JSR     ISADDQL
             RTS
-
+ADDQcode11   JSR    OPCODE_INVALID              ;INVALID
+		    RTS
 ***************************** END ADDQ_BorADDQ_WorADDQ_L ************************************
 
 
@@ -803,6 +831,7 @@ someCLR     LEA     STACK,SP            ; Load the SP
 tableSomeCLR        JMP     CLRcode00   *CLR.B
                     JMP     CLRcode01   *CLR.W
                     JMP     CLRcode10   *CLR.L
+                    JMP     CLRcode11   ; INVALID
 
 CLRcode00   JSR     ISCLRB
             RTS
@@ -810,7 +839,8 @@ CLRcode01   JSR     ISCLRW
             RTS
 CLRcode10   JSR     ISCLRL
             RTS
-
+CLRcode11   JSR    OPCODE_INVALID              ;INVALID
+		    RTS
 *****************************END someCLR ************************************
 
 *****************************NOPorCLRorRTSorJSR ************************************
@@ -1011,6 +1041,7 @@ ADDI_BorADDI_WorADDI_L     LEA     STACK,SP            ; Load the SP
 tableADDI_BorADDI_WorADDI_L    JMP     ADDIBcode00
                                JMP     ADDIWcode01
                                JMP     ADDILcode10
+                               JMP     ADDILcode11
 
 
 ADDIBcode00        JSR     ISADDIB
@@ -1019,7 +1050,8 @@ ADDIWcode01        JSR     ISADDIW
                     JSR    DONE
 ADDILcode10        JSR     ISADDIL
                     JSR    DONE
-
+ADDILcode11        JSR    OPCODE_INVALID              ;INVALID
+					RTS 
 *****************************END ADDI_BorADDI_WorADDI_L ************************************
 
 
