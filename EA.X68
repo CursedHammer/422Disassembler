@@ -18,21 +18,139 @@
 EA_ADD:
     MOVEM.W     A0-A6/D0-D7, -(SP)  ; Save registers
     JSR         EA_OPMODE_COMBO     ; opmode: D6, register: D7
-    *get default ea
-    JSR         EA_DEFAULT_COMBO    ; mode: D6, register: D7
-    LEA         MULS_W_MODE, A0     ; Set index '0' for jump table
+    LEA         ADD_OPMODE, A0      ; Set index '0' for jump table
     MULU        #6, D6              ; Form offset (move 6 bytes in memory for every 'JMP' command)
     JSR         0(A0, D6)           ; Jump indirect with index, i.e. jump to 'table' + displacement
-    *check validity based on mode value
+*--- determine mode: mode 1 is '<ea>, Dn', mode 2 is 'Dn, <ea>'
+ADD_OPMODE:
+    JMP         ADD_OPMODE_000 ; mode 1, byte
+    JMP         ADD_OPMODE_001 ; mode 1, word
+    JMP         ADD_OPMODE_010 ; mode 1, long
+    JMP         ADD_OPMODE_011 ; Invalid value
+    JMP         ADD_OPMODE_100 ; mode 2, byte
+    JMP         ADD_OPMODE_101 ; mode 2, word
+    JMP         ADD_OPMODE_110 ; mode 2, long
+    JMP         ADD_OPMODE_111 ; Invalid value
+*-----------------------------------
+*--- Opmode jump table options -----
+ADD_OPMODE_000: ; mode 1, byte
+        MOVE.B      #1, D5          ; Store size in the case of an immediate operand
+        JMP         ADD_MODE_1
+ADD_OPMODE_001: ; mode 1, word
+        MOVE.B      #2, D5          ; Store size in the case of an immediate operand
+        JMP         ADD_MODE_1
+ADD_OPMODE_010: ; mode 1, long
+        MOVE.B      #3, D5          ; Store size in the case of an immediate operand
+        JMP         ADD_MODE_1
+ADD_OPMODE_011: ; Invalid value
+        JSR         EA_INVALID
+        JMP         ADD_END
+ADD_OPMODE_100: ; mode 2, byte
+        MOVE.B      #1, D5          ; Store size in the case of an immediate operand
+        JMP         ADD_MODE_2
+ADD_OPMODE_101: ; mode 2, word
+        MOVE.B      #1, D5          ; Store size in the case of an immediate operand
+        JMP         ADD_MODE_2
+ADD_OPMODE_110: ; mode 2, long
+        MOVE.B      #1, D5          ; Store size in the case of an immediate operand
+        JMP         ADD_MODE_2
+ADD_OPMODE_111: ; Invalid value
+        JSR         EA_INVALID
+        JMP         ADD_END
+*-----------------------------------
+*--- Mode 1 ------------------------
+ADD_MODE_1:
+        CLR         D0              ; Clear data register 0
+        MOVE.B      #1, D0          ; Save mode number to D0
+        MOVE.W      D7, D1          ; Save register value for printing dest. operand
+        JSR         EA_DEFAULT_COMBO ; Stores mode bits in D6, register bits in D7
+        JSR         ADD_EVAL_EA     ; Evaluate the results of subroutine call
+        *PRINT COMMA TODO
+        MOVE.W      D1, D7          ; Return register value to D7 for use by subroutine
+        JSR         EA_PRINT_DN     ; Print data register
+        JMP         ADD_END
+*-----------------------------------
+*--- Mode 2 ------------------------
+ADD_MODE_2:
+        CLR         D0              ; Clear data register 0
+        MOVE.B      #2, D0          ; Save mode number to D0
+        JSR         EA_PRINT_DN     ; Print data register
+        *PRINT COMMA TODO
+        JSR         EA_DEFAULT_COMBO ; Stores mode bits in D6, register bits in D7
+        JSR         ADD_EVAL_EA     ; Evaluate the results of subroutine call
+        JMP         ADD_END
+*-----------------------------------
+*--- Evaluate EA bits --------------
+ADD_EVAL_EA:
+        LEA         ADD_MODE, A0        ; Set index '0' for jump table
+        MULU        #6, D6              ; Form offset (move 6 bytes in memory for every 'JMP' command)
+        JSR         0(A0, D6)           ; Jump indirect with index, i.e. jump to 'table' + displacement
+*--- Check validity based on mode value
 ADD_MODE:
-    JMP         ADD_MODE_000 ; Dn
-    JMP         ADD_MODE_001 ; Invalid: An
-    JMP         ADD_MODE_010 ; (An)
-    JMP         ADD_MODE_011 ; (An)+
-    JMP         ADD_MODE_100 ; -(An)
-    JMP         ADD_MODE_101 ; Invalid: Address Register Indirect with Displacement Mode
-    JMP         ADD_MODE_110 ; Invalid: Address Register Indirect with Index (8-Bit Displacement)
-    JMP         ADD_MODE_111 ; The rest (not all valid, validated by register number)
+        JMP         ADD_MODE_000    ; Dn (invalid if opmode 2)
+        JMP         ADD_MODE_001    ; An (invalid if opmode 2)
+        JMP         ADD_MODE_010    ; (An)
+        JMP         ADD_MODE_011    ; (An)+
+        JMP         ADD_MODE_100    ; -(An)
+        JMP         ADD_MODE_101    ; Invalid: Address Register Indirect with Displacement Mode
+        JMP         ADD_MODE_110    ; Invalid: Address Register Indirect with Index (8-Bit Displacement)
+        JMP         ADD_MODE_111    ; The rest (not all valid, validated by register number)
+*-----------------------------------
+*--- EA mode jump table options ----
+ADD_MODE_000: ; Dn (invalid if opmode 2)
+        CMP         #2, D0
+        BEQ         ADD_MODE_INVALID ; If opmode 2, Dn is invalid addressing mode
+        JSR         EA_PRINT_DN     ; Print data register direct operand
+        JMP         ADD_MODE_END    ; End evaluation of ea mode
+ADD_MODE_001: ; An (invalid if opmode 2)
+        CMP         #2, D0
+        BEQ         ADD_MODE_INVALID ; If opmode 2, An is invalid addressing mode
+        JSR         EA_PRINT_AN     ; Address register direct is invalid mode
+        JMP         ADD_MODE_END    ; End evaluation of ea mode
+ADD_MODE_010: ; (An)
+        JSR         EA_PRINT_AN_IND ; Print address register indirect
+        JMP         ADD_MODE_END    ; End evaluation of ea mode
+ADD_MODE_011: ; (An)+
+        JSR         EA_PRINT_POSTINC ; Print address register indirect with post increment
+        JMP         ADD_MODE_END    ; End evaluation of ea mode
+ADD_MODE_100: ; -(An)
+        JSR         EA_PRINT_PREDEC ; Print address register indirect with pre decrement
+        JMP         ADD_MODE_END    ; End evaluation of ea mode
+ADD_MODE_101: ; Invalid: Address Register Indirect with Displacement Mode
+        JMP         ADD_MODE_INVALID
+ADD_MODE_110: ; Invalid: Address Register Indirect with Index (8-Bit Displacement)
+        JMP         ADD_MODE_INVALID
+ADD_MODE_111: ; The rest (not all valid, validated by register number)
+        CMP.B       #$00, D7        ; Test for absolute word address
+        BEQ         ADD_ABS_W
+        CMP.B       #$01, D7        ; Test for absolute long address
+        BEQ         ADD_ABS_L
+        CMP.B       #$04, D7        ; Test for immediate data
+        BEQ         ADD_IMM
+        JMP         ADD_MODE_INVALID ; else, invalid
+*-----------------------------------
+*--- Valid options for mode 111 ----
+ADD_ABS_W:
+        JSR         EA_PRINT_ABS_W  ; Print absolute word address operand
+        JMP         ADD_MODE_END
+ADD_ABS_L:
+        JSR         EA_PRINT_ABS_L  ; Print absolute long address operand
+        JMP         ADD_MODE_END
+ADD_IMM: ; invalid if opmode is 2
+        CMP         #2, D0
+        BEQ         ADD_MODE_INVALID ; If opmode 2, An is invalid addressing mode
+        JSR         EA_PRINT_IMM    ; Print immediate data
+        JMP         ADD_MODE_END
+*-----------------------------------
+ADD_MODE_END RTS
+ADD_MODE_INVALID:
+        JSR         EA_INVALID      ; Opcode word is Invalid, continue to ADD_END
+*-----------------------------------
+ADD_END:
+        MOVEM.L     (SP)+, A0-A6/D0-D5 ; Restore registers
+        RTS
+
+
 EA_ADDA
 EA_ADDI
 EA_ADDQ
@@ -60,12 +178,11 @@ EA_MOVEQ
 EA_MULS_W:
         MOVEM.W     A0-A6/D0-D7, -(SP) ; Save registers
 
-        *get default ea
         JSR         EA_DEFAULT_COMBO ; mode: D6, register: D7
         LEA         MULS_W_MODE, A0 ; Set index '0' for jump table
         MULU        #6, D6          ; Form offset (move 6 bytes in memory for every 'JMP' command)
         JSR         0(A0, D6)       ; Jump indirect with index, i.e. jump to 'table' + displacement
-        *check validity based on mode value
+*--- Check validity based on mode value --------------------
 MULS_W_MODE:
         JMP         MULS_W_MODE_000 ; Dn
         JMP         MULS_W_MODE_001 ; Invalid: An
@@ -75,7 +192,8 @@ MULS_W_MODE:
         JMP         MULS_W_MODE_101 ; Invalid: Address Register Indirect with Displacement Mode
         JMP         MULS_W_MODE_110 ; Invalid: Address Register Indirect with Index (8-Bit Displacement)
         JMP         MULS_W_MODE_111 ; The rest (not all valid, validated by register number)
-
+*-----------------------------------------------------------
+*--- Jump table options ------------------------------------
 MULS_W_MODE_000: ; Dn
         JSR         EA_PRINT_DN     ; Print data register direct operand
         JMP         MULS_W_DEST     ; Go to: print destination operand
@@ -106,7 +224,8 @@ MULS_W_MODE_111: ; The rest (not all valid, validated by register number)
         BEQ         MULS_W_IMM
         JSR         EA_INVALID      ; Else: invalid
         JMP         MULS_W_END
-
+*-----------------------------------------------------------
+*--- Valid options for mode 111 ----------------------------
 MULS_W_ABS_W:
         JSR         EA_PRINT_ABS_W  ; Print absolute word address operand
         JMP         MULS_W_DEST     ; Continue with parsing destination operand
@@ -116,7 +235,7 @@ MULS_W_ABS_L:
 MULS_W_IMM:
         JSR         EA_PRINT_IMM    ; Print immediate data
         JMP         MULS_W_DEST     ; Continue with parsing destination operand
-
+*-----------------------------------------------------------
 MULS_W_DEST:
         *print EA_MSG_COMMA
         *Get destination register
@@ -225,7 +344,7 @@ EA_PRINT_DN_JMP:
         JMP         EA_PRINT_DN_101 ; D5
         JMP         EA_PRINT_DN_110 ; D6
         JMP         EA_PRINT_DN_111 ; D7
-*print value
+*print value TODO
 EA_PRINT_DN_000 ; D0
 EA_PRINT_DN_001 ; D1
 EA_PRINT_DN_010 ; D2
@@ -255,7 +374,7 @@ AN_JMP:
         JMP         AN_101          ; A5
         JMP         AN_110          ; A6
         JMP         AN_111          ; A7
-*print value
+*print value TODO
 AN_000 ; A0
 AN_001 ; A1
 AN_010 ; A2
@@ -284,7 +403,7 @@ IND_JMP:
         JMP         IND_101         ; (A5)
         JMP         IND_110         ; (A6)
         JMP         IND_111         ; (A7)
-*print value
+*print value TODO
 IND_000 ; (A0)
 IND_001 ; (A1)
 IND_010 ; (A2)
@@ -297,10 +416,22 @@ IND_111 ; (A7)
 EA_PRINT_IND_END:
         RTS
 *---------- Immediate Data ---------------------------------
-* Example Description
+* Reads immediate data from memory and prints it, based on
+* size stored in D5 (1: B, 2: W, 3: L)
 *-----------------------------------------------------------
 EA_PRINT_IMM:
-
+        MOVEA.L     A2, A1          ; copy pointer to temp
+        ADDA.W      #$2, A1         ; Advance temp pointer to next word
+        CMP         #3, D5
+        BEQ         PRINT_IMM_L     ; if L, branch
+        MOVE.W      (A1), D0        ; store value in a register (todo, register tbd)
+        *print value TODO
+        JMP         PRINT_IMM_END
+PRINT_IMM_L:
+        MOVE.L      (A1), D0        ; store value in a register (todo, register tbd)
+        *print value TODO           ; and continue on to PRINT_IMM_END
+PRINT_IMM_END:
+        RTS
 *---------- Address Register Indirect w/ Post Increment ----
 * Example Description
 *-----------------------------------------------------------
@@ -317,7 +448,7 @@ POSTINC_JMP:
         JMP         POSTINC_101 ; (A5)+
         JMP         POSTINC_110 ; (A6)+
         JMP         POSTINC_111 ; (A7)+
-*print value
+*print value TODO
 POSTINC_000 ; (A0)+
 POSTINC_001 ; (A1)+
 POSTINC_010 ; (A2)+
@@ -345,7 +476,7 @@ PREDEC_JMP:
         JMP         PREDEC_101 ; -(A5)
         JMP         PREDEC_110 ; -(A6)
         JMP         PREDEC_111 ; -(A7)
-*print value
+*print value TODO
 PREDEC_000 ; -(A0)
 PREDEC_001 ; -(A1)
 PREDEC_010 ; -(A2)
@@ -361,17 +492,13 @@ RTS
 * Example Description
 *-----------------------------------------------------------
 EA_PRINT_ABS_L:
-
+*TODO
 *---------- Absolute Word Address --------------------------
 * Example Description
 *-----------------------------------------------------------
 EA_PRINT_ABS_W:
-
+*TODO
 *----------- Variables and Constants -----------------------
-
-
-
-
 
 *~Font name~Courier New~
 *~Font size~10~
