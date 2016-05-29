@@ -120,7 +120,7 @@ MULS_W_IMM:
 MULS_W_DEST:
         *print EA_MSG_COMMA
         *Get destination register
-        MOVE.W      (A5), D7        ; Load word at current pointer to D1
+        MOVE.W      (A2), D7        ; Load word at current pointer to D1
         MOVE.B      #4, D2          ; Clear upper 4 bits of opcode word
         LSL.W       D2, D7          ; Perform shift (zeros shifted in)
         MOVE.B      #13, D2         ; 'Right-align' bits 9-11 to determine register
@@ -156,19 +156,19 @@ EA_INVALID:
 * POST: mode bits in D6, register bits in D7
 *-----------------------------------------------------------
 EA_DEFAULT_COMBO:
-        MOVEM.L     A0-A4/D0-D5, -(SP) ; Save registers (excluding D6 and D7, used
-                                       ; to return results, A5-A7 are addresses and SP)
+        MOVEM.L     A0-A6/D0-D5, -(SP) ; Save registers (excluding D6 and D7, used
+                                       ; to return results, and A7 for SP)
         CLR.B       D6              ; Clear space for mode bits
         CLR.B       D7              ; Clear space for register bits
 * Get Mode
-        MOVE.L      (A5), D1        ; Load opcode to data register 1
+        MOVE.L      (A2), D1        ; Load opcode to data register 1
         MOVE.B      #10, D2         ; Clear upper 10 bits of opcode word
         LSL.W       D2, D1          ; Perform shift (zeros shifted in)
         MOVE.B      #13, D2         ; 'Right-align' bits 3-5 to determine mode bits
         LSR.W       D2, D1          ; Perform shift (zeros shifted in)
         MOVE.B      D1, D6          ; Save mode bits to D6
 * Get Register
-        MOVE.L      (A5), D1        ; Reload opcode to data register 1
+        MOVE.L      (A2), D1        ; Reload opcode to data register 1
         MOVE.B      #13, D2         ; Clear upper 13 bits of opcode word
         LSL.W       D2, D1          ; Perform shift (zeros shifted in)
         MOVE.B      #13, D2         ; 'Right-align' bits 0-2 to determine register bits
@@ -177,6 +177,34 @@ EA_DEFAULT_COMBO:
 
         MOVEM.L     (SP)+, A0-A4/D0-D5 ; Restore registers
         RTS                         ; Return from subroutine
+
+*---------- Parse Opmode Combo ----------------------------
+* Parses and separates values in the opmode/register
+* data combo found in bits 6-11 in many opcode words.
+* POST: opmode bits in D6, register bits in D7
+*-----------------------------------------------------------
+EA_OPMODE_COMBO:
+        MOVEM.L     A0-A4/D0-D5, -(SP) ; Save registers (excluding D6 and D7, used
+                                       ; to return results, and A7 for SP)
+        CLR.B       D6              ; Clear space for mode bits
+        CLR.B       D7              ; Clear space for register bits
+* Get Opmode
+        MOVE.L      (A2), D1        ; Load opcode to data register 1
+        MOVE.B      #10, D2         ; Clear upper 10 bits of opcode word
+        LSL.W       D2, D1          ; Perform shift (zeros shifted in)
+        MOVE.B      #13, D2         ; 'Right-align' bits 3-5 to determine mode bits
+        LSR.W       D2, D1          ; Perform shift (zeros shifted in)
+        MOVE.B      D1, D6          ; Save mode bits to D6
+* Get Register
+        MOVE.L      (A2), D1        ; Reload opcode to data register 1
+        MOVE.B      #13, D2         ; Clear upper 13 bits of opcode word
+        LSL.W       D2, D1          ; Perform shift (zeros shifted in)
+        MOVE.B      #13, D2         ; 'Right-align' bits 0-2 to determine register bits
+        LSR.W       D2, D1          ; Perform shift (zeros shifted in)
+        MOVE.B      D1, D7          ; Save register bits to D7
+
+        MOVEM.L     (SP)+, A0-A4/D0-D5 ; Restore registers
+            RTS                         ; Return from subroutine
 
 *-- Read & Print Subroutines -------------------------------
 
