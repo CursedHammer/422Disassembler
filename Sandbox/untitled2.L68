@@ -1,0 +1,33 @@
+00001000 Starting Address
+Assembler used: EASy68K Editor/Assembler v5.15.04
+Created On: 5/28/2016 4:33:36 PM
+
+00000000                             1  *-----------------------------------------------------------
+00000000                             2  * Title      :
+00000000                             3  * Written by :
+00000000                             4  * Date       :
+00000000                             5  * Description:
+00000000                             6  *-----------------------------------------------------------
+00001000                             7      ORG    $1000
+00001000                             8  START:                  ; first instruction of program
+00001000                             9  
+00001000                            10  
+Line 11 ERROR: Invalid addressing mode
+00001000                            11      BCC D7, D0
+00001000                            12    
+00001000                            13  * Put program code here
+00001000                            14  
+00001000  FFFF FFFF                 15      SIMHALT             ; halt simulator
+00001004                            16  
+00001004                            17  * Put variables and constants here
+00001004                            18  
+00001004                            19      END    START        ; last line of source
+
+1 error detected
+No warnings generated
+
+
+SYMBOL TABLE INFORMATION
+Symbol-name         Value
+-------------------------
+START               1000
