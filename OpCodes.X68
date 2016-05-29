@@ -436,12 +436,12 @@ tableROd_LSd_ASd:
         JMP         ROd_LSd_ASdcode11 ; ROL_ROR
 
 ROd_LSd_ASdcode00 JSR ASL_ASR
-                  JSR DONE
+                  RTS
 ROd_LSd_ASdcode01 JSR LSL_LSR
-                  JSR DONE
+                  RTS
 ROd_LSd_ASdcode10 STOP #$2700
 ROd_LSd_ASdcode11 JSR ROL_ROR
-                  JSR DONE
+                  RTS
 *----------- END  ROd_LSd_ASd ------------------------------
 
 *----------- AND_BorAND_WorAND_LorMULS_W -------------------
@@ -470,20 +470,20 @@ tableAND_BorAND_WorAND_LorMULS_W:
         JMP         ANDcode111   ; MULS.W
 
 ANDcode000 JSR      ISANDB
-           JSR      DONE
+           RTS
 ANDcode001 JSR      ISANDW
-           JSR      DONE
+           RTS
 ANDcode010 JSR      ISANDL
-           JSR      DONE
+           RTS
 ANDcode011 STOP     #$2700
 ANDcode100 JSR      ISANDB
-           JSR      DONE
+           RTS
 ANDcode101 JSR      ISANDW
-           JSR      DONE
+           RTS
 ANDcode110 JSR      ISANDL
-           JSR      DONE
+           RTS
 ANDcode111 JSR      ISMULSW
-           JSR      DONE
+           RTS
 *----------- END  ADD_BorADD_WorADD_L ----------------------
 
 *----------- ADD_BorADD_WorADD_L ---------------------------
@@ -512,21 +512,21 @@ tableADD_BorADD_WorADD_L:
         JMP         ADDcode111      *ADDA.L
 
 ADDcode000 JSR      ISADDB
-           JSR      DONE
+           RTS
 ADDcode001 JSR      ISADDW
-           JSR      DONE
+           RTS
 ADDcode010 JSR      ISADDL
-           JSR      DONE
+           RTS
 ADDcode011 JSR      ISADDAW
-           JSR      DONE
+           RTS
 ADDcode100 JSR      ISADDB
-           JSR      DONE
+           RTS
 ADDcode101 JSR      ISADDW
-           JSR      DONE
+           RTS
 ADDcode110 JSR      ISADDL
-           JSR      DONE
+           RTS
 ADDcode111 JSR      ISADDAL
-           JSR      DONE
+           RTS
 *----------- END  ADD_BorADD_WorADD_L ----------------------
 
 *----------- SUB_BorSUB_WorSUB_L ---------------------------
@@ -554,18 +554,18 @@ tableSUB_BorSUB_WorSUB_L:
         JMP         SUBcode110      *SUB.L
 
 SUBcode000 JSR      ISSUBB
-           JSR      DONE
+           RTS
 SUBcode001 JSR      ISSUBW
-           JSR      DONE
+           RTS
 SUBcode010 JSR      ISSUBL
-           JSR      DONE
+           RTS
 SUBcode011 STOP     #$2700
 SUBcode100 JSR      ISSUBB
-           JSR      DONE
+           RTS
 SUBcode101 JSR      ISSUBW
-           JSR      DONE
+           RTS
 SUBcode110 JSR      ISSUBL
-           JSR      DONE
+           RTS
 *----------- END  SUB_BorSUB_WorSUB_L ----------------------
 
 *----------- CMP_BorCMP_WorCMP_L ---------------------------
@@ -589,11 +589,11 @@ tableCMP_BorCMP_WorCMP_L:
         JMP         CMPcode010      *CMP.L
 
 CMPcode000 JSR      ISCMPB
-           JSR      DONE
+           RTS
 CMPcode001 JSR      ISCMPW
-           JSR      DONE
+           RTS
 CMPcode010 JSR      ISCMPL
-           JSR      DONE
+           RTS
 *----------- END CMP_BorCMP_WorCMP_L -----------------------
 
 *----------- ADDQ_BorADDQ_WorADDQ_L ------------------------
@@ -617,11 +617,11 @@ tableADDQ_BorADDQ_WorADDQ_L:
         JMP         ADDQcode10      *ADDQ.L
 
 ADDQcode00 JSR      ISADDQB
-           JSR      DONE
+           RTS
 ADDQcode01 JSR      ISADDQW
-           JSR      DONE
+           RTS
 ADDQcode10 JSR      ISADDQL
-           JSR      DONE
+           RTS
 *----------- END ADDQ_BorADDQ_WorADDQ_L --------------------
 
 *----------- someCLR ---------------------------------------
@@ -693,13 +693,13 @@ tableNOPorCLRorRTSorJSR:
         JMP         JSRorCLRcode1111
 
 RTScommand JSR      ISRTS
-           JSR      DONE
+           RTS
 NOPcommand JSR      ISNOP
-           JSR      DONE
+           RTS
 JSRorCLRcode0000 STOP #$2700
 JSRorCLRcode0001 STOP #$2700
 JSRorCLRcode0010 JSR someCLR
-                 JSR DONE
+                 RTS
 JSRorCLRcode0011 STOP #$2700
 JSRorCLRcode0100 STOP #$2700
 JSRorCLRcode0101 STOP #$2700
@@ -712,7 +712,7 @@ JSRorCLRcode1011 STOP #$2700
 JSRorCLRcode1100 STOP #$2700
 JSRorCLRcode1101 STOP #$2700
 JSRorCLRcode1110 JSR ISJSR
-                 JSR DONE
+                 RTS
 JSRorCLRcode1111 STOP  #$2700
 *----------- END NOPorCLRorRTSorJSR ------------------------
 
@@ -888,7 +888,7 @@ tableMOVEA_WorMOVE_W:
 MOVEWcode000 JSR    ISMOVEW
              RTS
 MOVEAWcode001 JSR   ISMOVEAW
-              JSR   DONE
+              RTS
 MOVEWcode010 JSR    ISMOVEW
              RTS
 MOVEWcode011 JSR    ISMOVEW
