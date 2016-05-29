@@ -60,7 +60,21 @@ ENDADDR   EQU   $5010               * Variable to hold ending address value
 TRUE      EQU   $01                 * Value equivalent to 'true'
 
           ORG   $1000               * Program begins at address 1000
-            
+          
+*********** END DEFINITIONS **************************************************
+
+          
+******************************************************************************
+*           INCLUDES                                                         *
+******************************************************************************
+
+    INCLUDE 'IO.X68'
+    *INCLUDE 'OpCodes.X68'
+    *INCLUDE 'EA.X68'
+
+*********** END INCLUDES *****************************************************    
+      
+      
 ******************************************************************************
 *           BEGIN CODE                                                       *
 ******************************************************************************
@@ -69,35 +83,42 @@ TRUE      EQU   $01                 * Value equivalent to 'true'
 * Begins program's logical flow. Similar to main in C/C++
 *-----------------------------------------------------------------------------
 START
-    LEA         STACK, SP           * SP is stored in A7
-    JSR         IO_WELCOME          * Run welcome subroutine
-    * get addresses and do address validation
-    MOVE.L      BEGINADDR, A6       * Move start address to A6 for easier manipulation
+    LEA         STACK,SP            * SP is stored in A7
+    JSR         GET_ADDRESSES       * Runs GET_ADDRESSES and IO_WELCOME
+    MOVEA.L     BEGINADDR,A6        * Assign beginning address to A6 for use
+
 LOOP
-    JSR         OC_PARSE            * Determine if there is an initial opcode match
+    * OC_PARSE Command doesn't work due to issues in the OpCode include
+    * many errors need to be fixed. Same with EA include
+    *JSR         OC_PARSE            * Determine if there is an initial opcode match
     * decrement row count
     * if at 0, prompt for next page
     * else, continue
-LOOP_CHECK 
-    CMPA        A6, ENDADDR         * Check if pointer is at end of address range
-    BLT         END_LOOP            * For debugging, if pointer advances too far
+    ADDA.W      #$4,A6            * Advance address to test LOOP (test only)
+    
+LOOP_CHECK
+    * Changed the following code from: 
+    * CMPA        A6, ENDADDR         
+    * to:
+    * CMPA      (ENDADDR),A6 
+    * When using the CMPA, destination must be an address so A6
+    CMPA.L      ENDADDR,A6          * Is pointer at end of address range?
+    
+    BGT         END_LOOP            * If yes, END_LOOP
     ; in case this resets status register, do another compare TODO
-    BNE         LOOP                * If not at end address, restart loop
+    
+    BNE         LOOP                * If not, continue processing addresses
     ; If at end of address range, check if user wants to continue
     ; if user wants to continue, restart
     ; else, end
 
+END_LOOP
     STOP        #$3000              * End program
 *    JMP         START               * Restart program (optional workflow)
 
+*---------- END - START ------------------------------------------------------
 
-******************************************************************************
-*           SUB ROUTINES FILES                                               *
-******************************************************************************
-
-    INCLUDE 'IO.X68'
-    INCLUDE 'OpCodes.X68'
-    INCLUDE 'EA.X68'
+*********** END BEGIN CODE ***************************************************
 
 
 ******************************************************************************

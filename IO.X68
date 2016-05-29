@@ -9,6 +9,8 @@
 *
 * TODO:
 *    Hex to ASCII
+*    Write end function to ask user if they are done
+*    Write data error
 *
 * DONE:
 *    Make sure addresses are even
@@ -24,10 +26,6 @@
 *           DEFINITIONS                                                      *
 ******************************************************************************
 
-STACK     EQU   $7000
-
-BEGINADDR EQU   $5000
-ENDADDR   EQU   $5010
 STR_LEN   EQU   $5020
 HEXFLAG   EQU   $5021
 HEXVALUE  EQU   $5030
@@ -46,8 +44,7 @@ LF        EQU   $0A
 *---------- START ------------------------------------------------------------
 * Begins program's logical flow. Similar to main in C/C++
 *-----------------------------------------------------------------------------           
-START       
-    LEA         STACK, SP           * SP is stored in A7
+GET_ADDRESSES
     JSR         CLEARSCRN
     JSR         IO_WELCOME          * Run welcome subroutine
             
@@ -68,7 +65,6 @@ GET_FIRST_ADDRESS
     MOVE.L      HEXVALUE,BEGINADDR  * Copy hex value to begin
     LEA         BMESSAGE,A1         * Load message in A1 for display
     MOVE.L      (HEXVALUE),D1       * Load hex value into A1 for display 
-    *JSR         PRINT_HEXVALUE      * Display hex value
     JSR         NEW_LINE            * Space
     
     JSR         CLEAR               * Clear values for next hex
@@ -90,7 +86,6 @@ GET_SECOND_ADDRESS
     MOVE.L      HEXVALUE,ENDADDR    * Copy hex value to begin
     LEA         EMESSAGE,A1         * Load message in A1 for display
     MOVE.L      (HEXVALUE),D1       * Load hex value into A1 for display
-    *JSR         PRINT_HEXVALUE      * Display hex value
     JSR         NEW_LINE            * Space
     
     JSR         CLEAR               * Clear values for next hex
@@ -104,8 +99,8 @@ CHECK_BADDR_IS_LESS_THAN_EADDR
     BSR.W       START      
 
 
-FINISHED    
-    SIMHALT                         * halt simulator
+FINISHED
+    RTS                             * Return to Disassembler
     
 *---------- END - START ------------------------------------------------------
        
@@ -402,8 +397,6 @@ ADR_ERR_NOTLT   DC.B 'THE BEGINNING ADDRESS MUST BE LESS THAN THE ENDING ADDRESS
 HEXSTRING       DS.B 80             * Var for hex string
 
 ILLEGAL         DC.B '1000    DATA    $WXYZ',CR,LF,0
-
-                END  START          * Last line of source
 
 
 
