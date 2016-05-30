@@ -16,7 +16,8 @@
 * the ADD opcode
 *-----------------------------------------------------------
 EA_ADD:
-    MOVEM.W     A0-A6/D0-D7, -(SP)  ; Save registers
+    MOVEM.L     A0-A5/D0-D7, -(SP)  ; Save registers (except A6, global pointer to word to read)
+    JSR         EA_COPY_PTR         ; Copy global pointer to A5
     JSR         EA_OPMODE_COMBO     ; opmode: D6, register: D7
     LEA         ADD_OPMODE, A0      ; Set index '0' for jump table
     MULU        #6, D6              ; Form offset (move 6 bytes in memory for every 'JMP' command)
@@ -149,7 +150,8 @@ ADD_MODE_INVALID:
     RTS                             ; Finish evaluating EA bits
 *-----------------------------------
 ADD_END:
-    MOVEM.L     (SP)+, A0-A6/D0-D5  ; Restore registers
+    JSR         EA_UPDATE_POINTER   ; Updates global pointer
+    MOVEM.L     (SP)+, A0-A5/D0-D7  ; Restore registers (except A6, global pointer to word to read)
     RTS
 
 *---------- ADDA Effective Addresses ------------------------
@@ -157,7 +159,8 @@ ADD_END:
 * the ADD opcode
 *-----------------------------------------------------------
 EA_ADDA:
-    MOVEM.W     A0-A6/D0-D7, -(SP)  ; Save registers
+    MOVEM.L     A0-A5/D0-D7, -(SP)  ; Save registers (except A6, global pointer to word to read)
+    JSR         EA_COPY_PTR         ; Copy global pointer to A5
     JSR         EA_DEFAULT_COMBO    ; Mode: D6, register: D7
     LEA         ADDA_MODE, A0       ; Set index '0' for jump table
     MULU        #6, D6              ; Form offset (move 6 bytes in memory for every 'JMP' command)
@@ -203,13 +206,13 @@ ADDA_MODE_111: ; The rest (not all valid, validated by register number)
     JMP         ADDA_MODE_INVALID   ; else, invalid
 *-----------------------------------
 *--- Valid options for mode 111 ----
-ADD_ABS_W:
+ADDA_ABS_W:
     JSR         EA_PRINT_ABS_W      ; Print absolute word address operand
     JMP         ADDA_MODE_END
-ADD_ABS_L:
+ADDA_ABS_L:
     JSR         EA_PRINT_ABS_L      ; Print absolute long address operand
     JMP         ADDA_MODE_END
-ADD_IMM:
+ADDA_IMM:
     JSR         EA_PRINT_IMM        ; Print immediate data
     JMP         ADDA_MODE_END
 *-----------------------------------
@@ -221,11 +224,23 @@ ADDA_MODE_END:
     JSR         EA_OPMODE_COMBO     ; Opmode: D6, register: D7
     JSR         EA_PRINT_AN         ; Print address register
 ADDA_END:
-    MOVEM.L     (SP)+, A0-A6/D0-D5  ; Restore registers
+    JSR         EA_UPDATE_POINTER   ; Update global pointer
+    MOVEM.L     (SP)+, A0-A5/D0-D7  ; Restore registers (except A6, global pointer to word to read)
     RTS
 *-----------------------------------------------------------
 EA_ADDI:
-    JSR         EA_UNIMPLEMENTED
+    MOVEM.L     A0-A5/D0-D7, -(SP)  ; Save registers (except A6, global pointer to word to read)
+    JSR         EA_COPY_PTR         ; Copy global pointer to A5
+*--- Get size bits -----------------
+    MOVE.L      (A6), D1            ; Load opcode to data register 1
+    MOVE.B      #10, D2             ; Clear upper 10 bits of opcode word
+    LSL.W       D2, D1              ; Perform shift (zeros shifted in)
+    MOVE.B      #13, D2             ; 'Right-align' bits 3-5 to determine mode bits
+    LSR.W       D2, D1              ; Perform shift (zeros shifted in)
+    MOVE.B      D1, D6              ; Save mode bits to D6
+ADDI_END:
+    JSR         EA_UPDATE_POINTER   ; Update global pointer
+    MOVEM.L     (SP)+, A0-A5/D0-D7  ; Restore registers (except A6, global pointer to word to read)
     RTS
 *-----------------------------------------------------------
 EA_ADDQ:
@@ -297,8 +312,8 @@ EA_MOVEQ:
 * the MULS.W opcode
 *-----------------------------------------------------------
 EA_MULS_W:
-    MOVEM.W     A0-A6/D0-D7, -(SP)  ; Save registers
-
+    MOVEM.L     A0-A5/D0-D7, -(SP)  ; Save registers (except A6, global pointer to word to read)
+    JSR         EA_COPY_PTR         ; Copy global pointer to A5
     JSR         EA_DEFAULT_COMBO    ; mode: D6, register: D7
     LEA         MULS_W_MODE, A0     ; Set index '0' for jump table
     MULU        #6, D6              ; Form offset (move 6 bytes in memory for every 'JMP' command)
@@ -367,7 +382,8 @@ MULS_W_DEST:
     LSR.W       D2, D7              ; Perform shift (zeros shifted in)
     JSR         EA_PRINT_DN         ; Print data register direct operand
 MULS_W_END:
-    MOVEM.L     (SP)+, A0-A6/D0-D5  ; Restore registers
+    JSR         EA_UPDATE_POINTER   ; Update global pointer
+    MOVEM.L     (SP)+, A0-A5/D0-D7  ; Restore registers (except A6, global pointer to word to read)
     RTS
 
 EA_NOP:
@@ -416,14 +432,32 @@ EA_INVALID:
     *print or indicate invalidity
     RTS
 
+*---------- Update Global Pointer --------------------------
+* Updates global pointer based on address stored in A5
+*-----------------------------------------------------------
+EA_UPDATE_POINTER:
+    CMP.L       A5, A6              ; check if A5==A6
+    BNE         UPDATE_PTR          ; if NOT equal (a.k.a if any extra operands
+                                    ; were read), update global with current
+    ADDA.W      #$02, A5            ; else, increment past current opcode word, then update
+UPDATE_PTR:
+    MOVEA.L     A5, A6              ; update global pointer
+    RTS
+
+*---------- Copy Global Pointer ----------------------------
+* Stores current global pointer in A5. Called at the
+* beginning of every main subroutine
+*-----------------------------------------------------------
+EA_COPY_PTR:
+    MOVEA.L     A6, A5              ; save global pointer
+    RTS
+
 *---------- Parse Default Combo ----------------------------
 * Parses and separates values in the default mode/register
 * data combo found at the end of many opcode words.
 * POST: mode bits in D6, register bits in D7
 *-----------------------------------------------------------
 EA_DEFAULT_COMBO:
-    MOVEM.L     A0-A6/D0-D5, -(SP)  ; Save registers (excluding D6 and D7, used
-                                    ; to return results, and A7 for SP)
     CLR.B       D6                  ; Clear space for mode bits
     CLR.B       D7                  ; Clear space for register bits
 * Get Mode
@@ -440,8 +474,6 @@ EA_DEFAULT_COMBO:
     MOVE.B      #13, D2             ; 'Right-align' bits 0-2 to determine register bits
     LSR.W       D2, D1              ; Perform shift (zeros shifted in)
     MOVE.B      D1, D7              ; Save register bits to D7
-
-    MOVEM.L     (SP)+, A0-A6/D0-D5  ; Restore registers
     RTS                             ; Return from subroutine
 
 *---------- Parse Opmode Combo ----------------------------
@@ -450,8 +482,6 @@ EA_DEFAULT_COMBO:
 * POST: opmode bits in D6, register bits in D7
 *-----------------------------------------------------------
 EA_OPMODE_COMBO:
-    MOVEM.L     A0-A6/D0-D5, -(SP)  ; Save registers (excluding D6 and D7, used
-                                    ; to return results, and A7 for SP)
     CLR.B       D6                  ; Clear space for mode bits
     CLR.B       D7                  ; Clear space for register bits
 * Get Opmode
@@ -468,8 +498,6 @@ EA_OPMODE_COMBO:
     MOVE.B      #13, D2             ; 'Right-align' bits 9-11 to determine register bits
     LSR.W       D2, D1              ; Perform shift (zeros shifted in)
     MOVE.B      D1, D7              ; Save register bits to D7
-
-    MOVEM.L     (SP)+, A0-A6/D0-D5  ; Restore registers
     RTS                             ; Return from subroutine
 
 *-- Read & Print Subroutines -------------------------------
@@ -566,20 +594,24 @@ EA_PRINT_IND_END:
     RTS
 *---------- Immediate Data ---------------------------------
 * Reads immediate data from memory and prints it, based on
-* size stored in D5 (1: B, 2: W, 3: L)
+* size stored in D5 (1: B, 2: W, 3: L). Passes back new
+* pointer location in A5
 *-----------------------------------------------------------
 EA_PRINT_IMM:
-    MOVEA.L     A6, A1              ; copy pointer to temp
+    MOVEA.L     A5, A1              ; copy pointer to temp
     ADDA.W      #$2, A1             ; Advance temp pointer to next word
     CMP         #3, D5
     BEQ         PRINT_IMM_L         ; if L, branch
     MOVE.W      (A1), D0            ; store value in a register (todo, register tbd)
     *print value TODO
+    ADDA.W      #$2, A1             ; move temp pointer past word that has been read
     JMP         PRINT_IMM_END
 PRINT_IMM_L:
     MOVE.L      (A1), D0            ; store value in a register (todo, register tbd)
-    *print value TODO               ; and continue on to PRINT_IMM_END
+    *print value TODO
+    ADDA.W      #$4, A1             ; move temp pointer past longword that has been read
 PRINT_IMM_END:
+    MOVEA.L     A1, A5              ; store new pointer location to pass back
     RTS
 *---------- Address Register Indirect w/ Post Increment ----
 * Example Description
@@ -638,22 +670,28 @@ PREDEC_111 ; -(A7)
 EA_PRINT_PD_END:
     RTS
 *---------- Absolute Long Address --------------------------
-* Example Description
+* Reads and prints a longword address operand, and passes
+* back new pointer location in A5
 *-----------------------------------------------------------
 EA_PRINT_ABS_L:
-    MOVEA.L     A6, A1              ; copy pointer to temp
+    MOVEA.L     A5, A1              ; copy pointer to temp
     ADDA.W      #$2, A1             ; Advance temp pointer to next word
-    MOVEA.L      (A1), A2           ; store longword address to print in A2
+    MOVEA.L     (A1), A4            ; store longword address to print in A4? TODO
     *print value TODO
+    ADDA.W      #$4, A1             ; move temp pointer past longword that has been read
+    MOVEA.L     A1, A5              ; store new pointer location to pass back
     RTS
 *---------- Absolute Word Address --------------------------
-* Example Description
+* Reads and prints a word address operand, and passes back
+* new pointer location in A5
 *-----------------------------------------------------------
 EA_PRINT_ABS_W:
-    MOVEA.L     A6, A1              ; copy pointer to temp
+    MOVEA.L     A5, A1              ; copy pointer to temp
     ADDA.W      #$2, A1             ; Advance temp pointer to next word
-    MOVEA.W      (A1), A2           ; store word address to print in A2
+    MOVEA.W     (A1), A4            ; store word address to print in A4? TODO
     *print value TODO
+    ADDA.W      #$2, A1             ; move temp pointer past word that has been read
+    MOVEA.L     A1, A5              ; store new pointer location to pass back
     RTS
 *----------- Variables and Constants -----------------------
 
