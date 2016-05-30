@@ -20,7 +20,7 @@ EA_ADD:
     JSR         EA_OPMODE_COMBO     ; opmode: D6, register: D7
     LEA         ADD_OPMODE, A0      ; Set index '0' for jump table
     MULU        #6, D6              ; Form offset (move 6 bytes in memory for every 'JMP' command)
-    JSR         0(A0, D6)           ; Jump indirect with index, i.e. jump to 'table' + displacement
+    JMP         0(A0, D6)           ; Jump indirect with index, i.e. jump to 'table' + displacement
 *--- determine mode: mode 1 is '<ea>, Dn', mode 2 is 'Dn, <ea>'
 ADD_OPMODE:
     JMP         ADD_OPMODE_000      ; mode 1, byte
@@ -84,7 +84,7 @@ ADD_MODE_2:
 ADD_EVAL_EA:
     LEA         ADD_MODE, A0        ; Set index '0' for jump table
     MULU        #6, D6              ; Form offset (move 6 bytes in memory for every 'JMP' command)
-    JSR         0(A0, D6)           ; Jump indirect with index, i.e. jump to 'table' + displacement
+    JMP         0(A0, D6)           ; Jump indirect with index, i.e. jump to 'table' + displacement
 *--- Check validity based on mode value
 ADD_MODE:
     JMP         ADD_MODE_000        ; Dn (invalid if opmode 2)
@@ -159,7 +159,7 @@ EA_ADDA:
     JSR         EA_DEFAULT_COMBO    ; Mode: D6, register: D7
     LEA         ADDA_MODE, A0       ; Set index '0' for jump table
     MULU        #6, D6              ; Form offset (move 6 bytes in memory for every 'JMP' command)
-    JSR         0(A0, D6)           ; Jump indirect with index, i.e. jump to 'table' + displacement
+    JMP         0(A0, D6)           ; Jump indirect with index, i.e. jump to 'table' + displacement
 *--- Check validity based on mode value
 ADDA_MODE:
     JMP         ADDA_MODE_000       ; Dn
@@ -300,7 +300,7 @@ EA_MULS_W:
     JSR         EA_DEFAULT_COMBO    ; mode: D6, register: D7
     LEA         MULS_W_MODE, A0     ; Set index '0' for jump table
     MULU        #6, D6              ; Form offset (move 6 bytes in memory for every 'JMP' command)
-    JSR         0(A0, D6)           ; Jump indirect with index, i.e. jump to 'table' + displacement
+    JMP         0(A0, D6)           ; Jump indirect with index, i.e. jump to 'table' + displacement
 *--- Check validity based on mode value --------------------
 MULS_W_MODE:
     JMP         MULS_W_MODE_000     ; Dn
@@ -479,7 +479,7 @@ EA_OPMODE_COMBO:
 EA_PRINT_DN:
     LEA         EA_PRINT_DN_JMP, A0 ; Set index '0' for jump table
     MULU        #6, D7              ; Form offset (move 6 bytes in memory for every 'JMP' command)
-    JSR         0(A0, D7)           ; Jump indirect with index, i.e. jump to 'table' + displacement
+    JMP         0(A0, D7)           ; Jump indirect with index, i.e. jump to 'table' + displacement
 EA_PRINT_DN_JMP:
     JMP         DN_000 ; D0
     JMP         DN_001 ; D1
@@ -511,7 +511,7 @@ EA_PRINT_DN_END:
 EA_PRINT_AN:
     LEA         AN_JMP, A0          ; Set index '0' for jump table
     MULU        #6, D7              ; Form offset (move 6 bytes in memory for every 'JMP' command)
-    JSR         0(A0, D7)           ; Jump indirect with index, i.e. jump to 'table' + displacement
+    JMP         0(A0, D7)           ; Jump indirect with index, i.e. jump to 'table' + displacement
 AN_JMP:
     JMP         AN_000 ; A0
     JMP         AN_001 ; A1
@@ -540,7 +540,7 @@ EA_PRINT_AN_END:
 EA_PRINT_IND:
     LEA         IND_JMP, A0         ; Set index '0' for jump table
     MULU        #6, D7              ; Form offset (move 6 bytes in memory for every 'JMP' command)
-    JSR         0(A0, D7)           ; Jump indirect with index, i.e. jump to 'table' + displacement
+    JMP         0(A0, D7)           ; Jump indirect with index, i.e. jump to 'table' + displacement
 IND_JMP:
     JMP         IND_000 ; (A0)
     JMP         IND_001 ; (A1)
@@ -585,7 +585,7 @@ PRINT_IMM_END:
 EA_PRINT_POSTINC:
     LEA         POSTINC_JMP, A0     ; Set index '0' for jump table
     MULU        #6, D7              ; Form offset (move 6 bytes in memory for every 'JMP' command)
-    JSR         0(A0, D7)           ; Jump indirect with index, i.e. jump to 'table' + displacement
+    JMP         0(A0, D7)           ; Jump indirect with index, i.e. jump to 'table' + displacement
 POSTINC_JMP:
     JMP         POSTINC_000 ; (A0)+
     JMP         POSTINC_001 ; (A1)+
@@ -613,7 +613,7 @@ EA_PRINT_PI_END:
 EA_PRINT_PREDEC:
     LEA         PREDEC_JMP, A0      ; Set index '0' for jump table
     MULU        #6, D7              ; Form offset (move 6 bytes in memory for every 'JMP' command)
-    JSR         0(A0, D7)           ; Jump indirect with index, i.e. jump to 'table' + displacement
+    JMP         0(A0, D7)           ; Jump indirect with index, i.e. jump to 'table' + displacement
 PREDEC_JMP:
     JMP         PREDEC_000 ; -(A0)
     JMP         PREDEC_001 ; -(A1)
@@ -641,14 +641,18 @@ EA_PRINT_PD_END:
 EA_PRINT_ABS_L:
     MOVEA.L     A6, A1              ; copy pointer to temp
     ADDA.W      #$2, A1             ; Advance temp pointer to next word
-    MOVE.L      (A1), D0            ; store value in a register (todo, register tbd)
+    MOVEA.L      (A1), A2           ; store longword address to print in A2
     *print value TODO
     RTS
 *---------- Absolute Word Address --------------------------
 * Example Description
 *-----------------------------------------------------------
 EA_PRINT_ABS_W:
-*TODO
+    MOVEA.L     A6, A1              ; copy pointer to temp
+    ADDA.W      #$2, A1             ; Advance temp pointer to next word
+    MOVEA.W      (A1), A2           ; store word address to print in A2
+    *print value TODO
+    RTS
 *----------- Variables and Constants -----------------------
 
 *~Font name~Courier New~
