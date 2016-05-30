@@ -142,9 +142,11 @@ ADD_IMM: ; invalid if opmode is 2
     JSR         EA_PRINT_IMM        ; Print immediate data
     JMP         ADD_MODE_END
 *-----------------------------------
-ADD_MODE_END RTS
+ADD_MODE_END:
+    RTS                             ; Finish evaluating EA bits
 ADD_MODE_INVALID:
     JSR         EA_INVALID          ; Opcode word is Invalid, continue to ADD_END
+    RTS                             ; Finish evaluating EA bits
 *-----------------------------------
 ADD_END:
     MOVEM.L     (SP)+, A0-A6/D0-D5  ; Restore registers
