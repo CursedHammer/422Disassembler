@@ -358,7 +358,7 @@ MULS_W_IMM:
 MULS_W_DEST:
     *print EA_MSG_COMMA
     *Get destination register
-    MOVE.W      (A2), D7            ; Load word at current pointer to D1
+    MOVE.W      (A6), D7            ; Load word at current pointer to D1
     MOVE.B      #4, D2              ; Clear upper 4 bits of opcode word
     LSL.W       D2, D7              ; Perform shift (zeros shifted in)
     MOVE.B      #13, D2             ; 'Right-align' bits 9-11 to determine register
@@ -425,14 +425,14 @@ EA_DEFAULT_COMBO:
     CLR.B       D6                  ; Clear space for mode bits
     CLR.B       D7                  ; Clear space for register bits
 * Get Mode
-    MOVE.L      (A2), D1            ; Load opcode to data register 1
+    MOVE.L      (A6), D1            ; Load opcode to data register 1
     MOVE.B      #10, D2             ; Clear upper 10 bits of opcode word
     LSL.W       D2, D1              ; Perform shift (zeros shifted in)
     MOVE.B      #13, D2             ; 'Right-align' bits 3-5 to determine mode bits
     LSR.W       D2, D1              ; Perform shift (zeros shifted in)
     MOVE.B      D1, D6              ; Save mode bits to D6
 * Get Register
-    MOVE.L      (A2), D1            ; Reload opcode to data register 1
+    MOVE.L      (A6), D1            ; Reload opcode to data register 1
     MOVE.B      #13, D2             ; Clear upper 13 bits of opcode word
     LSL.W       D2, D1              ; Perform shift (zeros shifted in)
     MOVE.B      #13, D2             ; 'Right-align' bits 0-2 to determine register bits
@@ -453,14 +453,14 @@ EA_OPMODE_COMBO:
     CLR.B       D6                  ; Clear space for mode bits
     CLR.B       D7                  ; Clear space for register bits
 * Get Opmode
-    MOVE.L      (A2), D1            ; Load opcode to data register 1
+    MOVE.L      (A6), D1            ; Load opcode to data register 1
     MOVE.B      #7, D2              ; Clear upper 7 bits of opcode word
     LSL.W       D2, D1              ; Perform shift (zeros shifted in)
     MOVE.B      #13, D2             ; 'Right-align' bits 6-8 to determine opmode bits
     LSR.W       D2, D1              ; Perform shift (zeros shifted in)
     MOVE.B      D1, D6              ; Save opmode bits to D6
 * Get Register
-    MOVE.L      (A2), D1            ; Reload opcode to data register 1
+    MOVE.L      (A6), D1            ; Reload opcode to data register 1
     MOVE.B      #4, D2              ; Clear upper 4 bits of opcode word
     LSL.W       D2, D1              ; Perform shift (zeros shifted in)
     MOVE.B      #13, D2             ; 'Right-align' bits 9-11 to determine register bits
@@ -567,7 +567,7 @@ EA_PRINT_IND_END:
 * size stored in D5 (1: B, 2: W, 3: L)
 *-----------------------------------------------------------
 EA_PRINT_IMM:
-    MOVEA.L     A2, A1              ; copy pointer to temp
+    MOVEA.L     A6, A1              ; copy pointer to temp
     ADDA.W      #$2, A1             ; Advance temp pointer to next word
     CMP         #3, D5
     BEQ         PRINT_IMM_L         ; if L, branch
@@ -639,7 +639,7 @@ EA_PRINT_PD_END:
 * Example Description
 *-----------------------------------------------------------
 EA_PRINT_ABS_L:
-    MOVEA.L     A2, A1              ; copy pointer to temp
+    MOVEA.L     A6, A1              ; copy pointer to temp
     ADDA.W      #$2, A1             ; Advance temp pointer to next word
     MOVE.L      (A1), D0            ; store value in a register (todo, register tbd)
     *print value TODO
