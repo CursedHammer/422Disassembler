@@ -101,6 +101,9 @@ MESSAGEBCC DC.B    'BCC',CR,LF, 0
 MESSAGEBGT DC.B    'BGT',CR,LF, 0
 MESSAGEBLE DC.B    'BLE',CR,LF, 0
 
+MESSAGEOPCODE_INVALID DC.B    'That is not an opcode!',CR,LF, 0
+
+
 
 
 *~Font name~Courier New~
