@@ -223,71 +223,71 @@ ADDA_END:
         RTS
 *-----------------------------------------------------------
 EA_ADDI:
-        JSR         EA_INVALID
+        JSR         EA_UNIMPLEMENTED
         RTS
 *-----------------------------------------------------------
 EA_ADDQ:
-        JSR         EA_INVALID
+        JSR         EA_UNIMPLEMENTED
         RTS
 *-----------------------------------------------------------
 EA_AND:
-        JSR         EA_INVALID
+        JSR         EA_UNIMPLEMENTED
         RTS
 *-----------------------------------------------------------
 EA_ASL:
-        JSR         EA_INVALID
+        JSR         EA_UNIMPLEMENTED
         RTS
 *-----------------------------------------------------------
 EA_ASR:
-        JSR         EA_INVALID
+        JSR         EA_UNIMPLEMENTED
         RTS
 *-----------------------------------------------------------
 EA_BCC:
-        JSR         EA_INVALID
+        JSR         EA_UNIMPLEMENTED
         RTS
 *-----------------------------------------------------------
 EA_CLR:
-        JSR         EA_INVALID
+        JSR         EA_UNIMPLEMENTED
         RTS
 *-----------------------------------------------------------
 EA_CMP:
-        JSR         EA_INVALID
+        JSR         EA_UNIMPLEMENTED
         RTS
 *-----------------------------------------------------------
 EA_DIVU:
-        JSR         EA_INVALID
+        JSR         EA_UNIMPLEMENTED
         RTS
 *-----------------------------------------------------------
 EA_JSR:
-        JSR         EA_INVALID
+        JSR         EA_UNIMPLEMENTED
         RTS
 *-----------------------------------------------------------
 EA_LEA:
-        JSR         EA_INVALID
+        JSR         EA_UNIMPLEMENTED
         RTS
 *-----------------------------------------------------------
 EA_LSL:
-        JSR         EA_INVALID
+        JSR         EA_UNIMPLEMENTED
         RTS
 *-----------------------------------------------------------
 EA_LSR:
-        JSR         EA_INVALID
+        JSR         EA_UNIMPLEMENTED
         RTS
 *-----------------------------------------------------------
 EA_MOVE:
-        JSR         EA_INVALID
+        JSR         EA_UNIMPLEMENTED
         RTS
 *-----------------------------------------------------------
 EA_MOVEA:
-        JSR         EA_INVALID
+        JSR         EA_UNIMPLEMENTED
         RTS
 *-----------------------------------------------------------
 EA_MOVEM:
-        JSR         EA_INVALID
+        JSR         EA_UNIMPLEMENTED
         RTS
 *-----------------------------------------------------------
 EA_MOVEQ:
-        JSR         EA_INVALID
+        JSR         EA_UNIMPLEMENTED
         RTS
 
 *---------- MULS.W Effective Addresses ---------------------
@@ -369,27 +369,27 @@ MULS_W_END:
         RTS
 
 EA_NOP:
-        JSR         EA_INVALID
+        JSR         EA_UNIMPLEMENTED
         RTS
 *-----------------------------------------------------------
 EA_OR:
-        JSR         EA_INVALID
+        JSR         EA_UNIMPLEMENTED
         RTS
 *-----------------------------------------------------------
 EA_ROL:
-        JSR         EA_INVALID
+        JSR         EA_UNIMPLEMENTED
         RTS
 *-----------------------------------------------------------
 EA_ROR:
-        JSR         EA_INVALID
+        JSR         EA_UNIMPLEMENTED
         RTS
 *-----------------------------------------------------------
 EA_RTS:
-        JSR         EA_INVALID
+        JSR         EA_UNIMPLEMENTED
         RTS
 *-----------------------------------------------------------
 EA_SUB:
-        JSR         EA_INVALID
+        JSR         EA_UNIMPLEMENTED
         RTS
 *-----------------------------------------------------------
 
@@ -399,8 +399,16 @@ EA_SUB:
 
 *-- Generic Subroutines ------------------------------------
 
+*---------- Unimplemented EA -------------------------------
+* Prints error message for EA subroutines that have not been
+* implemented yet
+*-----------------------------------------------------------
+EA_UNIMPLEMENTED:
+        *print unimplemented message
+        RTS
+
 *---------- Invalid OpCode ---------------------------------
-*
+* Prints error message for current opcode in memory
 *-----------------------------------------------------------
 EA_INVALID:
         *print or indicate invalidity
