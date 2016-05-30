@@ -1,6 +1,6 @@
 00001000 Starting Address
 Assembler used: EASy68K Editor/Assembler v5.15.04
-Created On: 5/29/2016 4:10:30 PM
+Created On: 5/29/2016 7:42:36 PM
 
 00000000                             1  *-----------------------------------------------------------
 00000000                             2  * Title      : NOP check
@@ -480,7 +480,7 @@ Created On: 5/29/2016 4:10:30 PM
 0000149A  4E75                     476              RTS
 0000149C  4EB9 00001F0C            477  RORcode10   JSR     ISRORL
 000014A2  4E75                     478              RTS
-000014A4  4EB9 00001D12            479  RORcode11   JSR    OPCODE_INVALID              ;INVALID
+000014A4  4EB9 00001D12            479  RORcode11   JSR     OPCODE_INVALID              ;INVALID
 000014AA  4E75                     480              RTS
 000014AC                           481  *****************************END someROR ************************************
 000014AC                           482  

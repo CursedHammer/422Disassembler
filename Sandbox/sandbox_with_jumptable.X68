@@ -476,7 +476,7 @@ RORcode01   JSR     ISRORW
             RTS
 RORcode10   JSR     ISRORL
             RTS
-RORcode11   JSR    OPCODE_INVALID              ;INVALID
+RORcode11   JSR     OPCODE_INVALID              ;INVALID
 		    RTS
 *****************************END someROR ************************************
 
@@ -1756,6 +1756,7 @@ MESSAGEOPCODE_INVALID DC.B    'That is not an opcode!',CR,LF, 0
 * Put variables and constants here
 
     END    START        ; last line of source
+
 
 
 
