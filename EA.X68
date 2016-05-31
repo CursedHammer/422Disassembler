@@ -235,18 +235,13 @@ ADDA_END:
 EA_ADDI:
     MOVEM.L     A0-A5/D0-D7, -(SP)  ; Save registers (except A6, global pointer to word to read)
     JSR         EA_COPY_PTR         ; Copy global pointer to A5
-*--- Get size bits -----------------
-    MOVE.L      (A6), D1            ; Load opcode to data register 1
-    MOVE.B      #8, D2              ; Clear upper 8 bits of opcode word
-    LSL.W       D2, D1              ; Perform shift (zeros shifted in)
-    MOVE.B      #14, D2             ; 'Right-align' bits 6-7 to determine size bits
-    LSR.W       D2, D1              ; Perform shift (zeros shifted in)
+    JSR         EA_SIZE_BITS        ; get size bits in D7
 *--- Branch based on size ----------
-    CMP.B       #$00, D1            ; Test if size: byte
+    CMP.B       #$00, D7            ; Test if size: byte
     BEQ         ADDI_B
-    CMP.B       #$01, D1            ; Test if size: word
+    CMP.B       #$01, D7            ; Test if size: word
     BEQ         ADDI_W
-    CMP.B       #$02, D1            ; Test if size: long
+    CMP.B       #$02, D7            ; Test if size: long
     BEQ         ADDI_L
     JSR         EA_INVALID          ; Else, invalid
     JMP         ADDI_END
@@ -550,8 +545,8 @@ EA_COPY_PTR:
 * POST: mode bits in D6, register bits in D7
 *-----------------------------------------------------------
 EA_DEFAULT_COMBO:
-    CLR.B       D6                  ; Clear space for mode bits
-    CLR.B       D7                  ; Clear space for register bits
+    CLR.L       D6                  ; Clear space for mode bits
+    CLR.L       D7                  ; Clear space for register bits
 * Get Mode
     MOVE.L      (A6), D1            ; Load opcode to data register 1
     MOVE.B      #10, D2             ; Clear upper 10 bits of opcode word
@@ -574,8 +569,8 @@ EA_DEFAULT_COMBO:
 * POST: opmode bits in D6, register bits in D7
 *-----------------------------------------------------------
 EA_OPMODE_COMBO:
-    CLR.B       D6                  ; Clear space for mode bits
-    CLR.B       D7                  ; Clear space for register bits
+    CLR.L       D6                  ; Clear space for mode bits
+    CLR.L       D7                  ; Clear space for register bits
 * Get Opmode
     MOVE.L      (A6), D1            ; Load opcode to data register 1
     MOVE.B      #7, D2              ; Clear upper 7 bits of opcode word
@@ -591,6 +586,18 @@ EA_OPMODE_COMBO:
     LSR.W       D2, D1              ; Perform shift (zeros shifted in)
     MOVE.B      D1, D7              ; Save register bits to D7
     RTS                             ; Return from subroutine
+
+*---------- Parse Size bits --------------------------------
+* Stores the size bits 6-7 of opcode word in D7
+*-----------------------------------------------------------
+EA_SIZE_BITS:
+    CLR.L       D7
+    MOVE.L      (A6), D7            ; Load opcode to data register 1
+    MOVE.B      #8, D2              ; Clear upper 8 bits of opcode word
+    LSL.W       D2, D7              ; Perform shift (zeros shifted in)
+    MOVE.B      #14, D2             ; 'Right-align' bits 6-7 to determine size bits
+    LSR.W       D2, D7              ; Perform shift (zeros shifted in)
+    RTS
 
 *-- Read & Print Subroutines -------------------------------
 
