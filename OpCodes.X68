@@ -79,7 +79,7 @@ DONE    MOVEM.W     (SP)+,  A0-A7/D0-D7 ; Restore registers
 BCCorBGTorBLE       LEA     STACK,SP            ; Load the SP
                     LEA     tableBCCorBGTorBLE, A0            ; Index into the table
                     CLR.L   D0                  ; Zero it
-                    MOVE.W  #example,D0         ; We'll play with it here
+                    MOVE.W  (A6),D0         ; We'll play with it here
                     MOVE.B  #6,D1           ; Shift 6 bits left
                     ASL.W   D1,D0
                     MOVE.B  #shift,D1           ; Shift 12 bits to the right
@@ -113,7 +113,7 @@ BCCorBGTorBLEcode11    JSR     ISBLE
 OR_BorOR_WorOR_LorDIVU:
         LEA         tableOR_BorOR_WorOR_LorDIVU, A0 ; Index into the table
         CLR.L       D0              ; Zero it
-        MOVE.W      #example,D0     ; We'll play with it here
+        MOVE.W      (A6),D0     ; We'll play with it here
         MOVE.B      #7,D1           ; Shift 7 bits left
         ASL.W       D1,D0
         MOVE.B      #shift,D1       ; Shift 12 bits to the right
@@ -150,14 +150,14 @@ OR_DIVUcode101 JSR  ISORW
 OR_DIVUcode110 JSR  ISORL
                RTS
 OR_DIVUcode111 JSR    OPCODE_INVALID              ;INVALID
-		       RTS                 
+		       RTS
 *----------- END  ADD_BorADD_WorADD_L ----------------------
 
 *****************************  MULSLorDIVUL ************************************
 MULSLorDIVUL        LEA     STACK,SP            ; Load the SP
                     LEA     tableMULSLorDIVUL, A0            ; Index into the table
                     CLR.L   D0                  ; Zero it
-                    MOVE.W  #example,D0         ; We'll play with it here
+                    MOVE.W  (A6),D0         ; We'll play with it here
                     MOVE.B  #6,D1           ; Shift 6 bits left
                     ASL.W   D1,D0
                     MOVE.B  #shift,D1           ; Shift 12 bits to the right
@@ -180,7 +180,7 @@ MULSLorDIVULcode1   JSR     ISDIVUL
 someASR:
         LEA         tableSomeASR, A0 ; Index into the table
         CLR.L       D0              ; Zero it
-        MOVE.W      #example,D0     ; We'll play with it here
+        MOVE.W      (A6),D0     ; We'll play with it here
         MOVE.B      #8,D1           ; Shift 8 bits left
         ASL.W       D1,D0
         MOVE.B      #shift,D1       ; Shift 12 bits to the right
@@ -204,14 +204,14 @@ ASRcode01 JSR       ISASRW
 ASRcode10 JSR       ISASRL
           RTS
 ASRcode11 JSR    OPCODE_INVALID              ;INVALID
-		  RTS          
+		  RTS
 *----------- END someLSL -----------------------------------
 
 *----------- someASL ---------------------------------------
 someASL:
         LEA         tableSomeASL, A0 ; Index into the table
         CLR.L       D0              ; Zero it
-        MOVE.W      #example,D0     ; We'll play with it here
+        MOVE.W      (A6),D0     ; We'll play with it here
         MOVE.B      #8,D1           ; Shift 8 bits left
         ASL.W       D1,D0
         MOVE.B      #shift,D1       ; Shift 12 bits to the right
@@ -227,7 +227,7 @@ tableSomeASL:
         JMP         ASLcode01       *ASL.W
         JMP         ASLcode10       *ASL.L
         JMP         ASLcode11       ; INVALID
-        
+
 ASLcode00 JSR       ISASLB
           RTS
 ASLcode01 JSR       ISASLW
@@ -235,14 +235,14 @@ ASLcode01 JSR       ISASLW
 ASLcode10 JSR       ISASLL
           RTS
 ASLcode11 JSR       OPCODE_INVALID ; INVALID
-		  RTS         
+		  RTS
 *----------- END someLSL -----------------------------------
 
 *----------- someLSR ---------------------------------------
 someLSR:
         LEA         tableSomeLSR, A0 ; Index into the table
         CLR.L       D0              ; Zero it
-        MOVE.W      #example,D0     ; We'll play with it here
+        MOVE.W      (A6),D0     ; We'll play with it here
         MOVE.B      #8,D1           ; Shift 8 bits left
         ASL.W       D1,D0
         MOVE.B      #shift,D1       ; Shift 12 bits to the right
@@ -265,14 +265,14 @@ LSRcode01 JSR       ISLSRW
 LSRcode10 JSR       ISLSRL
           RTS
 LSRcode11 JSR    OPCODE_INVALID              ;INVALID
-		  RTS          
+		  RTS
 *----------- END someLSR -----------------------------------
 
 *----------- someLSL ---------------------------------------
 someLSL:
         LEA         tableSomeLSL, A0 ; Index into the table
         CLR.L       D0              ; Zero it
-        MOVE.W      #example,D0     ; We'll play with it here
+        MOVE.W      (A6),D0     ; We'll play with it here
         MOVE.B      #8,D1           ; Shift 8 bits left
         ASL.W       D1,D0
         MOVE.B      #shift,D1       ; Shift 12 bits to the right
@@ -296,14 +296,14 @@ LSLcode01 JSR       ISLSLW
 LSLcode10 JSR       ISLSLL
           RTS
 LSLcode11 JSR       OPCODE_INVALID              ;INVALID
-		  RTS          
+		  RTS
 *----------- END someLSL -----------------------------------
 
 *----------- someROL ---------------------------------------
 someROL:
         LEA         tableSomeROL, A0 ; Index into the table
         CLR.L       D0              ; Zero it
-        MOVE.W      #example,D0     ; We'll play with it here
+        MOVE.W      (A6),D0     ; We'll play with it here
         MOVE.B      #8,D1           ; Shift 8 bits left
         ASL.W       D1,D0
         MOVE.B      #shift,D1       ; Shift 12 bits to the right
@@ -319,7 +319,7 @@ tableSomeROL:
         JMP         ROLcode01       *ROL.W
         JMP         ROLcode10       *ROL.L
         JMP         ROLcode11       ; INVALID
-        
+
 ROLcode00 JSR       ISROLB
           RTS
 ROLcode01 JSR       ISROLW
@@ -327,7 +327,7 @@ ROLcode01 JSR       ISROLW
 ROLcode10 JSR       ISROLL
           RTS
 ROLcode11 JSR       OPCODE_INVALID              ;INVALID
-		  RTS          
+		  RTS
 *----------- END someROR -----------------------------------
 
 
@@ -335,7 +335,7 @@ ROLcode11 JSR       OPCODE_INVALID              ;INVALID
 someROR:
         LEA         tableSomeROR, A0 ; Index into the table
         CLR.L       D0              ; Zero it
-        MOVE.W      #example,D0     ; We'll play with it here
+        MOVE.W      (A6),D0     ; We'll play with it here
         MOVE.B      #8,D1           ; Shift 8 bits left
         ASL.W       D1,D0
         MOVE.B      #shift,D1       ; Shift 12 bits to the right
@@ -359,14 +359,14 @@ RORcode01 JSR       ISRORW
 RORcode10 JSR       ISRORL
           RTS
 RORcode11 JSR       OPCODE_INVALID ; INVALID
-		  RTS          
+		  RTS
 *----------- END someROR -----------------------------------
 
 *----------- ROL_ROR ---------------------------------------
 ROL_ROR:
         LEA         tableROL_ROR, A0 ; Index into the table
         CLR.L       D0              ; Zero it
-        MOVE.W      #example,D0     ; We'll play with it here
+        MOVE.W      (A6),D0     ; We'll play with it here
         MOVE.B      #7,D1           ; Shift 7 bits left
         ASL.W       D1,D0
         MOVE.B      #shift,D1       ; Shift 12 bits to the right
@@ -391,7 +391,7 @@ ROL_RORcode1 JSR    someROL
 LSL_LSR:
         LEA         tableLSL_LSR, A0 ; Index into the table
         CLR.L       D0              ; Zero it
-        MOVE.W      #example,D0     ; We'll play with it here
+        MOVE.W      (A6),D0     ; We'll play with it here
         MOVE.B      #7,D1           ; Shift 7 bits left
         ASL.W       D1,D0
         MOVE.B      #shift,D1       ; Shift 12 bits to the right
@@ -416,7 +416,7 @@ LSL_LSRcode1 JSR    someLSL
 ASL_ASR:
         LEA         tableASL_ASR, A0 ; Index into the table
         CLR.L       D0              ; Zero it
-        MOVE.W      #example,D0     ; We'll play with it here
+        MOVE.W      (A6),D0     ; We'll play with it here
         MOVE.B      #7,D1           ; Shift 7 bits left
         ASL.W       D1,D0
         MOVE.B      #shift,D1       ; Shift 12 bits to the right
@@ -441,7 +441,7 @@ ASL_ASRcode1 JSR    someASL
 ROd_LSd_ASd:
         LEA         tableROd_LSd_ASd, A0 ; Index into the table
         CLR.L       D0              ; Zero it
-        MOVE.W      #example,D0     ; We'll play with it here
+        MOVE.W      (A6),D0     ; We'll play with it here
         MOVE.B      #11,D1          ; Shift 11 bits left
         ASL.W       D1,D0
         MOVE.B      #shift,D1       ; Shift 12 bits to the right
@@ -472,7 +472,7 @@ ROd_LSd_ASdcode11 JSR ROL_ROR
 AND_BorAND_WorAND_LorMULS_W:
         LEA         tableAND_BorAND_WorAND_LorMULS_W, A0            ; Index into the table
         CLR.L       D0                  ; Zero it
-        MOVE.W      #example,D0         ; We'll play with it here
+        MOVE.W      (A6),D0         ; We'll play with it here
         MOVE.B      #7,D1           ; Shift 7 bits left
         ASL.W       D1,D0
         MOVE.B      #shift,D1           ; Shift 12 bits to the right
@@ -515,7 +515,7 @@ ANDcode111 JSR      ISMULSW
 ADD_BorADD_WorADD_L:
         LEA         tableADD_BorADD_WorADD_L, A0 ; Index into the table
         CLR.L       D0              ; Zero it
-        MOVE.W      #example,D0     ; We'll play with it here
+        MOVE.W      (A6),D0     ; We'll play with it here
         MOVE.B      #7,D1           ; Shift 7 bits left
         ASL.W       D1,D0
         MOVE.B      #shift,D1       ; Shift 12 bits to the right
@@ -558,7 +558,7 @@ ADDcode111 JSR      ISADDAL
 SUB_BorSUB_WorSUB_L:
         LEA         tableSUB_BorSUB_WorSUB_L, A0 ; Index into the table
         CLR.L       D0              ; Zero it
-        MOVE.W      #example,D0     ; We'll play with it here
+        MOVE.W      (A6),D0     ; We'll play with it here
         MOVE.B      #7,D1           ; Shift 7 bits left
         ASL.W       D1,D0
         MOVE.B      #shift,D1       ; Shift 12 bits to the right
@@ -578,7 +578,7 @@ tableSUB_BorSUB_WorSUB_L:
         JMP         SUBcode101      *SUB.W
         JMP         SUBcode110      *SUB.L
         JMP         SUBcode111      ; INVALID
-        
+
 SUBcode000 JSR      ISSUBB
            RTS
 SUBcode001 JSR      ISSUBW
@@ -594,14 +594,14 @@ SUBcode101 JSR      ISSUBW
 SUBcode110 JSR      ISSUBL
            RTS
 SUBcode111 JSR      OPCODE_INVALID              ;INVALID
-		   RTS           
+		   RTS
 *----------- END  SUB_BorSUB_WorSUB_L ----------------------
 
 *----------- CMP_BorCMP_WorCMP_L ---------------------------
 CMP_BorCMP_WorCMP_L:
         LEA         tableCMP_BorCMP_WorCMP_L, A0 ; Index into the table
         CLR.L       D0              ; Zero it
-        MOVE.W      #example,D0     ; We'll play with it here
+        MOVE.W      (A6),D0     ; We'll play with it here
         MOVE.B      #8,D1           ; Shift 8 bits left
         ASL.W       D1,D0
         MOVE.B      #shift,D1       ; Shift 12 bits to the right
@@ -625,14 +625,14 @@ CMPcode01   JSR      ISCMPW
 CMPcode10   JSR      ISCMPL
             RTS
 CMPcode11   JSR    OPCODE_INVALID              ;INVALID
-		    RTS            
+		    RTS
 *----------- END CMP_BorCMP_WorCMP_L -----------------------
 
 *----------- ADDQ_BorADDQ_WorADDQ_L ------------------------
 ADDQ_BorADDQ_WorADDQ_L:
         LEA         tableADDQ_BorADDQ_WorADDQ_L, A0 ; Index into the table
         CLR.L       D0              ; Zero it
-        MOVE.W      #example,D0     ; We'll play with it here
+        MOVE.W      (A6),D0     ; We'll play with it here
         MOVE.B      #8,D1           ; Shift 8 bits left
         ASL.W       D1,D0
         MOVE.B      #shift,D1       ; Shift 12 bits to the right
@@ -648,7 +648,7 @@ tableADDQ_BorADDQ_WorADDQ_L:
         JMP         ADDQcode01      *ADDQ.W
         JMP         ADDQcode10      *ADDQ.L
         JMP         ADDQcode11      ; INVALID
-        
+
 ADDQcode00 JSR      ISADDQB
            RTS
 ADDQcode01 JSR      ISADDQW
@@ -656,14 +656,14 @@ ADDQcode01 JSR      ISADDQW
 ADDQcode10 JSR      ISADDQL
            RTS
 ADDQcode11   JSR    OPCODE_INVALID              ;INVALID
-		    RTS           
+		    RTS
 *----------- END ADDQ_BorADDQ_WorADDQ_L --------------------
 
 *----------- someCLR ---------------------------------------
 someCLR:
         LEA         tableSomeCLR, A0 ; Index into the table
         CLR.L       D0              ; Zero it
-        MOVE.W      #example,D0     ; We'll play with it here
+        MOVE.W      (A6),D0     ; We'll play with it here
         MOVE.B      #8,D1           ; Shift 8 bits left
         ASL.W       D1,D0
         MOVE.B      #shift,D1       ; Shift 12 bits to the right
@@ -687,14 +687,14 @@ CLRcode01 JSR       ISCLRW
 CLRcode10 JSR       ISCLRL
           RTS
 CLRcode11 JSR    OPCODE_INVALID              ;INVALID
-		  RTS          
+		  RTS
 *----------- END someCLR -----------------------------------
 
 *----------- NOPorCLRorRTSorJSR ----------------------------
 NOPorCLRorRTSorJSR:
         LEA         tableNOPorCLRorRTSorJSR, A0 ; Index into the table
         CLR.L       D0              ; Zero it
-        MOVE.W      #example,D0     ; We'll play with it here
+        MOVE.W      (A6),D0     ; We'll play with it here
 
         MOVE.W      #%0100111001110001, D1 ; 0100111001110001 = NOP
         CMP.W       D0, D1
@@ -772,7 +772,7 @@ JSRorCLRcode1111 JSR    OPCODE_INVALID              ;INVALID
 someMOVEM:
         LEA         tableSomeMOVEM, A0 ; Index into the table
         CLR.L       D0              ; Zero it
-        MOVE.W      #example,D0     ; We'll play with it here
+        MOVE.W      (A6),D0     ; We'll play with it here
         MOVE.B      #9,D1           ; Shift 9 bits left
         ASL.W       D1,D0
         MOVE.B      #shift,D1       ; Shift 12 bits to the right
@@ -797,7 +797,7 @@ MOVEMcode1 JSR      ISMOVEML
 NOP_MOVEM_LEA_JSR_CLR_RTS:
         LEA         tableNOP_MOVEM_LEA_JSR_CLR_RTS, A0 ; Index into the table
         CLR.L       D0              ; Zero it
-        MOVE.W      #example,D0     ; We'll play with it here
+        MOVE.W      (A6),D0     ; We'll play with it here
         MOVE.B      #7,D1           ; Shift 7 bits right
         ASR.W       D1,D0
         MOVE.B      #13,D1          ; Shift 13 bits left
@@ -864,7 +864,7 @@ LOTScode1111 JSR    OPCODE_INVALID              ;INVALID
 ADDI_BorADDI_WorADDI_L:
         LEA         tableADDI_BorADDI_WorADDI_L,A0 ; Index into the table
         CLR.L       D0              ; Zero it
-        MOVE.W      #example,D0     ; We'll play with it here
+        MOVE.W      (A6),D0     ; We'll play with it here
         MOVE.B      #7,D1           ; Shift 7 bits left
         ASL.W       D1,D0
         MOVE.B      #13,D1
@@ -885,14 +885,14 @@ ADDIWcode01 JSR     ISADDIW
 ADDILcode10 JSR     ISADDIL
             RTS
 ADDILcode11 JSR    OPCODE_INVALID              ;INVALID
-			RTS             
+			RTS
 *----------- END ADDI_BorADDI_WorADDI_L --------------------
 
 *----------- MOVEA_LorMOVE_L -------------------------------
 MOVEA_LorMOVE_L:
         LEA         tableMOVEA_LorMOVE_L,A0 ; Index into the table
         CLR.L       D0              ; Zero it
-        MOVE.W      #example,D0     ; We'll play with it here
+        MOVE.W      (A6),D0         ; We'll play with it here
         MOVE.B      #7,D1           ; Shift 7 bits left
         ASL.W       D1,D0           ; 0011 1010 0100 0100 to 0010 0000 0000 0000
         MOVE.B      #13,D1          ; Shift 13 bits right
@@ -932,7 +932,7 @@ MOVEcode111 JSR     ISMOVEL
 MOVEA_WorMOVE_W:
         LEA         tableMOVEA_WorMOVE_W,A0 ; Index into the table
         CLR.L       D0              ; Zero it
-        MOVE.W      #example,D0     ; We'll play with it here
+        MOVE.W      (A6),D0     ; We'll play with it here
         MOVE.B      #7,D1           ; Shift 7 bits left
         ASL.W       D1,D0           ; 0011 1010 0100 0100 to 0010 0000 0000 0000
         MOVE.B      #13,D1          ; Shift 13 bits right
@@ -979,7 +979,7 @@ OPCODE_INVALID  MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
 
             MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
             RTS
-            
+
 ISBCC  MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
             LEA MESSAGEBCC, A1
             MOVE.B  #14, D0
