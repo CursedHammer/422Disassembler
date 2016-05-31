@@ -203,7 +203,7 @@ ADDA_MODE_111: ; The rest (not all valid, validated by register number)
     BEQ         ADDA_ABS_L
     CMP.B       #$04, D7            ; Test for immediate data
     BEQ         ADDA_IMM
-    JMP         ADDA_MODE_INVALID   ; else, invalid
+    JMP         ADDA_MODE_INVALID   ; Else, invalid
 *-----------------------------------
 *--- Valid options for mode 111 ----
 ADDA_ABS_W:
@@ -233,11 +233,34 @@ EA_ADDI:
     JSR         EA_COPY_PTR         ; Copy global pointer to A5
 *--- Get size bits -----------------
     MOVE.L      (A6), D1            ; Load opcode to data register 1
-    MOVE.B      #10, D2             ; Clear upper 10 bits of opcode word
+    MOVE.B      #8, D2              ; Clear upper 8 bits of opcode word
     LSL.W       D2, D1              ; Perform shift (zeros shifted in)
-    MOVE.B      #13, D2             ; 'Right-align' bits 3-5 to determine mode bits
+    MOVE.B      #14, D2             ; 'Right-align' bits 6-7 to determine size bits
     LSR.W       D2, D1              ; Perform shift (zeros shifted in)
-    MOVE.B      D1, D6              ; Save mode bits to D6
+*--- Branch based on size ----------
+    CMP.B       #$00, D1            ; Test if size: byte
+    BEQ         ADDI_B
+    CMP.B       #$01, D1            ; Test if size: word
+    BEQ         ADDI_W
+    CMP.B       #$02, D1            ; Test if size: long
+    BEQ         ADDI_L
+    JSR         EA_INVALID          ; Else, invalid
+    JMP         ADDI_END
+*--- Print immediate data ----------
+ADDI_B:
+    ADDA.W      #$02, A5            ; Increment A5 past current word
+    MOVE.W      (A5), D0
+    *TODO isolate bits
+    *print data
+    JMP         ADDI_GET_DEST
+ADDI_W:
+    ADDA.W      #$02, A5            ; Increment A5 past current word
+ADDI_L:
+    ADDA.W      #$02, A5            ; Increment A5 past current word
+
+
+ADDI_GET_DEST:
+    *PRINT COMMA
 ADDI_END:
     JSR         EA_UPDATE_POINTER   ; Update global pointer
     MOVEM.L     (SP)+, A0-A5/D0-D7  ; Restore registers (except A6, global pointer to word to read)
@@ -436,12 +459,13 @@ EA_INVALID:
 * Updates global pointer based on address stored in A5
 *-----------------------------------------------------------
 EA_UPDATE_POINTER:
-    CMP.L       A5, A6              ; check if A5==A6
-    BNE         UPDATE_PTR          ; if NOT equal (a.k.a if any extra operands
-                                    ; were read), update global with current
-    ADDA.W      #$02, A5            ; else, increment past current opcode word, then update
+    CMP.L       A5, A6              ; Check if A5==A6
+    BNE         UPDATE_PTR          ; If NOT equal (a.k.a if any extra operands
+                                    ; were read, and is already up to date),
+                                    ; update global with current
+    ADDA.W      #$02, A5            ; Else, increment past current opcode word, then update
 UPDATE_PTR:
-    MOVEA.L     A5, A6              ; update global pointer
+    MOVEA.L     A5, A6              ; Update global pointer
     RTS
 
 *---------- Copy Global Pointer ----------------------------
@@ -449,7 +473,7 @@ UPDATE_PTR:
 * beginning of every main subroutine
 *-----------------------------------------------------------
 EA_COPY_PTR:
-    MOVEA.L     A6, A5              ; save global pointer
+    MOVEA.L     A6, A5              ; Save global pointer
     RTS
 
 *---------- Parse Default Combo ----------------------------
@@ -676,7 +700,7 @@ EA_PRINT_PD_END:
 EA_PRINT_ABS_L:
     MOVEA.L     A5, A1              ; copy pointer to temp
     ADDA.W      #$2, A1             ; Advance temp pointer to next word
-    MOVEA.L     (A1), A4            ; store longword address to print in A4? TODO
+    MOVE.L      (A1), D0            ; store longword address to print TODO
     *print value TODO
     ADDA.W      #$4, A1             ; move temp pointer past longword that has been read
     MOVEA.L     A1, A5              ; store new pointer location to pass back
@@ -688,7 +712,7 @@ EA_PRINT_ABS_L:
 EA_PRINT_ABS_W:
     MOVEA.L     A5, A1              ; copy pointer to temp
     ADDA.W      #$2, A1             ; Advance temp pointer to next word
-    MOVEA.W     (A1), A4            ; store word address to print in A4? TODO
+    MOVE.W      (A1), D0            ; store word address to print in TODO
     *print value TODO
     ADDA.W      #$2, A1             ; move temp pointer past word that has been read
     MOVEA.L     A1, A5              ; store new pointer location to pass back
