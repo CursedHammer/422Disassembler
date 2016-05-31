@@ -154,7 +154,7 @@ ADD_END:
     MOVEM.L     (SP)+, A0-A5/D0-D7  ; Restore registers (except A6, global pointer to word to read)
     RTS
 
-*---------- ADDA Effective Addresses ------------------------
+*---------- ADDA Effective Addresses -----------------------
 * Parses and prints the effective addressing information for
 * the ADDA opcode
 *-----------------------------------------------------------
@@ -228,7 +228,7 @@ ADDA_END:
     MOVEM.L     (SP)+, A0-A5/D0-D7  ; Restore registers (except A6, global pointer to word to read)
     RTS
 
-*---------- ADDI Effective Addresses ------------------------
+*---------- ADDI Effective Addresses -----------------------
 * Parses and prints the effective addressing information for
 * the ADDI opcode
 *-----------------------------------------------------------
@@ -328,71 +328,118 @@ ADDI_END:
     JSR         EA_UPDATE_POINTER   ; Update global pointer
     MOVEM.L     (SP)+, A0-A5/D0-D7  ; Restore registers (except A6, global pointer to word to read)
     RTS
+*---------- ADDQ Effective Addresses -----------------------
+* Parses and prints the effective addressing information for
+* the ADDQ opcode
 *-----------------------------------------------------------
 EA_ADDQ:
     JSR         EA_UNIMPLEMENTED
     RTS
+*---------- AND Effective Addresses -------------------------
+* Parses and prints the effective addressing information for
+* the AND opcode
 *-----------------------------------------------------------
 EA_AND:
     JSR         EA_UNIMPLEMENTED
     RTS
+*---------- ASL Effective Addresses -------------------------
+* Parses and prints the effective addressing information for
+* the ASL opcode
 *-----------------------------------------------------------
-EA_ASL:
+EA_ASL: *TODO MIGHT BE SAME AS ASR
     JSR         EA_UNIMPLEMENTED
     RTS
+*---------- ASR Effective Addresses ------------------------
+* Parses and prints the effective addressing information for
+* the ASR opcode
 *-----------------------------------------------------------
 EA_ASR:
     JSR         EA_UNIMPLEMENTED
     RTS
+*---------- BCC Effective Addresses ------------------------
+* Parses and prints the effective addressing information for
+* the BCC opcode
 *-----------------------------------------------------------
 EA_BCC:
     JSR         EA_UNIMPLEMENTED
     RTS
+*---------- CLR Effective Addresses ------------------------
+* Parses and prints the effective addressing information for
+* the CLR opcode
 *-----------------------------------------------------------
 EA_CLR:
     JSR         EA_UNIMPLEMENTED
     RTS
+*---------- CMP Effective Addresses ------------------------
+* Parses and prints the effective addressing information for
+* the CMP opcode
 *-----------------------------------------------------------
 EA_CMP:
     JSR         EA_UNIMPLEMENTED
     RTS
+*---------- DIVU Effective Addresses -----------------------
+* Parses and prints the effective addressing information for
+* the DIVU opcode
 *-----------------------------------------------------------
 EA_DIVU:
     JSR         EA_UNIMPLEMENTED
     RTS
+*---------- JSR Effective Addresses ------------------------
+* Parses and prints the effective addressing information for
+* the JSR opcode
 *-----------------------------------------------------------
 EA_JSR:
     JSR         EA_UNIMPLEMENTED
     RTS
+*---------- LEA Effective Addresses ------------------------
+* Parses and prints the effective addressing information for
+* the LEA opcode
 *-----------------------------------------------------------
 EA_LEA:
     JSR         EA_UNIMPLEMENTED
     RTS
+*---------- LSL Effective Addresses ------------------------
+* Parses and prints the effective addressing information for
+* the LSL opcode
 *-----------------------------------------------------------
-EA_LSL:
+EA_LSL: *TODO might be same as lsr
     JSR         EA_UNIMPLEMENTED
     RTS
+*---------- LSR Effective Addresses ------------------------
+* Parses and prints the effective addressing information for
+* the LSR opcode
 *-----------------------------------------------------------
 EA_LSR:
     JSR         EA_UNIMPLEMENTED
     RTS
+*---------- MOVE Effective Addresses -----------------------
+* Parses and prints the effective addressing information for
+* the MOVE opcode
 *-----------------------------------------------------------
 EA_MOVE:
     JSR         EA_UNIMPLEMENTED
     RTS
+*---------- MOVEA Effective Addresses ----------------------
+* Parses and prints the effective addressing information for
+* the MOVEA opcode
 *-----------------------------------------------------------
 EA_MOVEA:
     JSR         EA_UNIMPLEMENTED
     RTS
+*---------- MOVEM Effective Addresses ----------------------
+* Parses and prints the effective addressing information for
+* the MOVEM opcode
 *-----------------------------------------------------------
 EA_MOVEM:
     JSR         EA_UNIMPLEMENTED
     RTS
+*---------- MOVEQ Effective Addresses ----------------------
+* Parses and prints the effective addressing information for
+* the MOVEQ opcode
 *-----------------------------------------------------------
 EA_MOVEQ:
     JSR         EA_UNIMPLEMENTED
     RTS
-
 *---------- MULS.W Effective Addresses ---------------------
 * Parses and prints the effective addressing information for
 * the MULS.W opcode
@@ -472,36 +519,52 @@ MULS_W_END:
     MOVEM.L     (SP)+, A0-A5/D0-D7  ; Restore registers (except A6, global pointer to word to read)
     RTS
 
+*---------- NOP Effective Addresses ------------------------
+* Parses and prints the effective addressing information for
+* the NOP opcode
+*-----------------------------------------------------------
 EA_NOP:
     JSR         EA_UNIMPLEMENTED
     RTS
+*---------- OR Effective Addresses -------------------------
+* Parses and prints the effective addressing information for
+* the OR opcode
 *-----------------------------------------------------------
 EA_OR:
     JSR         EA_UNIMPLEMENTED
     RTS
+*---------- ROL Effective Addresses ------------------------
+* Parses and prints the effective addressing information for
+* the ROL opcode
 *-----------------------------------------------------------
-EA_ROL:
+EA_ROL: *todo might be same as ror
     JSR         EA_UNIMPLEMENTED
     RTS
+*---------- ROR Effective Addresses ------------------------
+* Parses and prints the effective addressing information for
+* the ROR opcode
 *-----------------------------------------------------------
 EA_ROR:
     JSR         EA_UNIMPLEMENTED
     RTS
+*---------- RTS Effective Addresses ------------------------
+* Parses and prints the effective addressing information for
+* the RTS opcode
 *-----------------------------------------------------------
 EA_RTS:
     JSR         EA_UNIMPLEMENTED
     RTS
+*---------- SUB Effective Addresses ------------------------
+* Parses and prints the effective addressing information for
+* the SUB opcode
 *-----------------------------------------------------------
 EA_SUB:
     JSR         EA_UNIMPLEMENTED
     RTS
-*-----------------------------------------------------------
 
-*---------- Example Subroutine -----------------------------
-* Example Description
 *-----------------------------------------------------------
-
 *-- Generic Subroutines ------------------------------------
+*-----------------------------------------------------------
 
 *---------- Unimplemented EA -------------------------------
 * Prints error message for EA subroutines that have not been
@@ -599,7 +662,9 @@ EA_SIZE_BITS:
     LSR.W       D2, D7              ; Perform shift (zeros shifted in)
     RTS
 
+*-----------------------------------------------------------
 *-- Read & Print Subroutines -------------------------------
+*-----------------------------------------------------------
 
 *---------- Data Register Direct ---------------------------
 * Prints the data register direct operand based on register
