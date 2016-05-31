@@ -342,25 +342,18 @@ EA_ADDQ:
 EA_AND:
     JSR         EA_UNIMPLEMENTED
     RTS
-*---------- ASL Effective Addresses -------------------------
+*---------- ASd Effective Addresses -------------------------
 * Parses and prints the effective addressing information for
-* the ASL opcode
+* the ASd opcode
 *-----------------------------------------------------------
-EA_ASL: *TODO MIGHT BE SAME AS ASR
-    JSR         EA_UNIMPLEMENTED
-    RTS
-*---------- ASR Effective Addresses ------------------------
-* Parses and prints the effective addressing information for
-* the ASR opcode
-*-----------------------------------------------------------
-EA_ASR:
+EA_ASd:
     JSR         EA_UNIMPLEMENTED
     RTS
 *---------- BCC Effective Addresses ------------------------
 * Parses and prints the effective addressing information for
 * the BCC opcode
 *-----------------------------------------------------------
-EA_BCC:
+EA_BCC: *ONLY BCC, BGT, BLE
     JSR         EA_UNIMPLEMENTED
     RTS
 *---------- CLR Effective Addresses ------------------------
@@ -398,18 +391,11 @@ EA_JSR:
 EA_LEA:
     JSR         EA_UNIMPLEMENTED
     RTS
-*---------- LSL Effective Addresses ------------------------
+*---------- LSd Effective Addresses ------------------------
 * Parses and prints the effective addressing information for
-* the LSL opcode
+* the LSd opcode
 *-----------------------------------------------------------
-EA_LSL: *TODO might be same as lsr
-    JSR         EA_UNIMPLEMENTED
-    RTS
-*---------- LSR Effective Addresses ------------------------
-* Parses and prints the effective addressing information for
-* the LSR opcode
-*-----------------------------------------------------------
-EA_LSR:
+EA_LSd:
     JSR         EA_UNIMPLEMENTED
     RTS
 *---------- MOVE Effective Addresses -----------------------
@@ -533,25 +519,11 @@ EA_NOP:
 EA_OR:
     JSR         EA_UNIMPLEMENTED
     RTS
-*---------- ROL Effective Addresses ------------------------
+*---------- ROd Effective Addresses ------------------------
 * Parses and prints the effective addressing information for
-* the ROL opcode
+* the ROd opcode
 *-----------------------------------------------------------
-EA_ROL: *todo might be same as ror
-    JSR         EA_UNIMPLEMENTED
-    RTS
-*---------- ROR Effective Addresses ------------------------
-* Parses and prints the effective addressing information for
-* the ROR opcode
-*-----------------------------------------------------------
-EA_ROR:
-    JSR         EA_UNIMPLEMENTED
-    RTS
-*---------- RTS Effective Addresses ------------------------
-* Parses and prints the effective addressing information for
-* the RTS opcode
-*-----------------------------------------------------------
-EA_RTS:
+EA_ROd:
     JSR         EA_UNIMPLEMENTED
     RTS
 *---------- SUB Effective Addresses ------------------------
