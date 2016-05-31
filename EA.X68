@@ -61,7 +61,7 @@ ADD_OPMODE_111: ; Invalid value
 *-----------------------------------
 *--- Mode 1 ------------------------
 ADD_MODE_1:
-    CLR         D0                  ; Clear data register 0
+    CLR.L       D0                  ; Clear data register 0
     MOVE.B      #1, D0              ; Save mode number to D0
     MOVE.W      D7, D1              ; Save register value for printing dest. operand
     JSR         EA_DEFAULT_COMBO    ; Stores mode bits in D6, register bits in D7
@@ -73,7 +73,7 @@ ADD_MODE_1:
 *-----------------------------------
 *--- Mode 2 ------------------------
 ADD_MODE_2:
-    CLR         D0                  ; Clear data register 0
+    CLR.L       D0                  ; Clear data register 0
     MOVE.B      #2, D0              ; Save mode number to D0
     JSR         EA_PRINT_DN         ; Print data register
     *PRINT COMMA TODO
@@ -156,7 +156,7 @@ ADD_END:
 
 *---------- ADDA Effective Addresses ------------------------
 * Parses and prints the effective addressing information for
-* the ADD opcode
+* the ADDA opcode
 *-----------------------------------------------------------
 EA_ADDA:
     MOVEM.L     A0-A5/D0-D7, -(SP)  ; Save registers (except A6, global pointer to word to read)
@@ -227,6 +227,10 @@ ADDA_END:
     JSR         EA_UPDATE_POINTER   ; Update global pointer
     MOVEM.L     (SP)+, A0-A5/D0-D7  ; Restore registers (except A6, global pointer to word to read)
     RTS
+
+*---------- ADDI Effective Addresses ------------------------
+* Parses and prints the effective addressing information for
+* the ADDI opcode
 *-----------------------------------------------------------
 EA_ADDI:
     MOVEM.L     A0-A5/D0-D7, -(SP)  ; Save registers (except A6, global pointer to word to read)
@@ -248,19 +252,83 @@ EA_ADDI:
     JMP         ADDI_END
 *--- Print immediate data ----------
 ADDI_B:
-    ADDA.W      #$02, A5            ; Increment A5 past current word
-    MOVE.W      (A5), D0
-    *TODO isolate bits
+    ADDA.W      #$2, A5             ; Increment A5 past current word
+    CLR.L       D0
+    MOVE.W      (A5), D0            ; read next word in memory and save
+    MOVE.B      #8, D2              ; Clear upper 8 bits of operand word
+    LSL.W       D2, D0              ; Perform shift (zeros shifted in)
+    MOVE.B      #8, D2             ; 'Right-align' bits 0-7 to get value
+    LSR.W       D2, D0              ; Perform shift (zeros shifted in)
     *print data
+    ADDA.W      #$2, A5             ; Increment A5 past operand word
     JMP         ADDI_GET_DEST
 ADDI_W:
-    ADDA.W      #$02, A5            ; Increment A5 past current word
+    ADDA.W      #$2, A5             ; Increment A5 past current word
+    CLR.L       D0
+    MOVE.W      (A5), D0            ; read next word in memory and save
+    *print data
+    ADDA.W      #$2, A5             ; Increment A5 past operand word
+    JMP         ADDI_GET_DEST
 ADDI_L:
-    ADDA.W      #$02, A5            ; Increment A5 past current word
-
-
+    ADDA.W      #$2, A5             ; Increment A5 past current word
+    MOVE.L      (A5), D0            ; read next two words in memory and save
+    ADDA.W      #$4, A5             ; Increment A5 past operand longword
+*--- Get destination operand -------
 ADDI_GET_DEST:
     *PRINT COMMA
+    JSR         EA_DEFAULT_COMBO    ; get mode bits in D6, register bits in D7
+    LEA         ADDI_MODE, A0       ; Set index '0' for jump table
+    MULU        #6, D6              ; Form offset (move 6 bytes in memory for every 'JMP' command)
+    JMP         0(A0, D6)           ; Jump indirect with index, i.e. jump to 'table' + displacement
+*--- Check validity based on mode value
+ADDI_MODE:
+    JMP         ADDI_MODE_000       ; Dn
+    JMP         ADDI_MODE_001       ; Invalid: An
+    JMP         ADDI_MODE_010       ; (An)
+    JMP         ADDI_MODE_011       ; (An)+
+    JMP         ADDI_MODE_100       ; -(An)
+    JMP         ADDI_MODE_101       ; Invalid: Address Register Indirect with Displacement Mode
+    JMP         ADDI_MODE_110       ; Invalid: Address Register Indirect with Index (8-Bit Displacement)
+    JMP         ADDI_MODE_111       ; The rest (not all valid, validated by register number)
+*-----------------------------------
+*--- EA mode jump table options ----
+ADDI_MODE_000: ; Dn
+    JSR         EA_PRINT_DN         ; Print data register direct operand
+    JMP         ADDI_END
+ADDI_MODE_001: ; Invalid: An
+    JSR         EA_INVALID          ; Opcode word is Invalid
+    JMP         ADDI_END
+ADDI_MODE_010: ; (An)
+    JSR         EA_PRINT_AN_IND     ; Print address register indirect
+    JMP         ADDI_END            ; End evaluation of ea mode
+ADDI_MODE_011: ; (An)+
+    JSR         EA_PRINT_POSTINC    ; Print address register indirect with post increment
+    JMP         ADDI_END            ; End evaluation of ea mode
+ADDI_MODE_100: ; -(An)
+    JSR         EA_PRINT_PREDEC     ; Print address register indirect with pre decrement
+    JMP         ADDI_END            ; End evaluation of ea mode
+ADDI_MODE_101: ; Invalid: Address Register Indirect with Displacement Mode
+    JSR         EA_INVALID          ; Opcode word is Invalid
+    JMP         ADDI_END
+ADDI_MODE_110: ; Invalid: Address Register Indirect with Index (8-Bit Displacement)
+    JSR         EA_INVALID          ; Opcode word is Invalid
+    JMP         ADDI_END
+ADDI_MODE_111: ; The rest (not all valid, validated by register number)
+    CMP.B       #$00, D7            ; Test for absolute word address
+    BEQ         ADDI_ABS_W
+    CMP.B       #$01, D7            ; Test for absolute long address
+    BEQ         ADDI_ABS_L
+    JSR         EA_INVALID          ; else, invalid
+    JMP         ADDI_END
+*-----------------------------------
+*--- Valid options for mode 111 ----
+ADDI_ABS_W:
+    JSR         EA_PRINT_ABS_W      ; Print absolute word address operand
+    JMP         ADDI_END
+ADDI_ABS_L:
+    JSR         EA_PRINT_ABS_L      ; Print absolute long address operand
+    JMP         ADDI_END
+*-----------------------------------
 ADDI_END:
     JSR         EA_UPDATE_POINTER   ; Update global pointer
     MOVEM.L     (SP)+, A0-A5/D0-D7  ; Restore registers (except A6, global pointer to word to read)
