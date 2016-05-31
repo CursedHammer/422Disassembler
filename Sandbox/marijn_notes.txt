@@ -1,0 +1,4 @@
+- increment pointer after opcode subroutines w/ no EA
+- add EA subroutine calls to opcode end code
+- unimplemented message does not reset buffer, just adds to it
+- sort out printing messages vs. printing data
