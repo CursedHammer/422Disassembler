@@ -79,7 +79,7 @@ DONE    MOVEM.W     (SP)+,  A0-A7/D0-D7 ; Restore registers
 BCCorBGTorBLE       LEA     STACK,SP            ; Load the SP
                     LEA     tableBCCorBGTorBLE, A0            ; Index into the table
                     CLR.L   D0                  ; Zero it
-                    MOVE.W  #example,D0         ; We'll play with it here
+                    MOVE.W  (A6),D0         ; We'll play with it here
                     MOVE.B  #6,D1           ; Shift 6 bits left
                     ASL.W   D1,D0
                     MOVE.B  #shift,D1           ; Shift 12 bits to the right
@@ -113,7 +113,7 @@ BCCorBGTorBLEcode11    JSR     ISBLE
 OR_BorOR_WorOR_LorDIVU:
         LEA         tableOR_BorOR_WorOR_LorDIVU, A0 ; Index into the table
         CLR.L       D0              ; Zero it
-        MOVE.W      #example,D0     ; We'll play with it here
+        MOVE.W      (A6),D0     ; We'll play with it here
         MOVE.B      #7,D1           ; Shift 7 bits left
         ASL.W       D1,D0
         MOVE.B      #shift,D1       ; Shift 12 bits to the right
@@ -150,14 +150,14 @@ OR_DIVUcode101 JSR  ISORW
 OR_DIVUcode110 JSR  ISORL
                RTS
 OR_DIVUcode111 JSR    OPCODE_INVALID              ;INVALID
-		       RTS                 
+		       RTS
 *----------- END  ADD_BorADD_WorADD_L ----------------------
 
 *****************************  MULSLorDIVUL ************************************
 MULSLorDIVUL        LEA     STACK,SP            ; Load the SP
                     LEA     tableMULSLorDIVUL, A0            ; Index into the table
                     CLR.L   D0                  ; Zero it
-                    MOVE.W  #example,D0         ; We'll play with it here
+                    MOVE.W  (A6),D0         ; We'll play with it here
                     MOVE.B  #6,D1           ; Shift 6 bits left
                     ASL.W   D1,D0
                     MOVE.B  #shift,D1           ; Shift 12 bits to the right
@@ -180,7 +180,7 @@ MULSLorDIVULcode1   JSR     ISDIVUL
 someASR:
         LEA         tableSomeASR, A0 ; Index into the table
         CLR.L       D0              ; Zero it
-        MOVE.W      #example,D0     ; We'll play with it here
+        MOVE.W      (A6),D0     ; We'll play with it here
         MOVE.B      #8,D1           ; Shift 8 bits left
         ASL.W       D1,D0
         MOVE.B      #shift,D1       ; Shift 12 bits to the right
@@ -204,14 +204,14 @@ ASRcode01 JSR       ISASRW
 ASRcode10 JSR       ISASRL
           RTS
 ASRcode11 JSR    OPCODE_INVALID              ;INVALID
-		  RTS          
+		  RTS
 *----------- END someLSL -----------------------------------
 
 *----------- someASL ---------------------------------------
 someASL:
         LEA         tableSomeASL, A0 ; Index into the table
         CLR.L       D0              ; Zero it
-        MOVE.W      #example,D0     ; We'll play with it here
+        MOVE.W      (A6),D0     ; We'll play with it here
         MOVE.B      #8,D1           ; Shift 8 bits left
         ASL.W       D1,D0
         MOVE.B      #shift,D1       ; Shift 12 bits to the right
@@ -227,7 +227,7 @@ tableSomeASL:
         JMP         ASLcode01       *ASL.W
         JMP         ASLcode10       *ASL.L
         JMP         ASLcode11       ; INVALID
-        
+
 ASLcode00 JSR       ISASLB
           RTS
 ASLcode01 JSR       ISASLW
@@ -235,14 +235,14 @@ ASLcode01 JSR       ISASLW
 ASLcode10 JSR       ISASLL
           RTS
 ASLcode11 JSR       OPCODE_INVALID ; INVALID
-		  RTS         
+		  RTS
 *----------- END someLSL -----------------------------------
 
 *----------- someLSR ---------------------------------------
 someLSR:
         LEA         tableSomeLSR, A0 ; Index into the table
         CLR.L       D0              ; Zero it
-        MOVE.W      #example,D0     ; We'll play with it here
+        MOVE.W      (A6),D0     ; We'll play with it here
         MOVE.B      #8,D1           ; Shift 8 bits left
         ASL.W       D1,D0
         MOVE.B      #shift,D1       ; Shift 12 bits to the right
@@ -265,14 +265,14 @@ LSRcode01 JSR       ISLSRW
 LSRcode10 JSR       ISLSRL
           RTS
 LSRcode11 JSR    OPCODE_INVALID              ;INVALID
-		  RTS          
+		  RTS
 *----------- END someLSR -----------------------------------
 
 *----------- someLSL ---------------------------------------
 someLSL:
         LEA         tableSomeLSL, A0 ; Index into the table
         CLR.L       D0              ; Zero it
-        MOVE.W      #example,D0     ; We'll play with it here
+        MOVE.W      (A6),D0     ; We'll play with it here
         MOVE.B      #8,D1           ; Shift 8 bits left
         ASL.W       D1,D0
         MOVE.B      #shift,D1       ; Shift 12 bits to the right
@@ -296,14 +296,14 @@ LSLcode01 JSR       ISLSLW
 LSLcode10 JSR       ISLSLL
           RTS
 LSLcode11 JSR       OPCODE_INVALID              ;INVALID
-		  RTS          
+		  RTS
 *----------- END someLSL -----------------------------------
 
 *----------- someROL ---------------------------------------
 someROL:
         LEA         tableSomeROL, A0 ; Index into the table
         CLR.L       D0              ; Zero it
-        MOVE.W      #example,D0     ; We'll play with it here
+        MOVE.W      (A6),D0     ; We'll play with it here
         MOVE.B      #8,D1           ; Shift 8 bits left
         ASL.W       D1,D0
         MOVE.B      #shift,D1       ; Shift 12 bits to the right
@@ -319,7 +319,7 @@ tableSomeROL:
         JMP         ROLcode01       *ROL.W
         JMP         ROLcode10       *ROL.L
         JMP         ROLcode11       ; INVALID
-        
+
 ROLcode00 JSR       ISROLB
           RTS
 ROLcode01 JSR       ISROLW
@@ -327,7 +327,7 @@ ROLcode01 JSR       ISROLW
 ROLcode10 JSR       ISROLL
           RTS
 ROLcode11 JSR       OPCODE_INVALID              ;INVALID
-		  RTS          
+		  RTS
 *----------- END someROR -----------------------------------
 
 
@@ -335,7 +335,7 @@ ROLcode11 JSR       OPCODE_INVALID              ;INVALID
 someROR:
         LEA         tableSomeROR, A0 ; Index into the table
         CLR.L       D0              ; Zero it
-        MOVE.W      #example,D0     ; We'll play with it here
+        MOVE.W      (A6),D0     ; We'll play with it here
         MOVE.B      #8,D1           ; Shift 8 bits left
         ASL.W       D1,D0
         MOVE.B      #shift,D1       ; Shift 12 bits to the right
@@ -359,14 +359,14 @@ RORcode01 JSR       ISRORW
 RORcode10 JSR       ISRORL
           RTS
 RORcode11 JSR       OPCODE_INVALID ; INVALID
-		  RTS          
+		  RTS
 *----------- END someROR -----------------------------------
 
 *----------- ROL_ROR ---------------------------------------
 ROL_ROR:
         LEA         tableROL_ROR, A0 ; Index into the table
         CLR.L       D0              ; Zero it
-        MOVE.W      #example,D0     ; We'll play with it here
+        MOVE.W      (A6),D0     ; We'll play with it here
         MOVE.B      #7,D1           ; Shift 7 bits left
         ASL.W       D1,D0
         MOVE.B      #shift,D1       ; Shift 12 bits to the right
@@ -391,7 +391,7 @@ ROL_RORcode1 JSR    someROL
 LSL_LSR:
         LEA         tableLSL_LSR, A0 ; Index into the table
         CLR.L       D0              ; Zero it
-        MOVE.W      #example,D0     ; We'll play with it here
+        MOVE.W      (A6),D0     ; We'll play with it here
         MOVE.B      #7,D1           ; Shift 7 bits left
         ASL.W       D1,D0
         MOVE.B      #shift,D1       ; Shift 12 bits to the right
@@ -416,7 +416,7 @@ LSL_LSRcode1 JSR    someLSL
 ASL_ASR:
         LEA         tableASL_ASR, A0 ; Index into the table
         CLR.L       D0              ; Zero it
-        MOVE.W      #example,D0     ; We'll play with it here
+        MOVE.W      (A6),D0     ; We'll play with it here
         MOVE.B      #7,D1           ; Shift 7 bits left
         ASL.W       D1,D0
         MOVE.B      #shift,D1       ; Shift 12 bits to the right
@@ -441,7 +441,7 @@ ASL_ASRcode1 JSR    someASL
 ROd_LSd_ASd:
         LEA         tableROd_LSd_ASd, A0 ; Index into the table
         CLR.L       D0              ; Zero it
-        MOVE.W      #example,D0     ; We'll play with it here
+        MOVE.W      (A6),D0     ; We'll play with it here
         MOVE.B      #11,D1          ; Shift 11 bits left
         ASL.W       D1,D0
         MOVE.B      #shift,D1       ; Shift 12 bits to the right
@@ -472,7 +472,7 @@ ROd_LSd_ASdcode11 JSR ROL_ROR
 AND_BorAND_WorAND_LorMULS_W:
         LEA         tableAND_BorAND_WorAND_LorMULS_W, A0            ; Index into the table
         CLR.L       D0                  ; Zero it
-        MOVE.W      #example,D0         ; We'll play with it here
+        MOVE.W      (A6),D0         ; We'll play with it here
         MOVE.B      #7,D1           ; Shift 7 bits left
         ASL.W       D1,D0
         MOVE.B      #shift,D1           ; Shift 12 bits to the right
@@ -515,7 +515,7 @@ ANDcode111 JSR      ISMULSW
 ADD_BorADD_WorADD_L:
         LEA         tableADD_BorADD_WorADD_L, A0 ; Index into the table
         CLR.L       D0              ; Zero it
-        MOVE.W      #example,D0     ; We'll play with it here
+        MOVE.W      (A6),D0     ; We'll play with it here
         MOVE.B      #7,D1           ; Shift 7 bits left
         ASL.W       D1,D0
         MOVE.B      #shift,D1       ; Shift 12 bits to the right
@@ -558,7 +558,7 @@ ADDcode111 JSR      ISADDAL
 SUB_BorSUB_WorSUB_L:
         LEA         tableSUB_BorSUB_WorSUB_L, A0 ; Index into the table
         CLR.L       D0              ; Zero it
-        MOVE.W      #example,D0     ; We'll play with it here
+        MOVE.W      (A6),D0     ; We'll play with it here
         MOVE.B      #7,D1           ; Shift 7 bits left
         ASL.W       D1,D0
         MOVE.B      #shift,D1       ; Shift 12 bits to the right
@@ -578,7 +578,7 @@ tableSUB_BorSUB_WorSUB_L:
         JMP         SUBcode101      *SUB.W
         JMP         SUBcode110      *SUB.L
         JMP         SUBcode111      ; INVALID
-        
+
 SUBcode000 JSR      ISSUBB
            RTS
 SUBcode001 JSR      ISSUBW
@@ -594,14 +594,14 @@ SUBcode101 JSR      ISSUBW
 SUBcode110 JSR      ISSUBL
            RTS
 SUBcode111 JSR      OPCODE_INVALID              ;INVALID
-		   RTS           
+		   RTS
 *----------- END  SUB_BorSUB_WorSUB_L ----------------------
 
 *----------- CMP_BorCMP_WorCMP_L ---------------------------
 CMP_BorCMP_WorCMP_L:
         LEA         tableCMP_BorCMP_WorCMP_L, A0 ; Index into the table
         CLR.L       D0              ; Zero it
-        MOVE.W      #example,D0     ; We'll play with it here
+        MOVE.W      (A6),D0     ; We'll play with it here
         MOVE.B      #8,D1           ; Shift 8 bits left
         ASL.W       D1,D0
         MOVE.B      #shift,D1       ; Shift 12 bits to the right
@@ -625,14 +625,14 @@ CMPcode01   JSR      ISCMPW
 CMPcode10   JSR      ISCMPL
             RTS
 CMPcode11   JSR    OPCODE_INVALID              ;INVALID
-		    RTS            
+		    RTS
 *----------- END CMP_BorCMP_WorCMP_L -----------------------
 
 *----------- ADDQ_BorADDQ_WorADDQ_L ------------------------
 ADDQ_BorADDQ_WorADDQ_L:
         LEA         tableADDQ_BorADDQ_WorADDQ_L, A0 ; Index into the table
         CLR.L       D0              ; Zero it
-        MOVE.W      #example,D0     ; We'll play with it here
+        MOVE.W      (A6),D0     ; We'll play with it here
         MOVE.B      #8,D1           ; Shift 8 bits left
         ASL.W       D1,D0
         MOVE.B      #shift,D1       ; Shift 12 bits to the right
@@ -648,7 +648,7 @@ tableADDQ_BorADDQ_WorADDQ_L:
         JMP         ADDQcode01      *ADDQ.W
         JMP         ADDQcode10      *ADDQ.L
         JMP         ADDQcode11      ; INVALID
-        
+
 ADDQcode00 JSR      ISADDQB
            RTS
 ADDQcode01 JSR      ISADDQW
@@ -656,14 +656,14 @@ ADDQcode01 JSR      ISADDQW
 ADDQcode10 JSR      ISADDQL
            RTS
 ADDQcode11   JSR    OPCODE_INVALID              ;INVALID
-		    RTS           
+		    RTS
 *----------- END ADDQ_BorADDQ_WorADDQ_L --------------------
 
 *----------- someCLR ---------------------------------------
 someCLR:
         LEA         tableSomeCLR, A0 ; Index into the table
         CLR.L       D0              ; Zero it
-        MOVE.W      #example,D0     ; We'll play with it here
+        MOVE.W      (A6),D0     ; We'll play with it here
         MOVE.B      #8,D1           ; Shift 8 bits left
         ASL.W       D1,D0
         MOVE.B      #shift,D1       ; Shift 12 bits to the right
@@ -687,14 +687,14 @@ CLRcode01 JSR       ISCLRW
 CLRcode10 JSR       ISCLRL
           RTS
 CLRcode11 JSR    OPCODE_INVALID              ;INVALID
-		  RTS          
+		  RTS
 *----------- END someCLR -----------------------------------
 
 *----------- NOPorCLRorRTSorJSR ----------------------------
 NOPorCLRorRTSorJSR:
         LEA         tableNOPorCLRorRTSorJSR, A0 ; Index into the table
         CLR.L       D0              ; Zero it
-        MOVE.W      #example,D0     ; We'll play with it here
+        MOVE.W      (A6),D0     ; We'll play with it here
 
         MOVE.W      #%0100111001110001, D1 ; 0100111001110001 = NOP
         CMP.W       D0, D1
@@ -772,7 +772,7 @@ JSRorCLRcode1111 JSR    OPCODE_INVALID              ;INVALID
 someMOVEM:
         LEA         tableSomeMOVEM, A0 ; Index into the table
         CLR.L       D0              ; Zero it
-        MOVE.W      #example,D0     ; We'll play with it here
+        MOVE.W      (A6),D0     ; We'll play with it here
         MOVE.B      #9,D1           ; Shift 9 bits left
         ASL.W       D1,D0
         MOVE.B      #shift,D1       ; Shift 12 bits to the right
@@ -797,7 +797,7 @@ MOVEMcode1 JSR      ISMOVEML
 NOP_MOVEM_LEA_JSR_CLR_RTS:
         LEA         tableNOP_MOVEM_LEA_JSR_CLR_RTS, A0 ; Index into the table
         CLR.L       D0              ; Zero it
-        MOVE.W      #example,D0     ; We'll play with it here
+        MOVE.W      (A6),D0     ; We'll play with it here
         MOVE.B      #7,D1           ; Shift 7 bits right
         ASR.W       D1,D0
         MOVE.B      #13,D1          ; Shift 13 bits left
@@ -864,7 +864,7 @@ LOTScode1111 JSR    OPCODE_INVALID              ;INVALID
 ADDI_BorADDI_WorADDI_L:
         LEA         tableADDI_BorADDI_WorADDI_L,A0 ; Index into the table
         CLR.L       D0              ; Zero it
-        MOVE.W      #example,D0     ; We'll play with it here
+        MOVE.W      (A6),D0     ; We'll play with it here
         MOVE.B      #7,D1           ; Shift 7 bits left
         ASL.W       D1,D0
         MOVE.B      #13,D1
@@ -885,14 +885,14 @@ ADDIWcode01 JSR     ISADDIW
 ADDILcode10 JSR     ISADDIL
             RTS
 ADDILcode11 JSR    OPCODE_INVALID              ;INVALID
-			RTS             
+			RTS
 *----------- END ADDI_BorADDI_WorADDI_L --------------------
 
 *----------- MOVEA_LorMOVE_L -------------------------------
 MOVEA_LorMOVE_L:
         LEA         tableMOVEA_LorMOVE_L,A0 ; Index into the table
         CLR.L       D0              ; Zero it
-        MOVE.W      #example,D0     ; We'll play with it here
+        MOVE.W      (A6),D0         ; We'll play with it here
         MOVE.B      #7,D1           ; Shift 7 bits left
         ASL.W       D1,D0           ; 0011 1010 0100 0100 to 0010 0000 0000 0000
         MOVE.B      #13,D1          ; Shift 13 bits right
@@ -932,7 +932,7 @@ MOVEcode111 JSR     ISMOVEL
 MOVEA_WorMOVE_W:
         LEA         tableMOVEA_WorMOVE_W,A0 ; Index into the table
         CLR.L       D0              ; Zero it
-        MOVE.W      #example,D0     ; We'll play with it here
+        MOVE.W      (A6),D0     ; We'll play with it here
         MOVE.B      #7,D1           ; Shift 7 bits left
         ASL.W       D1,D0           ; 0011 1010 0100 0100 to 0010 0000 0000 0000
         MOVE.B      #13,D1          ; Shift 13 bits right
@@ -979,19 +979,19 @@ OPCODE_INVALID  MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
 
             MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
             RTS
-            
+
 ISBCC  MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
             LEA MESSAGEBCC, A1
             MOVE.B  #14, D0
             TRAP    #15
-
+            JSR     EA_BCC
             MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
             RTS
 ISBGT  MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
             LEA MESSAGEBGT, A1
             MOVE.B  #14, D0
             TRAP    #15
-
+            JSR     EA_BCC
             MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
             RTS
 
@@ -999,7 +999,7 @@ ISBLE  MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
             LEA MESSAGEBLE, A1
             MOVE.B  #14, D0
             TRAP    #15
-
+            JSR     EA_BCC
             MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
             RTS
 
@@ -1007,7 +1007,7 @@ ISDIVUL     MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
             LEA MESSAGEDIVUL, A1
             MOVE.B  #14, D0
             TRAP    #15
-
+            JSR     EA_DIVU
             MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
             RTS
 
@@ -1015,7 +1015,7 @@ ISDIVUW     MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
             LEA MESSAGEDIVUW, A1
             MOVE.B  #14, D0
             TRAP    #15
-
+            JSR     EA_DIVU
             MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
             RTS
 
@@ -1023,6 +1023,7 @@ ISORB   MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
         LEA         MESSAGEORB, A1
         MOVE.B      #14, D0
         TRAP        #15
+        JSR         EA_OR
         MOVEM.W     (SP)+,  A0-A7/D0-D7 ; Restore registers
         RTS
 
@@ -1030,6 +1031,7 @@ ISORW   MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
         LEA         MESSAGEORW, A1
         MOVE.B      #14, D0
         TRAP        #15
+        JSR         EA_OR
         MOVEM.W     (SP)+,  A0-A7/D0-D7 ; Restore registers
         RTS
 
@@ -1037,6 +1039,7 @@ ISORL   MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
         LEA         MESSAGEORL, A1
         MOVE.B      #14, D0
         TRAP        #15
+        JSR         EA_OR
         MOVEM.W     (SP)+,  A0-A7/D0-D7 ; Restore registers
         RTS
 
@@ -1044,6 +1047,7 @@ ISASRB  MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
         LEA         MESSAGEASRB, A1
         MOVE.B      #14, D0
         TRAP        #15
+        JSR         EA_ASd
         MOVEM.W     (SP)+,  A0-A7/D0-D7 ; Restore registers
         RTS
 
@@ -1051,6 +1055,7 @@ ISASRW  MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
         LEA         MESSAGEASRW, A1
         MOVE.B      #14, D0
         TRAP        #15
+        JSR         EA_ASd
         MOVEM.W     (SP)+,  A0-A7/D0-D7 ; Restore registers
         RTS
 
@@ -1058,6 +1063,7 @@ ISASRL  MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
         LEA         MESSAGEASRL, A1
         MOVE.B      #14, D0
         TRAP        #15
+        JSR         EA_ASd
         MOVEM.W     (SP)+,  A0-A7/D0-D7 ; Restore registers
         RTS
 
@@ -1065,6 +1071,7 @@ ISASLB  MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
         LEA         MESSAGEASLB, A1
         MOVE.B      #14, D0
         TRAP        #15
+        JSR         EA_ASd
         MOVEM.W     (SP)+,  A0-A7/D0-D7 ; Restore registers
         RTS
 
@@ -1072,6 +1079,7 @@ ISASLW  MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
         LEA         MESSAGEASLW, A1
         MOVE.B      #14, D0
         TRAP        #15
+        JSR         EA_ASd
         MOVEM.W     (SP)+,  A0-A7/D0-D7 ; Restore registers
         RTS
 
@@ -1079,6 +1087,7 @@ ISASLL  MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
         LEA         MESSAGEASLL, A1
         MOVE.B      #14, D0
         TRAP        #15
+        JSR         EA_ASd
         MOVEM.W     (SP)+,  A0-A7/D0-D7 ; Restore registers
         RTS
 
@@ -1086,6 +1095,7 @@ ISLSRB  MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
         LEA         MESSAGELSRB, A1
         MOVE.B      #14, D0
         TRAP        #15
+        JSR         EA_LSd
         MOVEM.W     (SP)+,  A0-A7/D0-D7 ; Restore registers
         RTS
 
@@ -1093,6 +1103,7 @@ ISLSRW  MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
         LEA         MESSAGELSRW, A1
         MOVE.B      #14, D0
         TRAP        #15
+        JSR         EA_LSd
         MOVEM.W     (SP)+,  A0-A7/D0-D7 ; Restore registers
         RTS
 
@@ -1100,6 +1111,7 @@ ISLSRL  MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
         LEA         MESSAGELSRL, A1
         MOVE.B      #14, D0
         TRAP        #15
+        JSR         EA_LSd
         MOVEM.W     (SP)+,  A0-A7/D0-D7 ; Restore registers
         RTS
 
@@ -1107,6 +1119,7 @@ ISLSLB  MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
         LEA         MESSAGELSLB, A1
         MOVE.B      #14, D0
         TRAP        #15
+        JSR         EA_LSd
         MOVEM.W     (SP)+,  A0-A7/D0-D7 ; Restore registers
         RTS
 
@@ -1114,6 +1127,7 @@ ISLSLW  MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
         LEA         MESSAGELSLW, A1
         MOVE.B      #14, D0
         TRAP        #15
+        JSR         EA_LSd
         MOVEM.W     (SP)+,  A0-A7/D0-D7 ; Restore registers
         RTS
 
@@ -1121,6 +1135,7 @@ ISLSLL  MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
         LEA         MESSAGELSLL, A1
         MOVE.B      #14, D0
         TRAP        #15
+        JSR         EA_LSd
         MOVEM.W     (SP)+,  A0-A7/D0-D7 ; Restore registers
         RTS
 
@@ -1128,6 +1143,7 @@ ISRORB  MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
         LEA         MESSAGERORB, A1
         MOVE.B      #14, D0
         TRAP        #15
+        JSR         EA_ROd
         MOVEM.W     (SP)+,  A0-A7/D0-D7 ; Restore registers
         RTS
 
@@ -1135,6 +1151,7 @@ ISRORW  MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
         LEA         MESSAGERORW, A1
         MOVE.B      #14, D0
         TRAP        #15
+        JSR         EA_ROd
         MOVEM.W     (SP)+,  A0-A7/D0-D7 ; Restore registers
         RTS
 
@@ -1142,6 +1159,7 @@ ISRORL  MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
         LEA         MESSAGERORL, A1
         MOVE.B      #14, D0
         TRAP        #15
+        JSR         EA_ROd
         MOVEM.W     (SP)+,  A0-A7/D0-D7 ; Restore registers
         RTS
 
@@ -1149,6 +1167,7 @@ ISROLB  MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
         LEA         MESSAGEROLB, A1
         MOVE.B      #14, D0
         TRAP        #15
+        JSR         EA_ROd
         MOVEM.W     (SP)+,  A0-A7/D0-D7 ; Restore registers
         RTS
 
@@ -1156,6 +1175,7 @@ ISROLW  MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
         LEA         MESSAGEROLW, A1
         MOVE.B      #14, D0
         TRAP        #15
+        JSR         EA_ROd
         MOVEM.W     (SP)+,  A0-A7/D0-D7 ; Restore registers
         RTS
 
@@ -1163,7 +1183,7 @@ ISROLL  MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
         LEA         MESSAGEROLL, A1
         MOVE.B      #14, D0
         TRAP        #15
-
+        JSR         EA_ROd
         MOVEM.W     (SP)+,  A0-A7/D0-D7 ; Restore registers
         RTS
 
@@ -1171,6 +1191,7 @@ ISMULSL MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
         LEA         MESSAGEMULSL, A1 *OPCODE is MULS.L
         MOVE.B      #14, D0
         TRAP        #15
+        *TODO may not need this opcode word, so no EA call for now
         MOVEM.W     (SP)+,  A0-A7/D0-D7 ; Restore registers
         RTS
 
@@ -1178,6 +1199,7 @@ ISMULSW MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
         LEA         MESSAGEMULSW, A1 *OPCODE is MULS.W
         MOVE.B      #14, D0
         TRAP        #15
+        JSR         EA_MULS_W
         MOVEM.W     (SP)+,  A0-A7/D0-D7 ; Restore registers
         RTS
 
@@ -1185,6 +1207,7 @@ ISANDB  MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
         LEA         MESSAGEANDB, A1 *OPCODE is AND.B
         MOVE.B      #14, D0
         TRAP        #15
+        JSR         EA_AND
         MOVEM.W     (SP)+,  A0-A7/D0-D7 ; Restore registers
         RTS
 
@@ -1192,6 +1215,7 @@ ISANDW  MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
         LEA         MESSAGEANDW, A1 *OPCODE is AND.W
         MOVE.B      #14, D0
         TRAP        #15
+        JSR         EA_AND
         MOVEM.W     (SP)+,  A0-A7/D0-D7 ; Restore registers
         RTS
 
@@ -1199,6 +1223,7 @@ ISANDL  MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
         LEA         MESSAGEANDL, A1 *OPCODE is AND.L
         MOVE.B      #14, D0
         TRAP        #15
+        JSR         EA_AND
         MOVEM.W     (SP)+,  A0-A7/D0-D7 ; Restore registers
         RTS
 
@@ -1206,6 +1231,7 @@ ISADDAW  MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
         LEA         MESSAGEADDAW, A1 *OPCODE is ADDA.W
         MOVE.B      #14, D0
         TRAP        #15
+        JSR         EA_ADDA
         MOVEM.W     (SP)+,  A0-A7/D0-D7 ; Restore registers
         RTS
 
@@ -1213,6 +1239,7 @@ ISADDAL MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
         LEA         MESSAGEADDAL, A1 *OPCODE is ADDA.L
         MOVE.B      #14, D0
         TRAP        #15
+        JSR         EA_ADDA
         MOVEM.W     (SP)+,  A0-A7/D0-D7 ; Restore registers
         RTS
 
@@ -1220,6 +1247,7 @@ ISADDB  MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
         LEA         MESSAGEADDB, A1 *OPCODE is ADD.B
         MOVE.B      #14, D0
         TRAP        #15
+        JSR         EA_ADD
         MOVEM.W     (SP)+,  A0-A7/D0-D7 ; Restore registers
         RTS
 
@@ -1227,6 +1255,7 @@ ISADDW  MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
         LEA         MESSAGEADDW, A1 *OPCODE is ADD.W
         MOVE.B      #14, D0
         TRAP        #15
+        JSR         EA_ADD
         MOVEM.W     (SP)+,  A0-A7/D0-D7 ; Restore registers
         RTS
 
@@ -1234,6 +1263,7 @@ ISADDL  MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
         LEA         MESSAGEADDL, A1 *OPCODE is ADD.L
         MOVE.B      #14, D0
         TRAP        #15
+        JSR         EA_ADD
         MOVEM.W     (SP)+,  A0-A7/D0-D7 ; Restore registers
         RTS
 
@@ -1241,6 +1271,7 @@ ISSUBB  MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
         LEA         MESSAGESUBB, A1 *OPCODE is SUB.B
         MOVE.B      #14, D0
         TRAP        #15
+        JSR         EA_SUB
         MOVEM.W     (SP)+,  A0-A7/D0-D7 ; Restore registers
         RTS
 
@@ -1248,6 +1279,7 @@ ISSUBW  MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
         LEA         MESSAGESUBW, A1 *OPCODE is SUB.W
         MOVE.B      #14, D0
         TRAP        #15
+        JSR         EA_SUB
         MOVEM.W     (SP)+,  A0-A7/D0-D7 ; Restore registers
         RTS
 
@@ -1255,6 +1287,7 @@ ISSUBL  MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
         LEA         MESSAGESUBL, A1 *OPCODE is SUB.L
         MOVE.B      #14, D0
         TRAP        #15
+        JSR         EA_SUB
         MOVEM.W     (SP)+,  A0-A7/D0-D7 ; Restore registers
         RTS
 
@@ -1262,6 +1295,7 @@ ISCMPB  MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
         LEA         MESSAGECMPB, A1 *OPCODE is CMP.B
         MOVE.B      #14, D0
         TRAP        #15
+        JSR         EA_CMP
         MOVEM.W     (SP)+,  A0-A7/D0-D7 ; Restore registers
         RTS
 
@@ -1269,6 +1303,7 @@ ISCMPW  MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
         LEA         MESSAGECMPW, A1 *OPCODE is CMP.W
         MOVE.B      #14, D0
         TRAP        #15
+        JSR         EA_CMP
         MOVEM.W     (SP)+,  A0-A7/D0-D7 ; Restore registers
         RTS
 
@@ -1276,7 +1311,7 @@ ISCMPL  MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
         LEA         MESSAGECMPL, A1 *OPCODE is CMP.L
         MOVE.B      #14, D0
         TRAP        #15
-
+        JSR         EA_CMP
         MOVEM.W     (SP)+,  A0-A7/D0-D7 ; Restore registers
         RTS
 
@@ -1284,6 +1319,7 @@ ISADDQB MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
         LEA         MESSAGEADDQB, A1 *OPCODE is ADDQ.B
         MOVE.B      #14, D0
         TRAP        #15
+        JSR         EA_ADDQ
         MOVEM.W     (SP)+,  A0-A7/D0-D7 ; Restore registers
         RTS
 
@@ -1291,7 +1327,7 @@ ISADDQW MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
         LEA         MESSAGEADDQW, A1 *OPCODE is ADDQ.W
         MOVE.B      #14, D0
         TRAP        #15
-
+        JSR         EA_ADDQ
         MOVEM.W     (SP)+,  A0-A7/D0-D7 ; Restore registers
         RTS
 
@@ -1299,6 +1335,7 @@ ISADDQL MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
         LEA         MESSAGEADDQL, A1 *OPCODE is ADDQ.L
         MOVE.B      #14, D0
         TRAP        #15
+        JSR         EA_ADDQ
         MOVEM.W     (SP)+,  A0-A7/D0-D7 ; Restore registers
         RTS
 
@@ -1306,7 +1343,7 @@ ISMOVEQL MOVEM.W    A0-A7/D0-D7, -(SP) ; Save registers
         LEA         MESSAGEMOVEQL, A1 *OPCODE is MOVEQ.L
         MOVE.B      #14, D0
         TRAP        #15
-
+        JSR         EA_MOVEQ
         MOVEM.W     (SP)+,  A0-A7/D0-D7 ; Restore registers
         RTS
 
@@ -1314,6 +1351,7 @@ ISCLRB  MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
         LEA         MESSAGECLRB, A1 *OPCODE is CLR.B
         MOVE.B      #14, D0
         TRAP        #15
+        JSR         EA_MOVEQ
         MOVEM.W     (SP)+,  A0-A7/D0-D7 ; Restore registers
         RTS
 
@@ -1321,6 +1359,7 @@ ISCLRW  MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
         LEA         MESSAGECLRW, A1 *OPCODE is CLR.W
         MOVE.B      #14, D0
         TRAP        #15
+        JSR         EA_CLR
         MOVEM.W     (SP)+,  A0-A7/D0-D7 ; Restore registers
         RTS
 
@@ -1328,6 +1367,7 @@ ISCLRL  MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
         LEA         MESSAGECLRL, A1 *OPCODE is CLR.L
         MOVE.B      #14, D0
         TRAP        #15
+        JSR         EA_CLR
         MOVEM.W     (SP)+,  A0-A7/D0-D7 ; Restore registers
         RTS
 
@@ -1335,6 +1375,7 @@ ISMOVEML MOVEM.W    A0-A7/D0-D7, -(SP) ; Save registers
         LEA         MESSAGEMOVEML, A1 *OPCODE is MOVEM.L
         MOVE.B      #14, D0
         TRAP        #15
+        JSR         EA_MOVEM
         MOVEM.W     (SP)+,  A0-A7/D0-D7 ; Restore registers
         RTS
 
@@ -1342,6 +1383,7 @@ ISMOVEMW MOVEM.W    A0-A7/D0-D7, -(SP) ; Save registers
         LEA         MESSAGEMOVEMW, A1 *OPCODE is MOVEM.W
         MOVE.B      #14, D0
         TRAP        #15
+        JSR         EA_MOVEM
         MOVEM.W     (SP)+,  A0-A7/D0-D7 ; Restore registers
         RTS
 
@@ -1349,6 +1391,7 @@ ISLEA   MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
         LEA         MESSAGELEA, A1  *OPCODE is LEA so display LEA message
         MOVE.B      #14, D0
         TRAP        #15
+        JSR         EA_LEA
         MOVEM.W     (SP)+,  A0-A7/D0-D7 ; Restore registers
         RTS                         ; Exit subroutine
 
@@ -1356,6 +1399,7 @@ ISJSR   MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
         LEA         MESSAGEJSR, A1  *OPCODE is NOP so display NOP message
         MOVE.B      #14, D0
         TRAP        #15
+        JSR         EA_JSR
         MOVEM.W     (SP)+,  A0-A7/D0-D7 ; Restore registers
         RTS                         ; Exit subroutine
 
@@ -1363,6 +1407,7 @@ ISRTS   MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
         LEA         MESSAGERTS, A1  *OPCODE is RTS
         MOVE.B      #14, D0
         TRAP        #15
+        ADDA.W      #$2, A6         ; increment global pointer past current opcode word
         MOVEM.W     (SP)+,  A0-A7/D0-D7 ; Restore registers
         RTS
 
@@ -1370,6 +1415,7 @@ ISCLR   MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
         LEA         MESSAGECLR, A1  *OPCODE is CLR
         MOVE.B      #14, D0
         TRAP        #15
+        JSR         EA_CLR
         MOVEM.W     (SP)+,  A0-A7/D0-D7 ; Restore registers
         RTS
 
@@ -1377,6 +1423,7 @@ ISNOP   MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
         LEA         MESSAGENOP, A1  *OPCODE is NOP so display NOP message
         MOVE.B      #14, D0
         TRAP        #15
+        ADDA.W      #$2, A6         ; increment global pointer past current opcode word
         MOVEM.W     (SP)+,  A0-A7/D0-D7 ; Restore registers
         RTS                         ; Exit subroutine
 
@@ -1384,6 +1431,7 @@ ISMOVEW MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
         LEA         MESSAGEMOVEW, A1 *OPCODE is MOVE.W so display MOVEW message
         MOVE.B      #14, D0
         TRAP        #15
+        JSR         EA_MOVE
         MOVEM.W     (SP)+,  A0-A7/D0-D7 ; Restore registers
         RTS                         ; Exit subroutine
 
@@ -1391,6 +1439,7 @@ ISMOVEAW MOVEM.W    A0-A7/D0-D7, -(SP) ; Save registers
         LEA         MESSAGEMOVEAW, A1 *OPCODE is MOVEA.W so display MOVEA.W message
         MOVE.B      #14, D0
         TRAP        #15
+        JSR         EA_MOVEA
         MOVEM.W     (SP)+,  A0-A7/D0-D7 ; Restore registers
         RTS                         ; Exit subroutine
 
@@ -1398,6 +1447,7 @@ ISMOVEL MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
         LEA         MESSAGEMOVEL, A1 *OPCODE is MOVE.L so display MOVE.L message
         MOVE.B      #14, D0
         TRAP        #15
+        JSR         EA_MOVE
         MOVEM.W     (SP)+,  A0-A7/D0-D7 ; Restore registers
         RTS                         ; Exit subroutine
 
@@ -1405,6 +1455,7 @@ ISMOVEAL MOVEM.W    A0-A7/D0-D7, -(SP) ; Save registers
         LEA         MESSAGEMOVEAL, A1 *OPCODE is MOVEA.L so display MOVEA.L message
         MOVE.B      #14, D0
         TRAP        #15
+        JSR         EA_MOVEA
         MOVEM.W     (SP)+,  A0-A7/D0-D7 ; Restore registers
         RTS                         ; Exit subroutine
 
@@ -1412,6 +1463,7 @@ ISMOVEB MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
         LEA         MESSAGEMOVEB, A1 *OPCODE is MOVE.B so display MOVEB message
         MOVE.B      #14, D0
         TRAP        #15
+        JSR         EA_MOVE
         MOVEM.W     (SP)+,  A0-A7/D0-D7 ; Restore registers
         RTS                         ; Exit subroutine
 
@@ -1419,6 +1471,7 @@ ISADDIW MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
         LEA         MESSAGEADDIW, A1 *OPCODE is ADDI.W so display ADDI.W message
         MOVE.B      #14, D0
         TRAP        #15
+        JSR         EA_ADDI
         MOVEM.W     (SP)+,  A0-A7/D0-D7 ; Restore registers
         RTS                         ; Exit subroutine
 
@@ -1426,6 +1479,7 @@ ISADDIL MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
         LEA         MESSAGEADDIL, A1 *OPCODE is ADDI.L so display ADDI.L message
         MOVE.B      #14, D0
         TRAP        #15
+        JSR         EA_ADDI
         MOVEM.W     (SP)+,  A0-A7/D0-D7 ; Restore registers
         RTS                         ; Exit subroutine
 
@@ -1433,6 +1487,7 @@ ISADDIB MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
         LEA         MESSAGEADDIB, A1 *OPCODE is ADDI.B so display ADDI.B message
         MOVE.B      #14, D0
         TRAP        #15
+        JSR         EA_ADDI
         MOVEM.W     (SP)+,  A0-A7/D0-D7 ; Restore registers
         RTS                         ; Exit subroutine
 
