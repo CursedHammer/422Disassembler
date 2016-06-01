@@ -1,6 +1,6 @@
 000014AA Starting Address
 Assembler used: EASy68K Editor/Assembler v5.15.04
-Created On: 5/29/2016 4:05:57 PM
+Created On: 6/1/2016 12:09:41 PM
 
 00000000                             1  ******************************************************************************
 00000000                             2  * Title      : 68k Disassembler
@@ -415,52 +415,54 @@ Created On: 5/29/2016 4:05:57 PM
 000014B2  2C78 5000                411      MOVEA.L     BEGINADDR,A6        * Assign beginning address to A6 for use
 000014B6                           412  
 000014B6                           413  LOOP
-000014B6                           414      *JSR         OC_PARSE            * Determine if there is an initial opcode match
-000014B6                           415      * decrement row count
-000014B6                           416      * if at 0, prompt for next page
-000014B6                           417      * else, continue
-000014B6  584E                     418      ADDA.W      #$4,A6            * Advance address to test LOOP (test only)
-000014B8                           419      
-000014B8                           420  LOOP_CHECK
-000014B8                           421      * Changed the following code from: 
-000014B8                           422      * CMPA        A6, ENDADDR         
-000014B8                           423      * to:
-000014B8                           424      * CMPA      (ENDADDR),A6 
-000014B8                           425      * When using the CMPA, destination must be an address so A6
-000014B8  BDF8 5010                426      CMPA.L      ENDADDR,A6          * Is pointer at end of address range?
-000014BC                           427      
-000014BC  6E00 0004                428      BGT         END_LOOP            * If yes, END_LOOP
-000014C0                           429      ; in case this resets status register, do another compare TODO
-000014C0                           430      
-000014C0  66F4                     431      BNE         LOOP                * If not, continue processing addresses
-000014C2                           432      ; If at end of address range, check if user wants to continue
-000014C2                           433      ; if user wants to continue, restart
-000014C2                           434      ; else, end
-000014C2                           435  
-000014C2                           436  END_LOOP
-000014C2  4E72 3000                437      STOP        #$3000              * End program
-000014C6                           438  *    JMP         START               * Restart program (optional workflow)
-000014C6                           439  
-000014C6                           440  *---------- END - START ------------------------------------------------------
+000014B6                           414      * OC_PARSE Command doesn't work due to issues in the Opcode include
+000014B6                           415      * many errors need to be fixed. Same with EA include
+000014B6                           416      *JSR         OC_PARSE            * Determine if there is an initial opcode match
+000014B6                           417      * decrement row count
+000014B6                           418      * if at 0, prompt for next page
+000014B6                           419      * else, continue
+000014B6  584E                     420      ADDA.W      #$4,A6            * Advance address to test LOOP (test only)
+000014B8                           421      
+000014B8                           422  LOOP_CHECK
+000014B8                           423      * Changed the following code from: 
+000014B8                           424      * CMPA        A6, ENDADDR         
+000014B8                           425      * to:
+000014B8                           426      * CMPA      (ENDADDR),A6 
+000014B8                           427      * When using the CMPA, destination must be an address so A6
+000014B8  BDF8 5010                428      CMPA.L      ENDADDR,A6          * Is pointer at end of address range?
+000014BC                           429      
+000014BC  6E00 0004                430      BGT         END_LOOP            * If yes, END_LOOP
+000014C0                           431      ; in case this resets status register, do another compare TODO
+000014C0                           432      
+000014C0  66F4                     433      BNE         LOOP                * If not, continue processing addresses
+000014C2                           434      ; If at end of address range, check if user wants to continue
+000014C2                           435      ; if user wants to continue, restart
+000014C2                           436      ; else, end
+000014C2                           437  
+000014C2                           438  END_LOOP
+000014C2  4E72 3000                439      STOP        #$3000              * End program
+000014C6                           440  *    JMP         START               * Restart program (optional workflow)
 000014C6                           441  
-000014C6                           442  *********** END BEGIN CODE ***************************************************
+000014C6                           442  *---------- END - START ------------------------------------------------------
 000014C6                           443  
-000014C6                           444  
-000014C6                           445  ******************************************************************************
-000014C6                           446  *           VARIABLES AND CONSTANTS                                          *
+000014C6                           444  *********** END BEGIN CODE ***************************************************
+000014C6                           445  
+000014C6                           446  
 000014C6                           447  ******************************************************************************
-000014C6                           448  
-000014C6                           449  
+000014C6                           448  *           VARIABLES AND CONSTANTS                                          *
+000014C6                           449  ******************************************************************************
 000014C6                           450  
-000014C6                           451  *---------- Reserved Registers -----------------------------
-000014C6                           452  *   A7: stack pointer
-000014C6                           453  *   A6: current address (updated by subroutines)
-000014C6                           454  *   D0: instruction validity flag (reset by main control
-000014C6                           455  *       code, can be set to false by subroutines)
-000014C6                           456  *-----------------------------------------------------------
-000014C6                           457  
-000014C6                           458  *---------- End --------------------------------------------
-000014C6                           459                 END  START          * Last line of source
+000014C6                           451  
+000014C6                           452  
+000014C6                           453  *---------- Reserved Registers -----------------------------
+000014C6                           454  *   A7: stack pointer
+000014C6                           455  *   A6: current address (updated by subroutines)
+000014C6                           456  *   D0: instruction validity flag (reset by main control
+000014C6                           457  *       code, can be set to false by subroutines)
+000014C6                           458  *-----------------------------------------------------------
+000014C6                           459  
+000014C6                           460  *---------- End --------------------------------------------
+000014C6                           461                 END  START          * Last line of source
 
 No errors detected
 No warnings generated

@@ -1,0 +1,1899 @@
+00002792 Starting Address
+Assembler used: EASy68K Editor/Assembler v5.15.04
+Created On: 5/29/2016 4:16:08 PM
+
+00000000                             1  *-----------------------------------------------------------
+00000000                             2  * Title      : Op-Code Subroutines
+00000000                             3  * Written by : Brandon Authier (Hblkr), Jack S. Eldridge
+00000000                             4  *              (JackScottie), Marijn Burger (marijnburger)
+00000000                             5  * Date       : 3 May 2016
+00000000                             6  * Description: Support file containing the op-code subroutines
+00000000                             7  *              for the disassembler.
+00000000                             8  *-----------------------------------------------------------
+00000000                             9  
+00000000                            10  *----------- Definitions Used for Code ---------------------
+00000000                            11          INCLUDE 'OCMessages.X68'
+00000000                            12  
+00000000                            13  
+00000000  =0000000D                 14  CR      EQU     $0D
+00000000  =0000000A                 15  LF      EQU     $0A
+00000000= 4E 4F 50 0D 0A 00         16  MESSAGENOP DC.B    'NOP',CR,LF, 0    
+00000006                            17  
+00000006= 4D 4F 56 45 2E 57 ...     18  MESSAGEMOVEW DC.B    'MOVE.W',CR,LF, 0
+0000000F= 4D 4F 56 45 2E 4C ...     19  MESSAGEMOVEL DC.B    'MOVE.L',CR,LF, 0
+00000018= 4D 4F 56 45 2E 42 ...     20  MESSAGEMOVEB DC.B    'MOVE.B',CR,LF, 0
+00000021                            21  
+00000021= 41 44 44 49 2E 57 ...     22  MESSAGEADDIW DC.B    'ADDI.W',CR,LF, 0
+0000002A= 41 44 44 49 2E 4C ...     23  MESSAGEADDIL DC.B    'ADDI.L',CR,LF, 0
+00000033= 41 44 44 49 2E 42 ...     24  MESSAGEADDIB DC.B    'ADDI.B',CR,LF, 0
+0000003C                            25  
+0000003C= 4D 4F 56 45 41 2E ...     26  MESSAGEMOVEAL DC.B    'MOVEA.L',CR,LF, 0
+00000046= 4D 4F 56 45 41 2E ...     27  MESSAGEMOVEAW DC.B    'MOVEA.W',CR,LF, 0
+00000050                            28  
+00000050= 4D 4F 56 45 4D 2E ...     29  MESSAGEMOVEML DC.B    'MOVEM.L',CR,LF, 0
+0000005A= 4D 4F 56 45 4D 2E ...     30  MESSAGEMOVEMW DC.B    'MOVEM.W',CR,LF, 0
+00000064                            31  
+00000064= 4A 53 52 0D 0A 00         32  MESSAGEJSR DC.B    'JSR',CR,LF, 0
+0000006A                            33  
+0000006A= 43 4C 52 0D 0A 00         34  MESSAGECLR DC.B    'CLR',CR,LF, 0
+00000070                            35  
+00000070= 52 54 53 0D 0A 00         36  MESSAGERTS DC.B    'RTS',CR,LF, 0
+00000076                            37  
+00000076= 4C 45 41 0D 0A 00         38  MESSAGELEA DC.B    'LEA',CR,LF, 0
+0000007C                            39  
+0000007C= 43 4C 52 2E 42 0D ...     40  MESSAGECLRB DC.B    'CLR.B',CR,LF, 0
+00000084= 43 4C 52 2E 57 0D ...     41  MESSAGECLRW DC.B    'CLR.W',CR,LF, 0
+0000008C= 43 4C 52 2E 4C 0D ...     42  MESSAGECLRL DC.B    'CLR.L',CR,LF, 0
+00000094                            43  
+00000094= 41 44 44 51 2E 42 ...     44  MESSAGEADDQB DC.B    'ADDQ.B',CR,LF, 0
+0000009D= 41 44 44 51 2E 57 ...     45  MESSAGEADDQW DC.B    'ADDQ.W',CR,LF, 0
+000000A6= 41 44 44 51 2E 4C ...     46  MESSAGEADDQL DC.B    'ADDQ.L',CR,LF, 0
+000000AF                            47  
+000000AF= 43 4D 50 2E 42 0D ...     48  MESSAGECMPB DC.B    'CMP.B',CR,LF, 0
+000000B7= 43 4D 50 2E 57 0D ...     49  MESSAGECMPW DC.B    'CMP.W',CR,LF, 0
+000000BF= 43 4D 50 2E 4C 0D ...     50  MESSAGECMPL DC.B    'CMP.L',CR,LF, 0
+000000C7                            51  
+000000C7= 53 55 42 2E 42 0D ...     52  MESSAGESUBB DC.B    'SUB.B',CR,LF, 0
+000000CF= 53 55 42 2E 57 0D ...     53  MESSAGESUBW DC.B    'SUB.W',CR,LF, 0
+000000D7= 53 55 42 2E 4C 0D ...     54  MESSAGESUBL DC.B    'SUB.L',CR,LF, 0
+000000DF                            55  
+000000DF= 41 44 44 2E 42 0D ...     56  MESSAGEADDB DC.B    'ADD.B',CR,LF, 0
+000000E7= 41 44 44 2E 57 0D ...     57  MESSAGEADDW DC.B    'ADD.W',CR,LF, 0
+000000EF= 41 44 44 2E 4C 0D ...     58  MESSAGEADDL DC.B    'ADD.L',CR,LF, 0
+000000F7                            59  
+000000F7= 41 44 44 41 2E 57 ...     60  MESSAGEADDAW DC.B    'ADDA.W',CR,LF, 0
+00000100= 41 44 44 41 2E 4C ...     61  MESSAGEADDAL DC.B    'ADDA.L',CR,LF, 0
+00000109                            62  
+00000109= 4D 4F 56 45 51 2E ...     63  MESSAGEMOVEQL DC.B    'MOVEQ.L',CR,LF, 0
+00000113                            64  
+00000113= 41 4E 44 2E 42 0D ...     65  MESSAGEANDB DC.B    'AND.B',CR,LF, 0
+0000011B= 41 4E 44 2E 57 0D ...     66  MESSAGEANDW DC.B    'AND.W',CR,LF, 0
+00000123= 41 4E 44 2E 4C 0D ...     67  MESSAGEANDL DC.B    'AND.L',CR,LF, 0
+0000012B                            68  
+0000012B= 4D 55 4C 53 2E 57 ...     69  MESSAGEMULSW DC.B    'MULS.W',CR,LF, 0
+00000134= 4D 55 4C 53 2E 4C ...     70  MESSAGEMULSL DC.B    'MULS.L',CR,LF, 0
+0000013D                            71  
+0000013D= 41 53 52 2E 42 0D ...     72  MESSAGEASRB DC.B    'ASR.B',CR,LF, 0
+00000145= 41 53 52 2E 57 0D ...     73  MESSAGEASRW DC.B    'ASR.W',CR,LF, 0
+0000014D= 41 53 52 2E 4C 0D ...     74  MESSAGEASRL DC.B    'ASR.L',CR,LF, 0
+00000155                            75  
+00000155= 41 53 4C 2E 42 0D ...     76  MESSAGEASLB DC.B    'ASL.B',CR,LF, 0
+0000015D= 41 53 4C 2E 57 0D ...     77  MESSAGEASLW DC.B    'ASL.W',CR,LF, 0
+00000165= 41 53 4C 2E 4C 0D ...     78  MESSAGEASLL DC.B    'ASL.L',CR,LF, 0
+0000016D                            79  
+0000016D= 52 4F 52 2E 42 0D ...     80  MESSAGERORB DC.B    'ROR.B',CR,LF, 0
+00000175= 52 4F 52 2E 57 0D ...     81  MESSAGERORW DC.B    'ROR.W',CR,LF, 0
+0000017D= 52 4F 52 2E 4C 0D ...     82  MESSAGERORL DC.B    'ROR.L',CR,LF, 0
+00000185                            83  
+00000185= 52 4F 4C 2E 42 0D ...     84  MESSAGEROLB DC.B    'ROL.B',CR,LF, 0
+0000018D= 52 4F 4C 2E 57 0D ...     85  MESSAGEROLW DC.B    'ROL.W',CR,LF, 0
+00000195= 52 4F 4C 2E 4C 0D ...     86  MESSAGEROLL DC.B    'ROL.L',CR,LF, 0
+0000019D                            87  
+0000019D= 4C 53 52 2E 42 0D ...     88  MESSAGELSRB DC.B    'LSR.B',CR,LF, 0
+000001A5= 4C 53 52 2E 57 0D ...     89  MESSAGELSRW DC.B    'LSR.W',CR,LF, 0
+000001AD= 4C 53 52 2E 4C 0D ...     90  MESSAGELSRL DC.B    'LSR.L',CR,LF, 0
+000001B5                            91  
+000001B5= 4C 53 4C 2E 42 0D ...     92  MESSAGELSLB DC.B    'LSL.B',CR,LF, 0
+000001BD= 4C 53 4C 2E 57 0D ...     93  MESSAGELSLW DC.B    'LSL.W',CR,LF, 0
+000001C5= 4C 53 4C 2E 4C 0D ...     94  MESSAGELSLL DC.B    'LSL.L',CR,LF, 0
+000001CD                            95  
+000001CD= 4F 52 2E 42 0D 0A 00      96  MESSAGEORB DC.B    'OR.B',CR,LF, 0
+000001D4= 4F 52 2E 57 0D 0A 00      97  MESSAGEORW DC.B    'OR.W',CR,LF, 0
+000001DB= 4F 52 2E 4C 0D 0A 00      98  MESSAGEORL DC.B    'OR.L',CR,LF, 0
+000001E2                            99  
+000001E2= 44 49 56 55 2E 57 ...    100  MESSAGEDIVUW DC.B    'DIVU.W',CR,LF, 0
+000001EB= 44 49 56 55 2E 4C ...    101  MESSAGEDIVUL DC.B    'DIVU.L',CR,LF, 0
+000001F4                           102  
+000001F4= 42 43 43 0D 0A 00        103  MESSAGEBCC DC.B    'BCC',CR,LF, 0 
+000001FA= 42 47 54 0D 0A 00        104  MESSAGEBGT DC.B    'BGT',CR,LF, 0
+00000200= 42 4C 45 0D 0A 00        105  MESSAGEBLE DC.B    'BLE',CR,LF, 0
+00000206                           106  
+00000206= 54 68 61 74 20 69 ...    107  MESSAGEOPCODE_INVALID DC.B    'That is not an opcode!',CR,LF, 0
+0000021F                           108  
+0000021F                           109  
+0000021F                           110  
+0000021F                           111  
+0000021F                           112  -------------------- end include --------------------
+0000021F                           113  
+0000021F                           114  *----------- Subroutines: ----------------------------------
+0000021F                           115  
+0000021F                           116  *----------- OC_PARSE --------------------------------------
+0000021F                           117  OC_PARSE:
+00000220  48A7 FFFF                118          MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
+00000224  41F9 0000023C            119          LEA         initial_table,A0 ; Index into the table
+0000022A  4280                     120          CLR.L       D0              ; Zero it
+0000022C  3012                     121          MOVE.W      (A2),D0         ; We'll play with it here
+0000022E  123C 000C                122          MOVE.B      #12,D1          ; Shift 12 bits to the right
+00000232  E268                     123          LSR.W       D1,D0           ; Move the bits (moves highest 4 bits to lowest 4 positions,
+00000234                           124                                      ; and the rest are zeroed out)
+00000234  C0FC 0006                125          MULU        #6,D0           ; Form offset (move 6 bytes in memory for every 'JMP' command)
+00000238  4EF0 0000                126          JMP         0(A0,D0)        ; Jump indirect with index, i.e. jump to 'table' + displacement
+0000023C                           127  
+0000023C                           128  initial_table:
+0000023C  4EF9 0000029C            129          JMP         code0000        ; ADDI.B, ADDI.W, or ADDI.L
+00000242  4EF9 000002A2            130          JMP         code0001        ; MOVE.B
+00000248  4EF9 000002AE            131          JMP         code0010        ; MOVEA.L or MOVE.L
+0000024E  4EF9 000002B4            132          JMP         code0011        ; MOVEA.W or MOVE.W
+00000254  4EF9 000002BA            133          JMP         code0100        ; NOP or MOVEM.W or MOVEM.L or LEA or CLR.B or CLR.W or CLR.L or JSR or RTS or MULS.W
+0000025A  4EF9 000002C6            134          JMP         code0101        ; ADDQ.B or ADDQ.W or ADDQ.L
+00000260  4EF9 000002D2            135          JMP         code0110        ; BCC or BGT or BLE
+00000266  4EF9 000002DE            136          JMP         code0111        ; MOVEQ.L
+0000026C  4EF9 000002EA            137          JMP         code1000        ; OR.B or OR.W or OR.L or DIVU (DIVU is either word or long depending on ea)
+00000272  4EF9 000002F6            138          JMP         code1001        ; SUB.B or SUB.W or SUB.L
+00000278  4EF9 00000302            139          JMP         code1010
+0000027E  4EF9 0000030A            140          JMP         code1011        ; CMP.B or CMP.W or CMP.L
+00000284  4EF9 00000316            141          JMP         code1100        ; AND_BorAND_WorAND_LorMULS_W
+0000028A  4EF9 00000322            142          JMP         code1101        ; ADD.B or ADD.W or ADD.L
+00000290  4EF9 0000032E            143          JMP         code1110        ; ROd_LSd_ASd
+00000296  4EF9 0000033A            144          JMP         code1111
+0000029C                           145  
+0000029C  4EB9 00000C6E            146  code0000 JSR        ADDI_BorADDI_WorADDI_L
+000002A2  4EB9 0000129C            147  code0001 JSR        ISMOVEB
+000002A8  4EB9 00000342            148           JSR        DONE
+000002AE  4EB9 00000CB8            149  code0010 JSR        MOVEA_LorMOVE_L
+000002B4  4EB9 00000D48            150  code0011 JSR        MOVEA_WorMOVE_W
+000002BA  4EB9 00000B70            151  code0100 JSR        NOP_MOVEM_LEA_JSR_CLR_RTS
+000002C0  4EB9 00000342            152           JSR        DONE
+000002C6  4EB9 0000096C            153  code0101 JSR        ADDQ_BorADDQ_WorADDQ_L
+000002CC  4EB9 00000342            154           JSR        DONE
+000002D2  4EB9 00000348            155  code0110 JSR        BCCorBGTorBLE
+000002D8  4EB9 00000342            156           JSR        DONE
+000002DE  4EB9 00001170            157  code0111 JSR        ISMOVEQL
+000002E4  4EB9 00000342            158           JSR        DONE
+000002EA  4EB9 000003AC            159  code1000 JSR        OR_BorOR_WorOR_LorDIVU
+000002F0  4EB9 00000342            160           JSR        DONE
+000002F6  4EB9 00000894            161  code1001 JSR        SUB_BorSUB_WorSUB_L
+000002FC  4EB9 00000342            162           JSR        DONE
+00000302  4EB9 00000DD8            163  code1010 JSR    OPCODE_INVALID              ;INVALID
+00000308  4E75                     164           RTS
+0000030A  4EB9 0000091C            165  code1011 JSR        CMP_BorCMP_WorCMP_L
+00000310  4EB9 00000342            166           JSR        DONE
+00000316  4EB9 00000768            167  code1100 JSR        AND_BorAND_WorAND_LorMULS_W
+0000031C  4EB9 00000342            168           JSR        DONE
+00000322  4EB9 000007FE            169  code1101 JSR        ADD_BorADD_WorADD_L
+00000328  4EB9 00000342            170           JSR        DONE
+0000032E  4EB9 00000710            171  code1110 JSR        ROd_LSd_ASd
+00000334  4EB9 00000342            172           JSR        DONE
+0000033A  4EB9 00000DD8            173  code1111 JSR    OPCODE_INVALID              ;INVALID
+00000340  4E75                     174           RTS
+00000342                           175  *----------- Done ------------------------------------------
+00000342  4C9F FFFF                176  DONE    MOVEM.W     (SP)+,  A0-A7/D0-D7 ; Restore registers
+00000346  4E75                     177          RTS
+00000348                           178  
+00000348                           179  *****************************  BCCorBGTorBLE ************************************
+Line 180 ERROR: Undefined symbol
+00000348  4FF9 004DBB8E            180  BCCorBGTorBLE       LEA     STACK,SP            ; Load the SP
+0000034E  41F9 00000374            181                      LEA     tableBCCorBGTorBLE, A0            ; Index into the table
+00000354  4280                     182                      CLR.L   D0                  ; Zero it
+Line 183 ERROR: Undefined symbol
+00000356  303C BB8E                183                      MOVE.W  #example,D0         ; We'll play with it here
+0000035A  123C 0006                184                      MOVE.B  #6,D1           ; Shift 6 bits left
+0000035E  E360                     185                      ASL.W   D1,D0
+Line 186 ERROR: Undefined symbol
+00000360  123C 008E                186                      MOVE.B  #shift,D1           ; Shift 12 bits to the right
+00000364  E268                     187                      LSR.W   D1,D0               ; Move the bits (moves highest 4 bits to lowest 4 positions,
+00000366                           188                                      ; and the rest are zeroed out)
+00000366  123C 0002                189                      MOVE.B  #2,D1           ; Shift 2 bits right
+0000036A  E260                     190                      ASR.W   D1,D0
+0000036C                           191  
+0000036C  C0FC 0006                192                      MULU    #6,D0               ; Form offset (move 6 bytes in memory for every 'JMP' command)
+00000370  4EF0 0000                193                      JMP     0(A0,D0)            ; Jump indirect with index, i.e. jump to 'table' + displacement
+00000374                           194  
+00000374  4EF9 0000038C            195  tableBCCorBGTorBLE   JMP    BCCorBGTorBLEcode00   ; BCC
+0000037A  4EF9 00000394            196                       JMP    BCCorBGTorBLEcode01   ;
+00000380  4EF9 0000039C            197                       JMP    BCCorBGTorBLEcode10   ; BGT
+00000386  4EF9 000003A4            198                       JMP    BCCorBGTorBLEcode11   ; BLE
+0000038C                           199  
+0000038C                           200  
+0000038C                           201  
+0000038C  4EB9 00000DEC            202  BCCorBGTorBLEcode00    JSR     ISBCC
+00000392  4E75                     203                         RTS
+00000394  4EB9 00000DD8            204  BCCorBGTorBLEcode01    JSR    OPCODE_INVALID              ;INVALID
+0000039A  4E75                     205                         RTS
+0000039C  4EB9 00000E00            206  BCCorBGTorBLEcode10    JSR     ISBGT
+000003A2  4E75                     207                         RTS
+000003A4  4EB9 00000E14            208  BCCorBGTorBLEcode11    JSR     ISBLE
+000003AA  4E75                     209                         RTS
+000003AC                           210  
+000003AC                           211  ***************************** END  BCCorBGTorBLE ************************************
+000003AC                           212  
+000003AC                           213  *----------- OR_BorOR_WorOR_LorDIVU ------------------------
+000003AC                           214  OR_BorOR_WorOR_LorDIVU:
+000003AC  41F9 000003D2            215          LEA         tableOR_BorOR_WorOR_LorDIVU, A0 ; Index into the table
+000003B2  4280                     216          CLR.L       D0              ; Zero it
+Line 217 ERROR: Undefined symbol
+000003B4  303C BB8E                217          MOVE.W      #example,D0     ; We'll play with it here
+000003B8  123C 0007                218          MOVE.B      #7,D1           ; Shift 7 bits left
+000003BC  E360                     219          ASL.W       D1,D0
+Line 220 ERROR: Undefined symbol
+000003BE  123C 008E                220          MOVE.B      #shift,D1       ; Shift 12 bits to the right
+000003C2  E268                     221          LSR.W       D1,D0           ; Move the bits (moves highest 4 bits to lowest 4 positions,
+000003C4                           222                                      ; and the rest are zeroed out)
+000003C4  123C 0001                223          MOVE.B      #1,D1           ; Shift 1 bits right
+000003C8  E260                     224          ASR.W       D1,D0
+000003CA  C0FC 0006                225          MULU        #6,D0           ; Form offset (move 6 bytes in memory for every 'JMP' command)
+000003CE  4EF0 0000                226          JMP         0(A0,D0)        ; Jump indirect with index, i.e. jump to 'table' + displacement
+000003D2                           227  
+000003D2                           228  tableOR_BorOR_WorOR_LorDIVU
+000003D2  4EF9 000003FC            229          JMP         OR_DIVUcode000  ; OR.B
+000003D8  4EF9 00000404            230          JMP         OR_DIVUcode001  ; OR.W
+000003DE  4EF9 0000040C            231          JMP         OR_DIVUcode010  ; OR.L
+000003E4  4EF9 00000414            232          JMP         OR_DIVUcode011  ; DIVU.W
+000003EA  4EF9 0000041C            233          JMP         OR_DIVUcode100  ; OR.B
+000003F0  4EF9 00000424            234          JMP         OR_DIVUcode101  ; OR.W
+000003F6  4EF9 0000042C            235          JMP         OR_DIVUcode110  ; OR.L
+000003FC                           236          ;JMP    OR_DIVUcode111
+000003FC                           237  
+000003FC  4EB9 00000E50            238  OR_DIVUcode000 JSR  ISORB
+00000402  4E75                     239                 RTS
+00000404  4EB9 00000E64            240  OR_DIVUcode001 JSR  ISORW
+0000040A  4E75                     241                 RTS
+0000040C  4EB9 00000E78            242  OR_DIVUcode010 JSR  ISORL
+00000412  4E75                     243                 RTS
+00000414  4EB9 00000E3C            244  OR_DIVUcode011 JSR  ISDIVUW
+0000041A  4E75                     245                 RTS
+0000041C  4EB9 00000E50            246  OR_DIVUcode100 JSR  ISORB
+00000422  4E75                     247                 RTS
+00000424  4EB9 00000E64            248  OR_DIVUcode101 JSR  ISORW
+0000042A  4E75                     249                 RTS
+0000042C  4EB9 00000E78            250  OR_DIVUcode110 JSR  ISORL
+00000432  4E75                     251                 RTS
+00000434                           252  *----------- END  ADD_BorADD_WorADD_L ----------------------
+00000434                           253  
+00000434                           254  *****************************  MULSLorDIVUL ************************************
+Line 255 ERROR: Undefined symbol
+00000434  4FF9 004DBB8E            255  MULSLorDIVUL        LEA     STACK,SP            ; Load the SP
+0000043A  41F9 0000045A            256                      LEA     tableMULSLorDIVUL, A0            ; Index into the table
+00000440  4280                     257                      CLR.L   D0                  ; Zero it
+Line 258 ERROR: Undefined symbol
+00000442  303C BB8E                258                      MOVE.W  #example,D0         ; We'll play with it here
+00000446  123C 0006                259                      MOVE.B  #6,D1           ; Shift 6 bits left
+0000044A  E360                     260                      ASL.W   D1,D0
+Line 261 ERROR: Undefined symbol
+0000044C  123C 008E                261                      MOVE.B  #shift,D1           ; Shift 12 bits to the right
+00000450  E268                     262                      LSR.W   D1,D0               ; Move the bits (moves highest 4 bits to lowest 4 positions,
+00000452                           263  
+00000452  C0FC 0006                264                      MULU    #6,D0               ; Form offset (move 6 bytes in memory for every 'JMP' command)
+00000456  4EB0 0000                265                      JSR     0(A0,D0)            ; Jump indirect with index, i.e. jump to 'table' + displacement
+0000045A                           266  
+0000045A  4EF9 00000466            267  tableMULSLorDIVUL             JMP    MULSLorDIVULcode0   ;  MULS.L
+00000460  4EF9 0000046E            268                                JMP    MULSLorDIVULcode1   ;  DIVU.L
+00000466                           269  
+00000466  4EB9 00000FF4            270  MULSLorDIVULcode0   JSR     ISMULSL
+0000046C  4E75                     271                      RTS
+0000046E  4EB9 00000E28            272  MULSLorDIVULcode1   JSR     ISDIVUL
+00000474  4E75                     273                      RTS
+00000476                           274  ***************************** END  MULSLorDIVUL ************************************
+00000476                           275  
+00000476                           276  
+00000476                           277  *----------- someASR ---------------------------------------
+00000476                           278  someASR:
+00000476  41F9 0000049C            279          LEA         tableSomeASR, A0 ; Index into the table
+0000047C  4280                     280          CLR.L       D0              ; Zero it
+Line 281 ERROR: Undefined symbol
+0000047E  303C BB8E                281          MOVE.W      #example,D0     ; We'll play with it here
+00000482  123C 0008                282          MOVE.B      #8,D1           ; Shift 8 bits left
+00000486  E360                     283          ASL.W       D1,D0
+Line 284 ERROR: Undefined symbol
+00000488  123C 008E                284          MOVE.B      #shift,D1       ; Shift 12 bits to the right
+0000048C  E268                     285          LSR.W       D1,D0           ; Move the bits (moves highest 4 bits to lowest 4 positions,
+0000048E                           286                                      ; and the rest are zeroed out)
+0000048E  123C 0002                287          MOVE.B      #2,D1           ; Shift 2 bits right
+00000492  E260                     288          ASR.W       D1,D0
+00000494  C0FC 0006                289          MULU        #6,D0           ; Form offset (move 6 bytes in memory for every 'JMP' command)
+00000498  4EF0 0000                290          JMP         0(A0,D0)        ; Jump indirect with index, i.e. jump to 'table' + displacement
+0000049C                           291  
+0000049C                           292  tableSomeASR:
+0000049C  4EF9 000004AE            293          JMP         ASRcode00       *ASR.B
+000004A2  4EF9 000004B6            294          JMP         ASRcode01       *ASR.W
+000004A8  4EF9 000004BE            295          JMP         ASRcode10       *ASR.L
+000004AE                           296  
+000004AE  4EB9 00000E8C            297  ASRcode00 JSR       ISASRB
+000004B4  4E75                     298            RTS
+000004B6  4EB9 00000EA0            299  ASRcode01 JSR       ISASRW
+000004BC  4E75                     300            RTS
+000004BE  4EB9 00000EB4            301  ASRcode10 JSR       ISASRL
+000004C4  4E75                     302            RTS
+000004C6                           303  *----------- END someLSL -----------------------------------
+000004C6                           304  
+000004C6                           305  *----------- someASL ---------------------------------------
+000004C6                           306  someASL:
+000004C6  41F9 000004EC            307          LEA         tableSomeASL, A0 ; Index into the table
+000004CC  4280                     308          CLR.L       D0              ; Zero it
+Line 309 ERROR: Undefined symbol
+000004CE  303C BB8E                309          MOVE.W      #example,D0     ; We'll play with it here
+000004D2  123C 0008                310          MOVE.B      #8,D1           ; Shift 8 bits left
+000004D6  E360                     311          ASL.W       D1,D0
+Line 312 ERROR: Undefined symbol
+000004D8  123C 008E                312          MOVE.B      #shift,D1       ; Shift 12 bits to the right
+000004DC  E268                     313          LSR.W       D1,D0           ; Move the bits (moves highest 4 bits to lowest 4 positions,
+000004DE                           314                                      ; and the rest are zeroed out)
+000004DE  123C 0002                315          MOVE.B      #2,D1           ; Shift 2 bits right
+000004E2  E260                     316          ASR.W       D1,D0
+000004E4  C0FC 0006                317          MULU        #6,D0           ; Form offset (move 6 bytes in memory for every 'JMP' command)
+000004E8  4EF0 0000                318          JMP         0(A0,D0)        ; Jump indirect with index, i.e. jump to 'table' + displacement
+000004EC                           319  
+000004EC                           320  tableSomeASL:
+000004EC  4EF9 000004FE            321          JMP         ASLcode00       *ASL.B
+000004F2  4EF9 00000506            322          JMP         ASLcode01       *ASL.W
+000004F8  4EF9 0000050E            323          JMP         ASLcode10       *ASL.L
+000004FE                           324  
+000004FE  4EB9 00000EC8            325  ASLcode00 JSR       ISASLB
+00000504  4E75                     326            RTS
+00000506  4EB9 00000EDC            327  ASLcode01 JSR       ISASLW
+0000050C  4E75                     328            RTS
+0000050E  4EB9 00000EF0            329  ASLcode10 JSR       ISASLL
+00000514  4E75                     330            RTS
+00000516                           331  *----------- END someLSL -----------------------------------
+00000516                           332  
+00000516                           333  *----------- someLSR ---------------------------------------
+00000516                           334  someLSR:
+00000516  41F9 0000053C            335          LEA         tableSomeLSR, A0 ; Index into the table
+0000051C  4280                     336          CLR.L       D0              ; Zero it
+Line 337 ERROR: Undefined symbol
+0000051E  303C BB8E                337          MOVE.W      #example,D0     ; We'll play with it here
+00000522  123C 0008                338          MOVE.B      #8,D1           ; Shift 8 bits left
+00000526  E360                     339          ASL.W       D1,D0
+Line 340 ERROR: Undefined symbol
+00000528  123C 008E                340          MOVE.B      #shift,D1       ; Shift 12 bits to the right
+0000052C  E268                     341          LSR.W       D1,D0           ; Move the bits (moves highest 4 bits to lowest 4 positions,
+0000052E                           342                                      ; and the rest are zeroed out)
+0000052E  123C 0002                343          MOVE.B      #2,D1           ; Shift 2 bits right
+00000532  E260                     344          ASR.W       D1,D0
+00000534  C0FC 0006                345          MULU        #6,D0           ; Form offset (move 6 bytes in memory for every 'JMP' command)
+00000538  4EF0 0000                346          JMP         0(A0,D0)        ; Jump indirect with index, i.e. jump to 'table' + displacement
+0000053C                           347  
+0000053C                           348  tableSomeLSR:
+0000053C  4EF9 0000054E            349          JMP         LSRcode00       *LSR.B
+00000542  4EF9 00000556            350          JMP         LSRcode01       *LSR.W
+00000548  4EF9 0000055E            351          JMP         LSRcode10       *LSR.L
+0000054E                           352  
+0000054E  4EB9 00000F04            353  LSRcode00 JSR       ISLSRB
+00000554  4E75                     354            RTS
+00000556  4EB9 00000F18            355  LSRcode01 JSR       ISLSRW
+0000055C  4E75                     356            RTS
+0000055E  4EB9 00000F2C            357  LSRcode10 JSR       ISLSRL
+00000564  4E75                     358            RTS
+00000566                           359  *----------- END someLSR -----------------------------------
+00000566                           360  
+00000566                           361  *----------- someLSL ---------------------------------------
+00000566                           362  someLSL:
+00000566  41F9 0000058C            363          LEA         tableSomeLSL, A0 ; Index into the table
+0000056C  4280                     364          CLR.L       D0              ; Zero it
+Line 365 ERROR: Undefined symbol
+0000056E  303C BB8E                365          MOVE.W      #example,D0     ; We'll play with it here
+00000572  123C 0008                366          MOVE.B      #8,D1           ; Shift 8 bits left
+00000576  E360                     367          ASL.W       D1,D0
+Line 368 ERROR: Undefined symbol
+00000578  123C 008E                368          MOVE.B      #shift,D1       ; Shift 12 bits to the right
+0000057C  E268                     369          LSR.W       D1,D0           ; Move the bits (moves highest 4 bits to lowest 4 positions,
+0000057E                           370                                      ; and the rest are zeroed out)
+0000057E  123C 0002                371          MOVE.B      #2,D1           ; Shift 2 bits right
+00000582  E260                     372          ASR.W       D1,D0
+00000584  C0FC 0006                373          MULU        #6,D0           ; Form offset (move 6 bytes in memory for every 'JMP' command)
+00000588  4EF0 0000                374          JMP         0(A0,D0)        ; Jump indirect with index, i.e. jump to 'table' + displacement
+0000058C                           375  
+0000058C                           376  tableSomeLSL:
+0000058C  4EF9 0000059E            377          JMP         LSLcode00       *LSL.B
+00000592  4EF9 000005A6            378          JMP         LSLcode01       *LSL.W
+00000598  4EF9 000005AE            379          JMP         LSLcode10       *LSL.L
+0000059E                           380  
+0000059E  4EB9 00000F40            381  LSLcode00 JSR       ISLSLB
+000005A4  4E75                     382            RTS
+000005A6  4EB9 00000F54            383  LSLcode01 JSR       ISLSLW
+000005AC  4E75                     384            RTS
+000005AE  4EB9 00000F68            385  LSLcode10 JSR       ISLSLL
+000005B4  4E75                     386            RTS
+000005B6                           387  *----------- END someLSL -----------------------------------
+000005B6                           388  
+000005B6                           389  *----------- someROL ---------------------------------------
+000005B6                           390  someROL:
+000005B6  41F9 000005DC            391          LEA         tableSomeROL, A0 ; Index into the table
+000005BC  4280                     392          CLR.L       D0              ; Zero it
+Line 393 ERROR: Undefined symbol
+000005BE  303C BB8E                393          MOVE.W      #example,D0     ; We'll play with it here
+000005C2  123C 0008                394          MOVE.B      #8,D1           ; Shift 8 bits left
+000005C6  E360                     395          ASL.W       D1,D0
+Line 396 ERROR: Undefined symbol
+000005C8  123C 008E                396          MOVE.B      #shift,D1       ; Shift 12 bits to the right
+000005CC  E268                     397          LSR.W       D1,D0           ; Move the bits (moves highest 4 bits to lowest 4 positions,
+000005CE                           398                                      ; and the rest are zeroed out)
+000005CE  123C 0002                399          MOVE.B      #2,D1           ; Shift 2 bits right
+000005D2  E260                     400          ASR.W       D1,D0
+000005D4  C0FC 0006                401          MULU        #6,D0           ; Form offset (move 6 bytes in memory for every 'JMP' command)
+000005D8  4EF0 0000                402          JMP         0(A0,D0)        ; Jump indirect with index, i.e. jump to 'table' + displacement
+000005DC                           403  
+000005DC                           404  tableSomeROL:
+000005DC  4EF9 000005EE            405          JMP         ROLcode00       *ROL.B
+000005E2  4EF9 000005F6            406          JMP         ROLcode01       *ROL.W
+000005E8  4EF9 000005FE            407          JMP         ROLcode10       *ROL.L
+000005EE                           408  
+000005EE  4EB9 00000FB8            409  ROLcode00 JSR       ISROLB
+000005F4  4E75                     410            RTS
+000005F6  4EB9 00000FCC            411  ROLcode01 JSR       ISROLW
+000005FC  4E75                     412            RTS
+000005FE  4EB9 00000FE0            413  ROLcode10 JSR       ISROLL
+00000604  4E75                     414            RTS
+00000606                           415  *----------- END someROR -----------------------------------
+00000606                           416  
+00000606                           417  
+00000606                           418  *----------- someROR ---------------------------------------
+00000606                           419  someROR:
+00000606  41F9 0000062C            420          LEA         tableSomeROR, A0 ; Index into the table
+0000060C  4280                     421          CLR.L       D0              ; Zero it
+Line 422 ERROR: Undefined symbol
+0000060E  303C BB8E                422          MOVE.W      #example,D0     ; We'll play with it here
+00000612  123C 0008                423          MOVE.B      #8,D1           ; Shift 8 bits left
+00000616  E360                     424          ASL.W       D1,D0
+Line 425 ERROR: Undefined symbol
+00000618  123C 008E                425          MOVE.B      #shift,D1       ; Shift 12 bits to the right
+0000061C  E268                     426          LSR.W       D1,D0           ; Move the bits (moves highest 4 bits to lowest 4 positions,
+0000061E                           427                                      ; and the rest are zeroed out)
+0000061E  123C 0002                428          MOVE.B      #2,D1           ; Shift 2 bits right
+00000622  E260                     429          ASR.W       D1,D0
+00000624  C0FC 0006                430          MULU        #6,D0           ; Form offset (move 6 bytes in memory for every 'JMP' command)
+00000628  4EF0 0000                431          JMP         0(A0,D0)        ; Jump indirect with index, i.e. jump to 'table' + displacement
+0000062C                           432  
+0000062C                           433  tableSomeROR:
+0000062C  4EF9 0000063E            434          JMP         RORcode00       *ROR.B
+00000632  4EF9 00000646            435          JMP         RORcode01       *ROR.W
+00000638  4EF9 0000064E            436          JMP         RORcode10       *ROR.L
+0000063E                           437  
+0000063E  4EB9 00000F7C            438  RORcode00 JSR       ISRORB
+00000644  4E75                     439            RTS
+00000646  4EB9 00000F90            440  RORcode01 JSR       ISRORW
+0000064C  4E75                     441            RTS
+0000064E  4EB9 00000FA4            442  RORcode10 JSR       ISRORL
+00000654  4E75                     443            RTS
+00000656                           444  *----------- END someROR -----------------------------------
+00000656                           445  
+00000656                           446  *----------- ROL_ROR ---------------------------------------
+00000656                           447  ROL_ROR:
+00000656  41F9 0000067C            448          LEA         tableROL_ROR, A0 ; Index into the table
+0000065C  4280                     449          CLR.L       D0              ; Zero it
+Line 450 ERROR: Undefined symbol
+0000065E  303C BB8E                450          MOVE.W      #example,D0     ; We'll play with it here
+00000662  123C 0007                451          MOVE.B      #7,D1           ; Shift 7 bits left
+00000666  E360                     452          ASL.W       D1,D0
+Line 453 ERROR: Undefined symbol
+00000668  123C 008E                453          MOVE.B      #shift,D1       ; Shift 12 bits to the right
+0000066C  E268                     454          LSR.W       D1,D0           ; Move the bits (moves highest 4 bits to lowest 4 positions,
+0000066E                           455                                      ; and the rest are zeroed out)
+0000066E  123C 0003                456          MOVE.B      #3,D1           ; Shift 3 bits right
+00000672  E260                     457          ASR.W       D1,D0
+00000674  C0FC 0006                458          MULU        #6,D0           ; Form offset (move 6 bytes in memory for every 'JMP' command)
+00000678  4EF0 0000                459          JMP         0(A0,D0)        ; Jump indirect with index, i.e. jump to 'table' + displacement
+0000067C                           460  
+0000067C                           461  tableROL_ROR:
+0000067C  4EF9 00000688            462          JMP         ROL_RORcode0    ; ROR
+00000682  4EF9 0000068E            463          JMP         ROL_RORcode1    ; ROL
+00000688                           464  
+00000688  4EB8 0606                465  ROL_RORcode0 JSR    someROR
+0000068C  4E75                     466               RTS
+0000068E  4EB8 05B6                467  ROL_RORcode1 JSR    someROL
+00000692  4E75                     468               RTS
+00000694                           469  *----------- END ROL_ROR -----------------------------------
+00000694                           470  
+00000694                           471  *----------- LSL_LSR ---------------------------------------
+00000694                           472  LSL_LSR:
+00000694  41F9 000006BA            473          LEA         tableLSL_LSR, A0 ; Index into the table
+0000069A  4280                     474          CLR.L       D0              ; Zero it
+Line 475 ERROR: Undefined symbol
+0000069C  303C BB8E                475          MOVE.W      #example,D0     ; We'll play with it here
+000006A0  123C 0007                476          MOVE.B      #7,D1           ; Shift 7 bits left
+000006A4  E360                     477          ASL.W       D1,D0
+Line 478 ERROR: Undefined symbol
+000006A6  123C 008E                478          MOVE.B      #shift,D1       ; Shift 12 bits to the right
+000006AA  E268                     479          LSR.W       D1,D0           ; Move the bits (moves highest 4 bits to lowest 4 positions,
+000006AC                           480                                      ; and the rest are zeroed out)
+000006AC  123C 0003                481          MOVE.B      #3,D1           ; Shift 3 bits right
+000006B0  E260                     482          ASR.W       D1,D0
+000006B2  C0FC 0006                483          MULU        #6,D0           ; Form offset (move 6 bytes in memory for every 'JMP' command)
+000006B6  4EF0 0000                484          JMP         0(A0,D0)        ; Jump indirect with index, i.e. jump to 'table' + displacement
+000006BA                           485  
+000006BA                           486  tableLSL_LSR:
+000006BA  4EF9 000006C6            487          JMP         LSL_LSRcode0    ; LSR
+000006C0  4EF9 000006CC            488          JMP         LSL_LSRcode1    ; LSL
+000006C6                           489  
+000006C6  4EB8 0516                490  LSL_LSRcode0 JSR    someLSR
+000006CA  4E75                     491               RTS
+000006CC  4EB8 0566                492  LSL_LSRcode1 JSR    someLSL
+000006D0  4E75                     493               RTS
+000006D2                           494  *----------- END LSL_LSR -----------------------------------
+000006D2                           495  
+000006D2                           496  *----------- ASL_ASR ---------------------------------------
+000006D2                           497  ASL_ASR:
+000006D2  41F9 000006F8            498          LEA         tableASL_ASR, A0 ; Index into the table
+000006D8  4280                     499          CLR.L       D0              ; Zero it
+Line 500 ERROR: Undefined symbol
+000006DA  303C BB8E                500          MOVE.W      #example,D0     ; We'll play with it here
+000006DE  123C 0007                501          MOVE.B      #7,D1           ; Shift 7 bits left
+000006E2  E360                     502          ASL.W       D1,D0
+Line 503 ERROR: Undefined symbol
+000006E4  123C 008E                503          MOVE.B      #shift,D1       ; Shift 12 bits to the right
+000006E8  E268                     504          LSR.W       D1,D0           ; Move the bits (moves highest 4 bits to lowest 4 positions,
+000006EA                           505                                      ; and the rest are zeroed out)
+000006EA  123C 0003                506          MOVE.B      #3,D1           ; Shift 3 bits right
+000006EE  E260                     507          ASR.W       D1,D0
+000006F0  C0FC 0006                508          MULU        #6,D0           ; Form offset (move 6 bytes in memory for every 'JMP' command)
+000006F4  4EF0 0000                509          JMP         0(A0,D0)        ; Jump indirect with index, i.e. jump to 'table' + displacement
+000006F8                           510  
+000006F8                           511  tableASL_ASR:
+000006F8  4EF9 00000704            512          JMP         ASL_ASRcode0    ; ASR
+000006FE  4EF9 0000070A            513          JMP         ASL_ASRcode1    ; ASL
+00000704                           514  
+00000704  4EB8 0476                515  ASL_ASRcode0 JSR    someASR
+00000708  4E75                     516               RTS
+0000070A  4EB8 04C6                517  ASL_ASRcode1 JSR    someASL
+0000070E  4E75                     518               RTS
+00000710                           519  *----------- END ASL_ASR -----------------------------------
+00000710                           520  
+00000710                           521  *----------- ROd_LSd_ASd -----------------------------------
+00000710                           522  ROd_LSd_ASd:
+00000710  41F9 00000736            523          LEA         tableROd_LSd_ASd, A0 ; Index into the table
+00000716  4280                     524          CLR.L       D0              ; Zero it
+Line 525 ERROR: Undefined symbol
+00000718  303C BB8E                525          MOVE.W      #example,D0     ; We'll play with it here
+0000071C  123C 000B                526          MOVE.B      #11,D1          ; Shift 11 bits left
+00000720  E360                     527          ASL.W       D1,D0
+Line 528 ERROR: Undefined symbol
+00000722  123C 008E                528          MOVE.B      #shift,D1       ; Shift 12 bits to the right
+00000726  E268                     529          LSR.W       D1,D0           ; Move the bits (moves highest 4 bits to lowest 4 positions,
+00000728                           530                                      ; and the rest are zeroed out)
+00000728  123C 0002                531          MOVE.B      #2,D1           ; Shift 2 bits right
+0000072C  E260                     532          ASR.W       D1,D0
+0000072E  C0FC 0006                533          MULU        #6,D0           ; Form offset (move 6 bytes in memory for every 'JMP' command)
+00000732  4EF0 0000                534          JMP         0(A0,D0)        ; Jump indirect with index, i.e. jump to 'table' + displacement
+00000736                           535  
+00000736                           536  tableROd_LSd_ASd:
+00000736  4EF9 0000074E            537          JMP         ROd_LSd_ASdcode00 ; ASL_ASR
+0000073C  4EF9 00000754            538          JMP         ROd_LSd_ASdcode01 ; LSL_LSR
+00000742  4EF9 0000075A            539          JMP         ROd_LSd_ASdcode10
+00000748  4EF9 00000762            540          JMP         ROd_LSd_ASdcode11 ; ROL_ROR
+0000074E                           541  
+0000074E  4EB8 06D2                542  ROd_LSd_ASdcode00 JSR ASL_ASR
+00000752  4E75                     543                    RTS
+00000754  4EB8 0694                544  ROd_LSd_ASdcode01 JSR LSL_LSR
+00000758  4E75                     545                    RTS
+0000075A  4EB9 00000DD8            546  ROd_LSd_ASdcode10 JSR    OPCODE_INVALID              ;INVALID
+00000760  4E75                     547                    RTS
+00000762  4EB8 0656                548  ROd_LSd_ASdcode11 JSR ROL_ROR
+00000766  4E75                     549                    RTS
+00000768                           550  *----------- END  ROd_LSd_ASd ------------------------------
+00000768                           551  
+00000768                           552  *----------- AND_BorAND_WorAND_LorMULS_W -------------------
+00000768                           553  AND_BorAND_WorAND_LorMULS_W:
+00000768  41F9 0000078E            554          LEA         tableAND_BorAND_WorAND_LorMULS_W, A0            ; Index into the table
+0000076E  4280                     555          CLR.L       D0                  ; Zero it
+Line 556 ERROR: Undefined symbol
+00000770  303C BB8E                556          MOVE.W      #example,D0         ; We'll play with it here
+00000774  123C 0007                557          MOVE.B      #7,D1           ; Shift 7 bits left
+00000778  E360                     558          ASL.W       D1,D0
+Line 559 ERROR: Undefined symbol
+0000077A  123C 008E                559          MOVE.B      #shift,D1           ; Shift 12 bits to the right
+0000077E  E268                     560          LSR.W       D1,D0               ; Move the bits (moves highest 4 bits to lowest 4 positions,
+00000780                           561                                  ; and the rest are zeroed out)
+00000780  123C 0001                562          MOVE.B      #1,D1           ; Shift 1 bits right
+00000784  E260                     563          ASR.W       D1,D0
+00000786  C0FC 0006                564          MULU        #6,D0               ; Form offset (move 6 bytes in memory for every 'JMP' command)
+0000078A  4EF0 0000                565          JMP         0(A0,D0)            ; Jump indirect with index, i.e. jump to 'table' + displacement
+0000078E                           566  
+0000078E                           567  tableAND_BorAND_WorAND_LorMULS_W:
+0000078E  4EF9 000007BE            568          JMP         ANDcode000   ; AND.B
+00000794  4EF9 000007C6            569          JMP         ANDcode001   ; AND.W
+0000079A  4EF9 000007CE            570          JMP         ANDcode010   ; AND.L
+000007A0  4EF9 000007D6            571          JMP         ANDcode011
+000007A6  4EF9 000007DE            572          JMP         ANDcode100   ; AND.B
+000007AC  4EF9 000007E6            573          JMP         ANDcode101   ; AND.W
+000007B2  4EF9 000007EE            574          JMP         ANDcode110   ; AND.L
+000007B8  4EF9 000007F6            575          JMP         ANDcode111   ; MULS.W
+000007BE                           576  
+000007BE  4EB9 0000101C            577  ANDcode000 JSR      ISANDB
+000007C4  4E75                     578             RTS
+000007C6  4EB9 00001030            579  ANDcode001 JSR      ISANDW
+000007CC  4E75                     580             RTS
+000007CE  4EB9 00001044            581  ANDcode010 JSR      ISANDL
+000007D4  4E75                     582             RTS
+000007D6  4EB9 00000DD8            583  ANDcode011 JSR    OPCODE_INVALID              ;INVALID
+000007DC  4E75                     584             RTS
+000007DE  4EB9 0000101C            585  ANDcode100 JSR      ISANDB
+000007E4  4E75                     586             RTS
+000007E6  4EB9 00001030            587  ANDcode101 JSR      ISANDW
+000007EC  4E75                     588             RTS
+000007EE  4EB9 00001044            589  ANDcode110 JSR      ISANDL
+000007F4  4E75                     590             RTS
+000007F6  4EB9 00001008            591  ANDcode111 JSR      ISMULSW
+000007FC  4E75                     592             RTS
+000007FE                           593  *----------- END  ADD_BorADD_WorADD_L ----------------------
+000007FE                           594  
+000007FE                           595  *----------- ADD_BorADD_WorADD_L ---------------------------
+000007FE                           596  ADD_BorADD_WorADD_L:
+000007FE  41F9 00000824            597          LEA         tableADD_BorADD_WorADD_L, A0 ; Index into the table
+00000804  4280                     598          CLR.L       D0              ; Zero it
+Line 599 ERROR: Undefined symbol
+00000806  303C BB8E                599          MOVE.W      #example,D0     ; We'll play with it here
+0000080A  123C 0007                600          MOVE.B      #7,D1           ; Shift 7 bits left
+0000080E  E360                     601          ASL.W       D1,D0
+Line 602 ERROR: Undefined symbol
+00000810  123C 008E                602          MOVE.B      #shift,D1       ; Shift 12 bits to the right
+00000814  E268                     603          LSR.W       D1,D0           ; Move the bits (moves highest 4 bits to lowest 4 positions,
+00000816                           604                                      ; and the rest are zeroed out)
+00000816  123C 0001                605          MOVE.B      #1,D1           ; Shift 1 bits right
+0000081A  E260                     606          ASR.W       D1,D0
+0000081C  C0FC 0006                607          MULU        #6,D0           ; Form offset (move 6 bytes in memory for every 'JMP' command)
+00000820  4EF0 0000                608          JMP         0(A0,D0)        ; Jump indirect with index, i.e. jump to 'table' + displacement
+00000824                           609  
+00000824                           610  tableADD_BorADD_WorADD_L:
+00000824  4EF9 00000854            611          JMP         ADDcode000      *ADD.B
+0000082A  4EF9 0000085C            612          JMP         ADDcode001      *ADD.W
+00000830  4EF9 00000864            613          JMP         ADDcode010      *ADD.L
+00000836  4EF9 0000086C            614          JMP         ADDcode011      *ADDA.W
+0000083C  4EF9 00000874            615          JMP         ADDcode100      *ADD.B
+00000842  4EF9 0000087C            616          JMP         ADDcode101      *ADD.W
+00000848  4EF9 00000884            617          JMP         ADDcode110      *ADD.L
+0000084E  4EF9 0000088C            618          JMP         ADDcode111      *ADDA.L
+00000854                           619  
+00000854  4EB9 00001080            620  ADDcode000 JSR      ISADDB
+0000085A  4E75                     621             RTS
+0000085C  4EB9 00001094            622  ADDcode001 JSR      ISADDW
+00000862  4E75                     623             RTS
+00000864  4EB9 000010A8            624  ADDcode010 JSR      ISADDL
+0000086A  4E75                     625             RTS
+0000086C  4EB9 00001058            626  ADDcode011 JSR      ISADDAW
+00000872  4E75                     627             RTS
+00000874  4EB9 00001080            628  ADDcode100 JSR      ISADDB
+0000087A  4E75                     629             RTS
+0000087C  4EB9 00001094            630  ADDcode101 JSR      ISADDW
+00000882  4E75                     631             RTS
+00000884  4EB9 000010A8            632  ADDcode110 JSR      ISADDL
+0000088A  4E75                     633             RTS
+0000088C  4EB9 0000106C            634  ADDcode111 JSR      ISADDAL
+00000892  4E75                     635             RTS
+00000894                           636  *----------- END  ADD_BorADD_WorADD_L ----------------------
+00000894                           637  
+00000894                           638  *----------- SUB_BorSUB_WorSUB_L ---------------------------
+00000894                           639  SUB_BorSUB_WorSUB_L:
+00000894  41F9 000008BA            640          LEA         tableSUB_BorSUB_WorSUB_L, A0 ; Index into the table
+0000089A  4280                     641          CLR.L       D0              ; Zero it
+Line 642 ERROR: Undefined symbol
+0000089C  303C BB8E                642          MOVE.W      #example,D0     ; We'll play with it here
+000008A0  123C 0007                643          MOVE.B      #7,D1           ; Shift 7 bits left
+000008A4  E360                     644          ASL.W       D1,D0
+Line 645 ERROR: Undefined symbol
+000008A6  123C 008E                645          MOVE.B      #shift,D1       ; Shift 12 bits to the right
+000008AA  E268                     646          LSR.W       D1,D0           ; Move the bits (moves highest 4 bits to lowest 4 positions,
+000008AC                           647                                      ; and the rest are zeroed out)
+000008AC  123C 0001                648          MOVE.B      #1,D1           ; Shift 1 bits right
+000008B0  E260                     649          ASR.W       D1,D0
+000008B2  C0FC 0006                650          MULU        #6,D0           ; Form offset (move 6 bytes in memory for every 'JMP' command)
+000008B6  4EF0 0000                651          JMP         0(A0,D0)        ; Jump indirect with index, i.e. jump to 'table' + displacement
+000008BA                           652  
+000008BA                           653  tableSUB_BorSUB_WorSUB_L:
+000008BA  4EF9 000008E4            654          JMP         SUBcode000      *SUB.B
+000008C0  4EF9 000008EC            655          JMP         SUBcode001      *SUB.W
+000008C6  4EF9 000008F4            656          JMP         SUBcode010      *SUB.L
+000008CC  4EF9 000008FC            657          JMP         SUBcode011
+000008D2  4EF9 00000904            658          JMP         SUBcode100      *SUB.B
+000008D8  4EF9 0000090C            659          JMP         SUBcode101      *SUB.W
+000008DE  4EF9 00000914            660          JMP         SUBcode110      *SUB.L
+000008E4                           661  
+000008E4  4EB9 000010BC            662  SUBcode000 JSR      ISSUBB
+000008EA  4E75                     663             RTS
+000008EC  4EB9 000010D0            664  SUBcode001 JSR      ISSUBW
+000008F2  4E75                     665             RTS
+000008F4  4EB9 000010E4            666  SUBcode010 JSR      ISSUBL
+000008FA  4E75                     667             RTS
+000008FC  4EB9 00000DD8            668  SUBcode011 JSR    OPCODE_INVALID              ;INVALID
+00000902  4E75                     669             RTS
+00000904  4EB9 000010BC            670  SUBcode100 JSR      ISSUBB
+0000090A  4E75                     671             RTS
+0000090C  4EB9 000010D0            672  SUBcode101 JSR      ISSUBW
+00000912  4E75                     673             RTS
+00000914  4EB9 000010E4            674  SUBcode110 JSR      ISSUBL
+0000091A  4E75                     675             RTS
+0000091C                           676  *----------- END  SUB_BorSUB_WorSUB_L ----------------------
+0000091C                           677  
+0000091C                           678  *----------- CMP_BorCMP_WorCMP_L ---------------------------
+0000091C                           679  CMP_BorCMP_WorCMP_L:
+0000091C  41F9 00000942            680          LEA         tableCMP_BorCMP_WorCMP_L, A0 ; Index into the table
+00000922  4280                     681          CLR.L       D0              ; Zero it
+Line 682 ERROR: Undefined symbol
+00000924  303C BB8E                682          MOVE.W      #example,D0     ; We'll play with it here
+00000928  123C 0007                683          MOVE.B      #7,D1           ; Shift 7 bits left
+0000092C  E360                     684          ASL.W       D1,D0
+Line 685 ERROR: Undefined symbol
+0000092E  123C 008E                685          MOVE.B      #shift,D1       ; Shift 12 bits to the right
+00000932  E268                     686          LSR.W       D1,D0           ; Move the bits (moves highest 4 bits to lowest 4 positions,
+00000934                           687                          ; and the rest are zeroed out)
+00000934  123C 0001                688          MOVE.B          #1,D1       ; Shift 1 bits right
+00000938  E260                     689          ASR.W       D1,D0
+0000093A  C0FC 0006                690          MULU        #6,D0           ; Form offset (move 6 bytes in memory for every 'JMP' command)
+0000093E  4EF0 0000                691          JMP         0(A0,D0)        ; Jump indirect with index, i.e. jump to 'table' + displacement
+00000942                           692  
+00000942                           693  tableCMP_BorCMP_WorCMP_L:
+00000942  4EF9 00000954            694          JMP         CMPcode000      *CMP.B
+00000948  4EF9 0000095C            695          JMP         CMPcode001      *CMP.W
+0000094E  4EF9 00000964            696          JMP         CMPcode010      *CMP.L
+00000954                           697  
+00000954  4EB9 000010F8            698  CMPcode000 JSR      ISCMPB
+0000095A  4E75                     699             RTS
+0000095C  4EB9 0000110C            700  CMPcode001 JSR      ISCMPW
+00000962  4E75                     701             RTS
+00000964  4EB9 00001120            702  CMPcode010 JSR      ISCMPL
+0000096A  4E75                     703             RTS
+0000096C                           704  *----------- END CMP_BorCMP_WorCMP_L -----------------------
+0000096C                           705  
+0000096C                           706  *----------- ADDQ_BorADDQ_WorADDQ_L ------------------------
+0000096C                           707  ADDQ_BorADDQ_WorADDQ_L:
+0000096C  41F9 00000992            708          LEA         tableADDQ_BorADDQ_WorADDQ_L, A0 ; Index into the table
+00000972  4280                     709          CLR.L       D0              ; Zero it
+Line 710 ERROR: Undefined symbol
+00000974  303C BB8E                710          MOVE.W      #example,D0     ; We'll play with it here
+00000978  123C 0008                711          MOVE.B      #8,D1           ; Shift 8 bits left
+0000097C  E360                     712          ASL.W       D1,D0
+Line 713 ERROR: Undefined symbol
+0000097E  123C 008E                713          MOVE.B      #shift,D1       ; Shift 12 bits to the right
+00000982  E268                     714          LSR.W       D1,D0           ; Move the bits (moves highest 4 bits to lowest 4 positions,
+00000984                           715                                      ; and the rest are zeroed out)
+00000984  123C 0002                716          MOVE.B      #2,D1           ; Shift 2 bits right
+00000988  E260                     717          ASR.W       D1,D0
+0000098A  C0FC 0006                718          MULU        #6,D0           ; Form offset (move 6 bytes in memory for every 'JMP' command)
+0000098E  4EF0 0000                719          JMP         0(A0,D0)        ; Jump indirect with index, i.e. jump to 'table' + displacement
+00000992                           720  
+00000992                           721  tableADDQ_BorADDQ_WorADDQ_L:
+00000992  4EF9 000009A4            722          JMP         ADDQcode00      *ADDQ.B
+00000998  4EF9 000009AC            723          JMP         ADDQcode01      *ADDQ.W
+0000099E  4EF9 000009B4            724          JMP         ADDQcode10      *ADDQ.L
+000009A4                           725  
+000009A4  4EB9 00001134            726  ADDQcode00 JSR      ISADDQB
+000009AA  4E75                     727             RTS
+000009AC  4EB9 00001148            728  ADDQcode01 JSR      ISADDQW
+000009B2  4E75                     729             RTS
+000009B4  4EB9 0000115C            730  ADDQcode10 JSR      ISADDQL
+000009BA  4E75                     731             RTS
+000009BC                           732  *----------- END ADDQ_BorADDQ_WorADDQ_L --------------------
+000009BC                           733  
+000009BC                           734  *----------- someCLR ---------------------------------------
+000009BC                           735  someCLR:
+000009BC  41F9 000009E2            736          LEA         tableSomeCLR, A0 ; Index into the table
+000009C2  4280                     737          CLR.L       D0              ; Zero it
+Line 738 ERROR: Undefined symbol
+000009C4  303C BB8E                738          MOVE.W      #example,D0     ; We'll play with it here
+000009C8  123C 0008                739          MOVE.B      #8,D1           ; Shift 8 bits left
+000009CC  E360                     740          ASL.W       D1,D0
+Line 741 ERROR: Undefined symbol
+000009CE  123C 008E                741          MOVE.B      #shift,D1       ; Shift 12 bits to the right
+000009D2  E268                     742          LSR.W       D1,D0           ; Move the bits (moves highest 4 bits to lowest 4 positions,
+000009D4                           743                                      ; and the rest are zeroed out)
+000009D4  123C 0002                744          MOVE.B      #2,D1           ; Shift 2 bits right
+000009D8  E260                     745          ASR.W       D1,D0
+000009DA  C0FC 0006                746          MULU        #6,D0           ; Form offset (move 6 bytes in memory for every 'JMP' command)
+000009DE  4EF0 0000                747          JMP         0(A0,D0)        ; Jump indirect with index, i.e. jump to 'table' + displacement
+000009E2                           748  
+000009E2                           749  tableSomeCLR:
+000009E2  4EF9 000009F4            750          JMP         CLRcode00       *CLR.B
+000009E8  4EF9 000009FC            751          JMP         CLRcode01       *CLR.W
+000009EE  4EF9 00000A04            752          JMP         CLRcode10       *CLR.L
+000009F4                           753  
+000009F4  4EB9 00001184            754  CLRcode00 JSR       ISCLRB
+000009FA  4E75                     755            RTS
+000009FC  4EB9 00001198            756  CLRcode01 JSR       ISCLRW
+00000A02  4E75                     757            RTS
+00000A04  4EB9 000011AC            758  CLRcode10 JSR       ISCLRL
+00000A0A  4E75                     759            RTS
+00000A0C                           760  *----------- END someCLR -----------------------------------
+00000A0C                           761  
+00000A0C                           762  *----------- NOPorCLRorRTSorJSR ----------------------------
+00000A0C                           763  NOPorCLRorRTSorJSR:
+00000A0C  41F9 00000A40            764          LEA         tableNOPorCLRorRTSorJSR, A0 ; Index into the table
+00000A12  4280                     765          CLR.L       D0              ; Zero it
+Line 766 ERROR: Undefined symbol
+00000A14  303C BB8E                766          MOVE.W      #example,D0     ; We'll play with it here
+00000A18                           767  
+00000A18  323C 4E71                768          MOVE.W      #%0100111001110001, D1 ; 0100111001110001 = NOP
+00000A1C  B240                     769          CMP.W       D0, D1
+00000A1E  6700 0088                770          BEQ         NOPcommand
+00000A22                           771  
+00000A22  323C 4E75                772          MOVE.W      #%0100111001110101, D1 ; 0100111001110101 = RTS
+00000A26  B240                     773          CMP.W       D0, D1
+00000A28  6700 0076                774          BEQ         RTScommand
+00000A2C                           775  
+00000A2C  123C 0004                776          MOVE.B      #4,D1           ; Shift 4 bits left
+00000A30  E360                     777          ASL.W       D1,D0
+Line 778 ERROR: Undefined symbol
+00000A32  123C 008E                778          MOVE.B      #shift,D1       ; Shift 12 bits to the right
+00000A36  E268                     779          LSR.W       D1,D0           ; Move the bits (moves highest 4 bits to lowest 4 positions,
+00000A38                           780                                      ; and the rest are zeroed out)
+00000A38  C0FC 0006                781          MULU        #6,D0           ; Form offset (move 6 bytes in memory for every 'JMP' command)
+00000A3C  4EF0 0000                782          JMP         0(A0,D0)        ; Jump indirect with index, i.e. jump to 'table' + displacement
+00000A40                           783  
+00000A40                           784  tableNOPorCLRorRTSorJSR:
+00000A40  4EF9 00000AB0            785          JMP         JSRorCLRcode0000
+00000A46  4EF9 00000AB8            786          JMP         JSRorCLRcode0001
+00000A4C  4EF9 00000AC0            787          JMP         JSRorCLRcode0010
+00000A52  4EF9 00000AC6            788          JMP         JSRorCLRcode0011
+00000A58  4EF9 00000ACE            789          JMP         JSRorCLRcode0100
+00000A5E  4EF9 00000AD6            790          JMP         JSRorCLRcode0101
+00000A64  4EF9 00000ADE            791          JMP         JSRorCLRcode0110
+00000A6A  4EF9 00000AE6            792          JMP         JSRorCLRcode0111
+00000A70  4EF9 00000AEE            793          JMP         JSRorCLRcode1000
+00000A76  4EF9 00000AF6            794          JMP         JSRorCLRcode1001
+00000A7C  4EF9 00000AFE            795          JMP         JSRorCLRcode1010
+00000A82  4EF9 00000B06            796          JMP         JSRorCLRcode1011
+00000A88  4EF9 00000B0E            797          JMP         JSRorCLRcode1100
+00000A8E  4EF9 00000B16            798          JMP         JSRorCLRcode1101
+00000A94  4EF9 00000B1E            799          JMP         JSRorCLRcode1110
+00000A9A  4EF9 00000B26            800          JMP         JSRorCLRcode1111
+00000AA0                           801  
+00000AA0  4EB9 00001210            802  RTScommand JSR      ISRTS
+00000AA6  4E75                     803             RTS
+00000AA8  4EB9 00001238            804  NOPcommand JSR      ISNOP
+00000AAE  4E75                     805             RTS
+00000AB0  4EB9 00000DD8            806  JSRorCLRcode0000 JSR    OPCODE_INVALID              ;INVALID
+00000AB6  4E75                     807                   RTS
+00000AB8  4EB9 00000DD8            808  JSRorCLRcode0001 JSR    OPCODE_INVALID              ;INVALID
+00000ABE  4E75                     809                   RTS
+00000AC0  4EB8 09BC                810  JSRorCLRcode0010 JSR someCLR
+00000AC4  4E75                     811                   RTS
+00000AC6  4EB9 00000DD8            812  JSRorCLRcode0011 JSR    OPCODE_INVALID              ;INVALID
+00000ACC  4E75                     813                   RTS
+00000ACE  4EB9 00000DD8            814  JSRorCLRcode0100 JSR    OPCODE_INVALID              ;INVALID
+00000AD4  4E75                     815                   RTS
+00000AD6  4EB9 00000DD8            816  JSRorCLRcode0101 JSR    OPCODE_INVALID              ;INVALID
+00000ADC  4E75                     817                   RTS
+00000ADE  4EB9 00000DD8            818  JSRorCLRcode0110 JSR    OPCODE_INVALID              ;INVALID
+00000AE4  4E75                     819                   RTS
+00000AE6  4EB9 00000DD8            820  JSRorCLRcode0111 JSR    OPCODE_INVALID              ;INVALID
+00000AEC  4E75                     821                   RTS
+00000AEE  4EB9 00000DD8            822  JSRorCLRcode1000 JSR    OPCODE_INVALID              ;INVALID
+00000AF4  4E75                     823                   RTS
+00000AF6  4EB9 00000DD8            824  JSRorCLRcode1001 JSR    OPCODE_INVALID              ;INVALID
+00000AFC  4E75                     825                   RTS
+00000AFE  4EB9 00000DD8            826  JSRorCLRcode1010 JSR    OPCODE_INVALID              ;INVALID
+00000B04  4E75                     827                   RTS
+00000B06  4EB9 00000DD8            828  JSRorCLRcode1011 JSR    OPCODE_INVALID              ;INVALID
+00000B0C  4E75                     829                   RTS
+00000B0E  4EB9 00000DD8            830  JSRorCLRcode1100 JSR    OPCODE_INVALID              ;INVALID
+00000B14  4E75                     831                   RTS
+00000B16  4EB9 00000DD8            832  JSRorCLRcode1101 JSR    OPCODE_INVALID              ;INVALID
+00000B1C  4E75                     833                   RTS
+00000B1E  4EB9 000011FC            834  JSRorCLRcode1110 JSR ISJSR
+00000B24  4E75                     835                   RTS
+00000B26  4EB9 00000DD8            836  JSRorCLRcode1111 JSR    OPCODE_INVALID              ;INVALID
+00000B2C  4E75                     837                   RTS
+00000B2E                           838  *----------- END NOPorCLRorRTSorJSR ------------------------
+00000B2E                           839  
+00000B2E                           840  *----------- someMOVEM -------------------------------------
+00000B2E                           841  someMOVEM:
+00000B2E  41F9 00000B54            842          LEA         tableSomeMOVEM, A0 ; Index into the table
+00000B34  4280                     843          CLR.L       D0              ; Zero it
+Line 844 ERROR: Undefined symbol
+00000B36  303C BB8E                844          MOVE.W      #example,D0     ; We'll play with it here
+00000B3A  123C 0009                845          MOVE.B      #9,D1           ; Shift 9 bits left
+00000B3E  E360                     846          ASL.W       D1,D0
+Line 847 ERROR: Undefined symbol
+00000B40  123C 008E                847          MOVE.B      #shift,D1       ; Shift 12 bits to the right
+00000B44  E268                     848          LSR.W       D1,D0           ; Move the bits (moves highest 4 bits to lowest 4 positions,
+00000B46                           849                                      ; and the rest are zeroed out)
+00000B46  123C 0003                850          MOVE.B      #3,D1           ; Shift 3 bits right
+00000B4A  E260                     851          ASR.W       D1,D0
+00000B4C  C0FC 0006                852          MULU        #6,D0           ; Form offset (move 6 bytes in memory for every 'JMP' command)
+00000B50  4EF0 0000                853          JMP         0(A0,D0)        ; Jump indirect with index, i.e. jump to 'table' + displacement
+00000B54                           854  
+00000B54                           855  tableSomeMOVEM:
+00000B54  4EF9 00000B60            856          JMP         MOVEMcode0      ; MOVEM.W
+00000B5A  4EF9 00000B68            857          JMP         MOVEMcode1      ; MOVEM.L
+00000B60                           858  
+00000B60  4EB9 000011D4            859  MOVEMcode0 JSR      ISMOVEMW
+00000B66  4E75                     860             RTS
+00000B68  4EB9 000011C0            861  MOVEMcode1 JSR      ISMOVEML
+00000B6E  4E75                     862             RTS
+00000B70                           863  *----------- END someMOVEM ---------------------------------
+00000B70                           864  
+00000B70                           865  *----------- NOP_MOVEM_LEA_JSR_CLR_RTS ---------------------
+00000B70                           866  NOP_MOVEM_LEA_JSR_CLR_RTS:
+00000B70  41F9 00000B96            867          LEA         tableNOP_MOVEM_LEA_JSR_CLR_RTS, A0 ; Index into the table
+00000B76  4280                     868          CLR.L       D0              ; Zero it
+Line 869 ERROR: Undefined symbol
+00000B78  303C BB8E                869          MOVE.W      #example,D0     ; We'll play with it here
+00000B7C  123C 0007                870          MOVE.B      #7,D1           ; Shift 7 bits right
+00000B80  E260                     871          ASR.W       D1,D0
+00000B82  123C 000D                872          MOVE.B      #13,D1          ; Shift 13 bits left
+00000B86  E360                     873          ASL.W       D1,D0
+Line 874 ERROR: Undefined symbol
+00000B88  123C 008E                874          MOVE.B      #shift,D1       ; Shift 12 bits to the right
+00000B8C  E268                     875          LSR.W       D1,D0           ; Move the bits (moves highest 4 bits to lowest 4 positions,
+00000B8E                           876                                      ; and the rest are zeroed out)
+00000B8E  C0FC 0006                877          MULU        #6,D0           ; Form offset (move 6 bytes in memory for every 'JMP' command)
+00000B92  4EF0 0000                878          JMP         0(A0,D0)        ; Jump indirect with index, i.e. jump to 'table' + displacement
+00000B96                           879  
+00000B96                           880  tableNOP_MOVEM_LEA_JSR_CLR_RTS:
+00000B96  4EF9 00000BF6            881          JMP         LOTScode0000
+00000B9C  4EF9 00000BFC            882          JMP         LOTScode0001
+00000BA2  4EF9 00000C04            883          JMP         LOTScode0010
+00000BA8  4EF9 00000C0A            884          JMP         LOTScode0011
+00000BAE  4EF9 00000C12            885          JMP         LOTScode0100
+00000BB4  4EF9 00000C1A            886          JMP         LOTScode0101
+00000BBA  4EF9 00000C22            887          JMP         LOTScode0110
+00000BC0  4EF9 00000C2A            888          JMP         LOTScode0111
+00000BC6  4EF9 00000C32            889          JMP         LOTScode1000
+00000BCC  4EF9 00000C38            890          JMP         LOTScode1001
+00000BD2  4EF9 00000C40            891          JMP         LOTScode1010
+00000BD8  4EF9 00000C46            892          JMP         LOTScode1011
+00000BDE  4EF9 00000C4E            893          JMP         LOTScode1100
+00000BE4  4EF9 00000C56            894          JMP         LOTScode1101
+00000BEA  4EF9 00000C5E            895          JMP         LOTScode1110
+00000BF0  4EF9 00000C66            896          JMP         LOTScode1111
+00000BF6                           897  
+00000BF6  4EB8 0434                898  LOTScode0000 JSR    MULSLorDIVUL
+00000BFA  4E75                     899               RTS
+00000BFC  4EB9 00000DD8            900  LOTScode0001 JSR    OPCODE_INVALID              ;INVALID
+00000C02  4E75                     901               RTS
+00000C04  4EB8 0B2E                902  LOTScode0010 JSR    someMOVEM
+00000C08  4E75                     903               RTS
+00000C0A  4EB9 00000DD8            904  LOTScode0011 JSR    OPCODE_INVALID              ;INVALID
+00000C10  4E75                     905               RTS
+00000C12  4EB9 00000DD8            906  LOTScode0100 JSR    OPCODE_INVALID              ;INVALID
+00000C18  4E75                     907               RTS
+00000C1A  4EB9 00000DD8            908  LOTScode0101 JSR    OPCODE_INVALID              ;INVALID
+00000C20  4E75                     909               RTS
+00000C22  4EB9 000011E8            910  LOTScode0110 JSR    ISLEA
+00000C28  4E75                     911               RTS
+00000C2A  4EB9 00000DD8            912  LOTScode0111 JSR    OPCODE_INVALID              ;INVALID
+00000C30  4E75                     913               RTS
+00000C32  4EB8 0A0C                914  LOTScode1000 JSR    NOPorCLRorRTSorJSR
+00000C36  4E75                     915               RTS
+00000C38  4EB9 00000DD8            916  LOTScode1001 JSR    OPCODE_INVALID              ;INVALID
+00000C3E  4E75                     917               RTS
+00000C40  4EB8 0A0C                918  LOTScode1010 JSR    NOPorCLRorRTSorJSR
+00000C44  4E75                     919               RTS
+00000C46  4EB9 00000DD8            920  LOTScode1011 JSR    OPCODE_INVALID              ;INVALID
+00000C4C  4E75                     921               RTS
+00000C4E  4EB9 00000DD8            922  LOTScode1100 JSR    OPCODE_INVALID              ;INVALID
+00000C54  4E75                     923               RTS
+00000C56  4EB9 00000DD8            924  LOTScode1101 JSR    OPCODE_INVALID              ;INVALID
+00000C5C  4E75                     925               RTS
+00000C5E  4EB9 000011E8            926  LOTScode1110 JSR    ISLEA
+00000C64  4E75                     927               RTS
+00000C66  4EB9 00000DD8            928  LOTScode1111 JSR    OPCODE_INVALID              ;INVALID
+00000C6C  4E75                     929               RTS
+00000C6E                           930  *----------- END NOP_MOVEM_LEA_JSR_CLR_RTS -----------------
+00000C6E                           931  
+00000C6E                           932  *----------- ADDI_BorADDI_WorADDI_L ------------------------
+00000C6E                           933  ADDI_BorADDI_WorADDI_L:
+00000C6E  41F9 00000C8E            934          LEA         tableADDI_BorADDI_WorADDI_L,A0 ; Index into the table
+00000C74  4280                     935          CLR.L       D0              ; Zero it
+Line 936 ERROR: Undefined symbol
+00000C76  303C BB8E                936          MOVE.W      #example,D0     ; We'll play with it here
+00000C7A  123C 0007                937          MOVE.B      #7,D1           ; Shift 7 bits left
+00000C7E  E360                     938          ASL.W       D1,D0
+00000C80  123C 000D                939          MOVE.B      #13,D1
+00000C84  E260                     940          ASR.W       D1,D0
+00000C86  C0FC 0006                941          MULU        #6,D0           ; Form offset (move 6 bytes in memory for every 'JMP' command)
+00000C8A  4EF0 0000                942          JMP         0(A0,D0)        ; Jump indirect with index, i.e. jump to 'table' + displacement
+00000C8E                           943  
+00000C8E                           944  tableADDI_BorADDI_WorADDI_L:
+00000C8E  4EF9 00000CA0            945          JMP         ADDIBcode00
+00000C94  4EF9 00000CA8            946          JMP         ADDIWcode01
+00000C9A  4EF9 00000CB0            947          JMP         ADDILcode10
+00000CA0                           948  
+00000CA0  4EB9 000012D8            949  ADDIBcode00 JSR     ISADDIB
+00000CA6  4E75                     950              RTS
+00000CA8  4EB9 000012B0            951  ADDIWcode01 JSR     ISADDIW
+00000CAE  4E75                     952              RTS
+00000CB0  4EB9 000012C4            953  ADDILcode10 JSR     ISADDIL
+00000CB6  4E75                     954              RTS
+00000CB8                           955  *----------- END ADDI_BorADDI_WorADDI_L --------------------
+00000CB8                           956  
+00000CB8                           957  *----------- MOVEA_LorMOVE_L -------------------------------
+00000CB8                           958  MOVEA_LorMOVE_L:
+00000CB8  41F9 00000CD8            959          LEA         tableMOVEA_LorMOVE_L,A0 ; Index into the table
+00000CBE  4280                     960          CLR.L       D0              ; Zero it
+Line 961 ERROR: Undefined symbol
+00000CC0  303C BB8E                961          MOVE.W      #example,D0     ; We'll play with it here
+00000CC4  123C 0007                962          MOVE.B      #7,D1           ; Shift 7 bits left
+00000CC8  E360                     963          ASL.W       D1,D0           ; 0011 1010 0100 0100 to 0010 0000 0000 0000
+00000CCA  123C 000D                964          MOVE.B      #13,D1          ; Shift 13 bits right
+00000CCE  E260                     965          ASR.W       D1,D0           ; 0010 0000 0000 0000 to 0000 0000 0000 0001
+00000CD0  C0FC 0006                966          MULU        #6,D0           ; Form offset (move 6 bytes in memory for every 'JMP' command)
+00000CD4  4EF0 0000                967          JMP         0(A0,D0)        ; Jump indirect with index, i.e. jump to 'table' + displacement
+00000CD8                           968  
+00000CD8                           969  tableMOVEA_LorMOVE_L:
+00000CD8  4EF9 00000D08            970          JMP         MOVEcode000
+00000CDE  4EF9 00000D10            971          JMP         MOVEAcode001
+00000CE4  4EF9 00000D18            972          JMP         MOVEcode010
+00000CEA  4EF9 00000D20            973          JMP         MOVEcode011
+00000CF0  4EF9 00000D28            974          JMP         MOVEcode100
+00000CF6  4EF9 00000D30            975          JMP         MOVEcode101
+00000CFC  4EF9 00000D38            976          JMP         MOVEcode110
+00000D02  4EF9 00000D40            977          JMP         MOVEcode111
+00000D08                           978  
+00000D08  4EB9 00001274            979  MOVEcode000 JSR     ISMOVEL
+00000D0E  4E75                     980              RTS
+00000D10  4EB9 00001288            981  MOVEAcode001 JSR    ISMOVEAL
+00000D16  4E75                     982               RTS
+00000D18  4EB9 00001274            983  MOVEcode010 JSR     ISMOVEL
+00000D1E  4E75                     984              RTS
+00000D20  4EB9 00001274            985  MOVEcode011 JSR     ISMOVEL
+00000D26  4E75                     986              RTS
+00000D28  4EB9 00001274            987  MOVEcode100 JSR     ISMOVEL
+00000D2E  4E75                     988              RTS
+00000D30  4EB9 00001274            989  MOVEcode101 JSR     ISMOVEL
+00000D36  4E75                     990              RTS
+00000D38  4EB9 00001274            991  MOVEcode110 JSR     ISMOVEL
+00000D3E  4E75                     992              RTS
+00000D40  4EB9 00001274            993  MOVEcode111 JSR     ISMOVEL
+00000D46  4E75                     994              RTS
+00000D48                           995  *----------- END MOVEA_LorMOVE_L ---------------------------
+00000D48                           996  
+00000D48                           997  *----------- MOVEA_WorMOVE_W -------------------------------
+00000D48                           998  MOVEA_WorMOVE_W:
+00000D48  41F9 00000D68            999          LEA         tableMOVEA_WorMOVE_W,A0 ; Index into the table
+00000D4E  4280                    1000          CLR.L       D0              ; Zero it
+Line 1001 ERROR: Undefined symbol
+00000D50  303C BB8E               1001          MOVE.W      #example,D0     ; We'll play with it here
+00000D54  123C 0007               1002          MOVE.B      #7,D1           ; Shift 7 bits left
+00000D58  E360                    1003          ASL.W       D1,D0           ; 0011 1010 0100 0100 to 0010 0000 0000 0000
+00000D5A  123C 000D               1004          MOVE.B      #13,D1          ; Shift 13 bits right
+00000D5E  E260                    1005          ASR.W       D1,D0           ; 0010 0000 0000 0000 to 0000 0000 0000 0001
+00000D60  C0FC 0006               1006          MULU        #6,D0           ; Form offset (move 6 bytes in memory for every 'JMP' command)
+00000D64  4EF0 0000               1007          JMP         0(A0,D0)        ; Jump indirect with index, i.e. jump to 'table' + displacement
+00000D68                          1008  
+00000D68                          1009  tableMOVEA_WorMOVE_W:
+00000D68  4EF9 00000D98           1010          JMP         MOVEWcode000
+00000D6E  4EF9 00000DA0           1011          JMP         MOVEAWcode001
+00000D74  4EF9 00000DA8           1012          JMP         MOVEWcode010
+00000D7A  4EF9 00000DB0           1013          JMP         MOVEWcode011
+00000D80  4EF9 00000DB8           1014          JMP         MOVEWcode100
+00000D86  4EF9 00000DC0           1015          JMP         MOVEWcode101
+00000D8C  4EF9 00000DC8           1016          JMP         MOVEWcode110
+00000D92  4EF9 00000DD0           1017          JMP         MOVEWcode111
+00000D98                          1018  
+00000D98  4EB9 0000124C           1019  MOVEWcode000 JSR    ISMOVEW
+00000D9E  4E75                    1020               RTS
+00000DA0  4EB9 00001260           1021  MOVEAWcode001 JSR   ISMOVEAW
+00000DA6  4E75                    1022                RTS
+00000DA8  4EB9 0000124C           1023  MOVEWcode010 JSR    ISMOVEW
+00000DAE  4E75                    1024               RTS
+00000DB0  4EB9 0000124C           1025  MOVEWcode011 JSR    ISMOVEW
+00000DB6  4E75                    1026               RTS
+00000DB8  4EB9 0000124C           1027  MOVEWcode100 JSR    ISMOVEW
+00000DBE  4E75                    1028               RTS
+00000DC0  4EB9 0000124C           1029  MOVEWcode101 JSR    ISMOVEW
+00000DC6  4E75                    1030               RTS
+00000DC8  4EB9 0000124C           1031  MOVEWcode110 JSR    ISMOVEW
+00000DCE  4E75                    1032               RTS
+00000DD0  4EB9 0000124C           1033  MOVEWcode111 JSR    ISMOVEW
+00000DD6  4E75                    1034               RTS
+00000DD8                          1035  *----------- END MOVEA_WorMOVE_W ---------------------------
+00000DD8                          1036  
+00000DD8                          1037  *----------- All 'IS' Subroutines --------------------------
+00000DD8                          1038  ; TODO: adjust workflow to:
+00000DD8                          1039  ;   1) save message address to buffer pointer
+00000DD8                          1040  ;   2) pass pointer to necessary EA Subroutines
+00000DD8  48A7 FFFF               1041  OPCODE_INVALID  MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
+00000DDC  43F8 0206               1042              LEA MESSAGEOPCODE_INVALID, A1
+00000DE0  103C 000E               1043              MOVE.B  #14, D0
+00000DE4  4E4F                    1044              TRAP    #15
+00000DE6                          1045  
+00000DE6  4C9F FFFF               1046              MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
+00000DEA  4E75                    1047              RTS
+00000DEC                          1048              
+00000DEC  48A7 FFFF               1049  ISBCC  MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
+00000DF0  43F8 01F4               1050              LEA MESSAGEBCC, A1
+00000DF4  103C 000E               1051              MOVE.B  #14, D0
+00000DF8  4E4F                    1052              TRAP    #15
+00000DFA                          1053  
+00000DFA  4C9F FFFF               1054              MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
+00000DFE  4E75                    1055              RTS
+00000E00  48A7 FFFF               1056  ISBGT  MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
+00000E04  43F8 01FA               1057              LEA MESSAGEBGT, A1
+00000E08  103C 000E               1058              MOVE.B  #14, D0
+00000E0C  4E4F                    1059              TRAP    #15
+00000E0E                          1060  
+00000E0E  4C9F FFFF               1061              MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
+00000E12  4E75                    1062              RTS
+00000E14                          1063  
+00000E14  48A7 FFFF               1064  ISBLE  MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
+00000E18  43F8 0200               1065              LEA MESSAGEBLE, A1
+00000E1C  103C 000E               1066              MOVE.B  #14, D0
+00000E20  4E4F                    1067              TRAP    #15
+00000E22                          1068  
+00000E22  4C9F FFFF               1069              MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
+00000E26  4E75                    1070              RTS
+00000E28                          1071  
+00000E28  48A7 FFFF               1072  ISDIVUL     MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
+00000E2C  43F8 01EB               1073              LEA MESSAGEDIVUL, A1
+00000E30  103C 000E               1074              MOVE.B  #14, D0
+00000E34  4E4F                    1075              TRAP    #15
+00000E36                          1076  
+00000E36  4C9F FFFF               1077              MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
+00000E3A  4E75                    1078              RTS
+00000E3C                          1079  
+00000E3C  48A7 FFFF               1080  ISDIVUW     MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
+00000E40  43F8 01E2               1081              LEA MESSAGEDIVUW, A1
+00000E44  103C 000E               1082              MOVE.B  #14, D0
+00000E48  4E4F                    1083              TRAP    #15
+00000E4A                          1084  
+00000E4A  4C9F FFFF               1085              MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
+00000E4E  4E75                    1086              RTS
+00000E50                          1087  
+00000E50  48A7 FFFF               1088  ISORB   MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
+00000E54  43F8 01CD               1089          LEA         MESSAGEORB, A1
+00000E58  103C 000E               1090          MOVE.B      #14, D0
+00000E5C  4E4F                    1091          TRAP        #15
+00000E5E  4C9F FFFF               1092          MOVEM.W     (SP)+,  A0-A7/D0-D7 ; Restore registers
+00000E62  4E75                    1093          RTS
+00000E64                          1094  
+00000E64  48A7 FFFF               1095  ISORW   MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
+00000E68  43F8 01D4               1096          LEA         MESSAGEORW, A1
+00000E6C  103C 000E               1097          MOVE.B      #14, D0
+00000E70  4E4F                    1098          TRAP        #15
+00000E72  4C9F FFFF               1099          MOVEM.W     (SP)+,  A0-A7/D0-D7 ; Restore registers
+00000E76  4E75                    1100          RTS
+00000E78                          1101  
+00000E78  48A7 FFFF               1102  ISORL   MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
+00000E7C  43F8 01DB               1103          LEA         MESSAGEORL, A1
+00000E80  103C 000E               1104          MOVE.B      #14, D0
+00000E84  4E4F                    1105          TRAP        #15
+00000E86  4C9F FFFF               1106          MOVEM.W     (SP)+,  A0-A7/D0-D7 ; Restore registers
+00000E8A  4E75                    1107          RTS
+00000E8C                          1108  
+00000E8C  48A7 FFFF               1109  ISASRB  MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
+00000E90  43F8 013D               1110          LEA         MESSAGEASRB, A1
+00000E94  103C 000E               1111          MOVE.B      #14, D0
+00000E98  4E4F                    1112          TRAP        #15
+00000E9A  4C9F FFFF               1113          MOVEM.W     (SP)+,  A0-A7/D0-D7 ; Restore registers
+00000E9E  4E75                    1114          RTS
+00000EA0                          1115  
+00000EA0  48A7 FFFF               1116  ISASRW  MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
+00000EA4  43F8 0145               1117          LEA         MESSAGEASRW, A1
+00000EA8  103C 000E               1118          MOVE.B      #14, D0
+00000EAC  4E4F                    1119          TRAP        #15
+00000EAE  4C9F FFFF               1120          MOVEM.W     (SP)+,  A0-A7/D0-D7 ; Restore registers
+00000EB2  4E75                    1121          RTS
+00000EB4                          1122  
+00000EB4  48A7 FFFF               1123  ISASRL  MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
+00000EB8  43F8 014D               1124          LEA         MESSAGEASRL, A1
+00000EBC  103C 000E               1125          MOVE.B      #14, D0
+00000EC0  4E4F                    1126          TRAP        #15
+00000EC2  4C9F FFFF               1127          MOVEM.W     (SP)+,  A0-A7/D0-D7 ; Restore registers
+00000EC6  4E75                    1128          RTS
+00000EC8                          1129  
+00000EC8  48A7 FFFF               1130  ISASLB  MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
+00000ECC  43F8 0155               1131          LEA         MESSAGEASLB, A1
+00000ED0  103C 000E               1132          MOVE.B      #14, D0
+00000ED4  4E4F                    1133          TRAP        #15
+00000ED6  4C9F FFFF               1134          MOVEM.W     (SP)+,  A0-A7/D0-D7 ; Restore registers
+00000EDA  4E75                    1135          RTS
+00000EDC                          1136  
+00000EDC  48A7 FFFF               1137  ISASLW  MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
+00000EE0  43F8 015D               1138          LEA         MESSAGEASLW, A1
+00000EE4  103C 000E               1139          MOVE.B      #14, D0
+00000EE8  4E4F                    1140          TRAP        #15
+00000EEA  4C9F FFFF               1141          MOVEM.W     (SP)+,  A0-A7/D0-D7 ; Restore registers
+00000EEE  4E75                    1142          RTS
+00000EF0                          1143  
+00000EF0  48A7 FFFF               1144  ISASLL  MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
+00000EF4  43F8 0165               1145          LEA         MESSAGEASLL, A1
+00000EF8  103C 000E               1146          MOVE.B      #14, D0
+00000EFC  4E4F                    1147          TRAP        #15
+00000EFE  4C9F FFFF               1148          MOVEM.W     (SP)+,  A0-A7/D0-D7 ; Restore registers
+00000F02  4E75                    1149          RTS
+00000F04                          1150  
+00000F04  48A7 FFFF               1151  ISLSRB  MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
+00000F08  43F8 019D               1152          LEA         MESSAGELSRB, A1
+00000F0C  103C 000E               1153          MOVE.B      #14, D0
+00000F10  4E4F                    1154          TRAP        #15
+00000F12  4C9F FFFF               1155          MOVEM.W     (SP)+,  A0-A7/D0-D7 ; Restore registers
+00000F16  4E75                    1156          RTS
+00000F18                          1157  
+00000F18  48A7 FFFF               1158  ISLSRW  MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
+00000F1C  43F8 01A5               1159          LEA         MESSAGELSRW, A1
+00000F20  103C 000E               1160          MOVE.B      #14, D0
+00000F24  4E4F                    1161          TRAP        #15
+00000F26  4C9F FFFF               1162          MOVEM.W     (SP)+,  A0-A7/D0-D7 ; Restore registers
+00000F2A  4E75                    1163          RTS
+00000F2C                          1164  
+00000F2C  48A7 FFFF               1165  ISLSRL  MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
+00000F30  43F8 01AD               1166          LEA         MESSAGELSRL, A1
+00000F34  103C 000E               1167          MOVE.B      #14, D0
+00000F38  4E4F                    1168          TRAP        #15
+00000F3A  4C9F FFFF               1169          MOVEM.W     (SP)+,  A0-A7/D0-D7 ; Restore registers
+00000F3E  4E75                    1170          RTS
+00000F40                          1171  
+00000F40  48A7 FFFF               1172  ISLSLB  MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
+00000F44  43F8 01B5               1173          LEA         MESSAGELSLB, A1
+00000F48  103C 000E               1174          MOVE.B      #14, D0
+00000F4C  4E4F                    1175          TRAP        #15
+00000F4E  4C9F FFFF               1176          MOVEM.W     (SP)+,  A0-A7/D0-D7 ; Restore registers
+00000F52  4E75                    1177          RTS
+00000F54                          1178  
+00000F54  48A7 FFFF               1179  ISLSLW  MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
+00000F58  43F8 01BD               1180          LEA         MESSAGELSLW, A1
+00000F5C  103C 000E               1181          MOVE.B      #14, D0
+00000F60  4E4F                    1182          TRAP        #15
+00000F62  4C9F FFFF               1183          MOVEM.W     (SP)+,  A0-A7/D0-D7 ; Restore registers
+00000F66  4E75                    1184          RTS
+00000F68                          1185  
+00000F68  48A7 FFFF               1186  ISLSLL  MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
+00000F6C  43F8 01C5               1187          LEA         MESSAGELSLL, A1
+00000F70  103C 000E               1188          MOVE.B      #14, D0
+00000F74  4E4F                    1189          TRAP        #15
+00000F76  4C9F FFFF               1190          MOVEM.W     (SP)+,  A0-A7/D0-D7 ; Restore registers
+00000F7A  4E75                    1191          RTS
+00000F7C                          1192  
+00000F7C  48A7 FFFF               1193  ISRORB  MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
+00000F80  43F8 016D               1194          LEA         MESSAGERORB, A1
+00000F84  103C 000E               1195          MOVE.B      #14, D0
+00000F88  4E4F                    1196          TRAP        #15
+00000F8A  4C9F FFFF               1197          MOVEM.W     (SP)+,  A0-A7/D0-D7 ; Restore registers
+00000F8E  4E75                    1198          RTS
+00000F90                          1199  
+00000F90  48A7 FFFF               1200  ISRORW  MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
+00000F94  43F8 0175               1201          LEA         MESSAGERORW, A1
+00000F98  103C 000E               1202          MOVE.B      #14, D0
+00000F9C  4E4F                    1203          TRAP        #15
+00000F9E  4C9F FFFF               1204          MOVEM.W     (SP)+,  A0-A7/D0-D7 ; Restore registers
+00000FA2  4E75                    1205          RTS
+00000FA4                          1206  
+00000FA4  48A7 FFFF               1207  ISRORL  MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
+00000FA8  43F8 017D               1208          LEA         MESSAGERORL, A1
+00000FAC  103C 000E               1209          MOVE.B      #14, D0
+00000FB0  4E4F                    1210          TRAP        #15
+00000FB2  4C9F FFFF               1211          MOVEM.W     (SP)+,  A0-A7/D0-D7 ; Restore registers
+00000FB6  4E75                    1212          RTS
+00000FB8                          1213  
+00000FB8  48A7 FFFF               1214  ISROLB  MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
+00000FBC  43F8 0185               1215          LEA         MESSAGEROLB, A1
+00000FC0  103C 000E               1216          MOVE.B      #14, D0
+00000FC4  4E4F                    1217          TRAP        #15
+00000FC6  4C9F FFFF               1218          MOVEM.W     (SP)+,  A0-A7/D0-D7 ; Restore registers
+00000FCA  4E75                    1219          RTS
+00000FCC                          1220  
+00000FCC  48A7 FFFF               1221  ISROLW  MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
+00000FD0  43F8 018D               1222          LEA         MESSAGEROLW, A1
+00000FD4  103C 000E               1223          MOVE.B      #14, D0
+00000FD8  4E4F                    1224          TRAP        #15
+00000FDA  4C9F FFFF               1225          MOVEM.W     (SP)+,  A0-A7/D0-D7 ; Restore registers
+00000FDE  4E75                    1226          RTS
+00000FE0                          1227  
+00000FE0  48A7 FFFF               1228  ISROLL  MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
+00000FE4  43F8 0195               1229          LEA         MESSAGEROLL, A1
+00000FE8  103C 000E               1230          MOVE.B      #14, D0
+00000FEC  4E4F                    1231          TRAP        #15
+00000FEE                          1232  
+00000FEE  4C9F FFFF               1233          MOVEM.W     (SP)+,  A0-A7/D0-D7 ; Restore registers
+00000FF2  4E75                    1234          RTS
+00000FF4                          1235  
+00000FF4  48A7 FFFF               1236  ISMULSL MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
+00000FF8  43F8 0134               1237          LEA         MESSAGEMULSL, A1 *OPCODE is MULS.L
+00000FFC  103C 000E               1238          MOVE.B      #14, D0
+00001000  4E4F                    1239          TRAP        #15
+00001002  4C9F FFFF               1240          MOVEM.W     (SP)+,  A0-A7/D0-D7 ; Restore registers
+00001006  4E75                    1241          RTS
+00001008                          1242  
+00001008  48A7 FFFF               1243  ISMULSW MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
+0000100C  43F8 012B               1244          LEA         MESSAGEMULSW, A1 *OPCODE is MULS.W
+00001010  103C 000E               1245          MOVE.B      #14, D0
+00001014  4E4F                    1246          TRAP        #15
+00001016  4C9F FFFF               1247          MOVEM.W     (SP)+,  A0-A7/D0-D7 ; Restore registers
+0000101A  4E75                    1248          RTS
+0000101C                          1249  
+0000101C  48A7 FFFF               1250  ISANDB  MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
+00001020  43F8 0113               1251          LEA         MESSAGEANDB, A1 *OPCODE is AND.B
+00001024  103C 000E               1252          MOVE.B      #14, D0
+00001028  4E4F                    1253          TRAP        #15
+0000102A  4C9F FFFF               1254          MOVEM.W     (SP)+,  A0-A7/D0-D7 ; Restore registers
+0000102E  4E75                    1255          RTS
+00001030                          1256  
+00001030  48A7 FFFF               1257  ISANDW  MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
+00001034  43F8 011B               1258          LEA         MESSAGEANDW, A1 *OPCODE is AND.W
+00001038  103C 000E               1259          MOVE.B      #14, D0
+0000103C  4E4F                    1260          TRAP        #15
+0000103E  4C9F FFFF               1261          MOVEM.W     (SP)+,  A0-A7/D0-D7 ; Restore registers
+00001042  4E75                    1262          RTS
+00001044                          1263  
+00001044  48A7 FFFF               1264  ISANDL  MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
+00001048  43F8 0123               1265          LEA         MESSAGEANDL, A1 *OPCODE is AND.L
+0000104C  103C 000E               1266          MOVE.B      #14, D0
+00001050  4E4F                    1267          TRAP        #15
+00001052  4C9F FFFF               1268          MOVEM.W     (SP)+,  A0-A7/D0-D7 ; Restore registers
+00001056  4E75                    1269          RTS
+00001058                          1270  
+00001058  48A7 FFFF               1271  ISADDAW  MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
+0000105C  43F8 00F7               1272          LEA         MESSAGEADDAW, A1 *OPCODE is ADDA.W
+00001060  103C 000E               1273          MOVE.B      #14, D0
+00001064  4E4F                    1274          TRAP        #15
+00001066  4C9F FFFF               1275          MOVEM.W     (SP)+,  A0-A7/D0-D7 ; Restore registers
+0000106A  4E75                    1276          RTS
+0000106C                          1277  
+0000106C  48A7 FFFF               1278  ISADDAL MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
+00001070  43F8 0100               1279          LEA         MESSAGEADDAL, A1 *OPCODE is ADDA.L
+00001074  103C 000E               1280          MOVE.B      #14, D0
+00001078  4E4F                    1281          TRAP        #15
+0000107A  4C9F FFFF               1282          MOVEM.W     (SP)+,  A0-A7/D0-D7 ; Restore registers
+0000107E  4E75                    1283          RTS
+00001080                          1284  
+00001080  48A7 FFFF               1285  ISADDB  MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
+00001084  43F8 00DF               1286          LEA         MESSAGEADDB, A1 *OPCODE is ADD.B
+00001088  103C 000E               1287          MOVE.B      #14, D0
+0000108C  4E4F                    1288          TRAP        #15
+0000108E  4C9F FFFF               1289          MOVEM.W     (SP)+,  A0-A7/D0-D7 ; Restore registers
+00001092  4E75                    1290          RTS
+00001094                          1291  
+00001094  48A7 FFFF               1292  ISADDW  MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
+00001098  43F8 00E7               1293          LEA         MESSAGEADDW, A1 *OPCODE is ADD.W
+0000109C  103C 000E               1294          MOVE.B      #14, D0
+000010A0  4E4F                    1295          TRAP        #15
+000010A2  4C9F FFFF               1296          MOVEM.W     (SP)+,  A0-A7/D0-D7 ; Restore registers
+000010A6  4E75                    1297          RTS
+000010A8                          1298  
+000010A8  48A7 FFFF               1299  ISADDL  MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
+000010AC  43F8 00EF               1300          LEA         MESSAGEADDL, A1 *OPCODE is ADD.L
+000010B0  103C 000E               1301          MOVE.B      #14, D0
+000010B4  4E4F                    1302          TRAP        #15
+000010B6  4C9F FFFF               1303          MOVEM.W     (SP)+,  A0-A7/D0-D7 ; Restore registers
+000010BA  4E75                    1304          RTS
+000010BC                          1305  
+000010BC  48A7 FFFF               1306  ISSUBB  MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
+000010C0  43F8 00C7               1307          LEA         MESSAGESUBB, A1 *OPCODE is SUB.B
+000010C4  103C 000E               1308          MOVE.B      #14, D0
+000010C8  4E4F                    1309          TRAP        #15
+000010CA  4C9F FFFF               1310          MOVEM.W     (SP)+,  A0-A7/D0-D7 ; Restore registers
+000010CE  4E75                    1311          RTS
+000010D0                          1312  
+000010D0  48A7 FFFF               1313  ISSUBW  MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
+000010D4  43F8 00CF               1314          LEA         MESSAGESUBW, A1 *OPCODE is SUB.W
+000010D8  103C 000E               1315          MOVE.B      #14, D0
+000010DC  4E4F                    1316          TRAP        #15
+000010DE  4C9F FFFF               1317          MOVEM.W     (SP)+,  A0-A7/D0-D7 ; Restore registers
+000010E2  4E75                    1318          RTS
+000010E4                          1319  
+000010E4  48A7 FFFF               1320  ISSUBL  MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
+000010E8  43F8 00D7               1321          LEA         MESSAGESUBL, A1 *OPCODE is SUB.L
+000010EC  103C 000E               1322          MOVE.B      #14, D0
+000010F0  4E4F                    1323          TRAP        #15
+000010F2  4C9F FFFF               1324          MOVEM.W     (SP)+,  A0-A7/D0-D7 ; Restore registers
+000010F6  4E75                    1325          RTS
+000010F8                          1326  
+000010F8  48A7 FFFF               1327  ISCMPB  MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
+000010FC  43F8 00AF               1328          LEA         MESSAGECMPB, A1 *OPCODE is CMP.B
+00001100  103C 000E               1329          MOVE.B      #14, D0
+00001104  4E4F                    1330          TRAP        #15
+00001106  4C9F FFFF               1331          MOVEM.W     (SP)+,  A0-A7/D0-D7 ; Restore registers
+0000110A  4E75                    1332          RTS
+0000110C                          1333  
+0000110C  48A7 FFFF               1334  ISCMPW  MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
+00001110  43F8 00B7               1335          LEA         MESSAGECMPW, A1 *OPCODE is CMP.W
+00001114  103C 000E               1336          MOVE.B      #14, D0
+00001118  4E4F                    1337          TRAP        #15
+0000111A  4C9F FFFF               1338          MOVEM.W     (SP)+,  A0-A7/D0-D7 ; Restore registers
+0000111E  4E75                    1339          RTS
+00001120                          1340  
+00001120  48A7 FFFF               1341  ISCMPL  MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
+00001124  43F8 00BF               1342          LEA         MESSAGECMPL, A1 *OPCODE is CMP.L
+00001128  103C 000E               1343          MOVE.B      #14, D0
+0000112C  4E4F                    1344          TRAP        #15
+0000112E                          1345  
+0000112E  4C9F FFFF               1346          MOVEM.W     (SP)+,  A0-A7/D0-D7 ; Restore registers
+00001132  4E75                    1347          RTS
+00001134                          1348  
+00001134  48A7 FFFF               1349  ISADDQB MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
+00001138  43F8 0094               1350          LEA         MESSAGEADDQB, A1 *OPCODE is ADDQ.B
+0000113C  103C 000E               1351          MOVE.B      #14, D0
+00001140  4E4F                    1352          TRAP        #15
+00001142  4C9F FFFF               1353          MOVEM.W     (SP)+,  A0-A7/D0-D7 ; Restore registers
+00001146  4E75                    1354          RTS
+00001148                          1355  
+00001148  48A7 FFFF               1356  ISADDQW MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
+0000114C  43F8 009D               1357          LEA         MESSAGEADDQW, A1 *OPCODE is ADDQ.W
+00001150  103C 000E               1358          MOVE.B      #14, D0
+00001154  4E4F                    1359          TRAP        #15
+00001156                          1360  
+00001156  4C9F FFFF               1361          MOVEM.W     (SP)+,  A0-A7/D0-D7 ; Restore registers
+0000115A  4E75                    1362          RTS
+0000115C                          1363  
+0000115C  48A7 FFFF               1364  ISADDQL MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
+00001160  43F8 00A6               1365          LEA         MESSAGEADDQL, A1 *OPCODE is ADDQ.L
+00001164  103C 000E               1366          MOVE.B      #14, D0
+00001168  4E4F                    1367          TRAP        #15
+0000116A  4C9F FFFF               1368          MOVEM.W     (SP)+,  A0-A7/D0-D7 ; Restore registers
+0000116E  4E75                    1369          RTS
+00001170                          1370  
+00001170  48A7 FFFF               1371  ISMOVEQL MOVEM.W    A0-A7/D0-D7, -(SP) ; Save registers
+00001174  43F8 0109               1372          LEA         MESSAGEMOVEQL, A1 *OPCODE is MOVEQ.L
+00001178  103C 000E               1373          MOVE.B      #14, D0
+0000117C  4E4F                    1374          TRAP        #15
+0000117E                          1375  
+0000117E  4C9F FFFF               1376          MOVEM.W     (SP)+,  A0-A7/D0-D7 ; Restore registers
+00001182  4E75                    1377          RTS
+00001184                          1378  
+00001184  48A7 FFFF               1379  ISCLRB  MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
+00001188  43F8 007C               1380          LEA         MESSAGECLRB, A1 *OPCODE is CLR.B
+0000118C  103C 000E               1381          MOVE.B      #14, D0
+00001190  4E4F                    1382          TRAP        #15
+00001192  4C9F FFFF               1383          MOVEM.W     (SP)+,  A0-A7/D0-D7 ; Restore registers
+00001196  4E75                    1384          RTS
+00001198                          1385  
+00001198  48A7 FFFF               1386  ISCLRW  MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
+0000119C  43F8 0084               1387          LEA         MESSAGECLRW, A1 *OPCODE is CLR.W
+000011A0  103C 000E               1388          MOVE.B      #14, D0
+000011A4  4E4F                    1389          TRAP        #15
+000011A6  4C9F FFFF               1390          MOVEM.W     (SP)+,  A0-A7/D0-D7 ; Restore registers
+000011AA  4E75                    1391          RTS
+000011AC                          1392  
+000011AC  48A7 FFFF               1393  ISCLRL  MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
+000011B0  43F8 008C               1394          LEA         MESSAGECLRL, A1 *OPCODE is CLR.L
+000011B4  103C 000E               1395          MOVE.B      #14, D0
+000011B8  4E4F                    1396          TRAP        #15
+000011BA  4C9F FFFF               1397          MOVEM.W     (SP)+,  A0-A7/D0-D7 ; Restore registers
+000011BE  4E75                    1398          RTS
+000011C0                          1399  
+000011C0  48A7 FFFF               1400  ISMOVEML MOVEM.W    A0-A7/D0-D7, -(SP) ; Save registers
+000011C4  43F8 0050               1401          LEA         MESSAGEMOVEML, A1 *OPCODE is MOVEM.L
+000011C8  103C 000E               1402          MOVE.B      #14, D0
+000011CC  4E4F                    1403          TRAP        #15
+000011CE  4C9F FFFF               1404          MOVEM.W     (SP)+,  A0-A7/D0-D7 ; Restore registers
+000011D2  4E75                    1405          RTS
+000011D4                          1406  
+000011D4  48A7 FFFF               1407  ISMOVEMW MOVEM.W    A0-A7/D0-D7, -(SP) ; Save registers
+000011D8  43F8 005A               1408          LEA         MESSAGEMOVEMW, A1 *OPCODE is MOVEM.W
+000011DC  103C 000E               1409          MOVE.B      #14, D0
+000011E0  4E4F                    1410          TRAP        #15
+000011E2  4C9F FFFF               1411          MOVEM.W     (SP)+,  A0-A7/D0-D7 ; Restore registers
+000011E6  4E75                    1412          RTS
+000011E8                          1413  
+000011E8  48A7 FFFF               1414  ISLEA   MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
+000011EC  43F8 0076               1415          LEA         MESSAGELEA, A1  *OPCODE is LEA so display LEA message
+000011F0  103C 000E               1416          MOVE.B      #14, D0
+000011F4  4E4F                    1417          TRAP        #15
+000011F6  4C9F FFFF               1418          MOVEM.W     (SP)+,  A0-A7/D0-D7 ; Restore registers
+000011FA  4E75                    1419          RTS                         ; Exit subroutine
+000011FC                          1420  
+000011FC  48A7 FFFF               1421  ISJSR   MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
+00001200  43F8 0064               1422          LEA         MESSAGEJSR, A1  *OPCODE is NOP so display NOP message
+00001204  103C 000E               1423          MOVE.B      #14, D0
+00001208  4E4F                    1424          TRAP        #15
+0000120A  4C9F FFFF               1425          MOVEM.W     (SP)+,  A0-A7/D0-D7 ; Restore registers
+0000120E  4E75                    1426          RTS                         ; Exit subroutine
+00001210                          1427  
+00001210  48A7 FFFF               1428  ISRTS   MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
+00001214  43F8 0070               1429          LEA         MESSAGERTS, A1  *OPCODE is RTS
+00001218  103C 000E               1430          MOVE.B      #14, D0
+0000121C  4E4F                    1431          TRAP        #15
+0000121E  4C9F FFFF               1432          MOVEM.W     (SP)+,  A0-A7/D0-D7 ; Restore registers
+00001222  4E75                    1433          RTS
+00001224                          1434  
+00001224  48A7 FFFF               1435  ISCLR   MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
+00001228  43F8 006A               1436          LEA         MESSAGECLR, A1  *OPCODE is CLR
+0000122C  103C 000E               1437          MOVE.B      #14, D0
+00001230  4E4F                    1438          TRAP        #15
+00001232  4C9F FFFF               1439          MOVEM.W     (SP)+,  A0-A7/D0-D7 ; Restore registers
+00001236  4E75                    1440          RTS
+00001238                          1441  
+00001238  48A7 FFFF               1442  ISNOP   MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
+0000123C  43F8 0000               1443          LEA         MESSAGENOP, A1  *OPCODE is NOP so display NOP message
+00001240  103C 000E               1444          MOVE.B      #14, D0
+00001244  4E4F                    1445          TRAP        #15
+00001246  4C9F FFFF               1446          MOVEM.W     (SP)+,  A0-A7/D0-D7 ; Restore registers
+0000124A  4E75                    1447          RTS                         ; Exit subroutine
+0000124C                          1448  
+0000124C  48A7 FFFF               1449  ISMOVEW MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
+00001250  43F8 0006               1450          LEA         MESSAGEMOVEW, A1 *OPCODE is MOVE.W so display MOVEW message
+00001254  103C 000E               1451          MOVE.B      #14, D0
+00001258  4E4F                    1452          TRAP        #15
+0000125A  4C9F FFFF               1453          MOVEM.W     (SP)+,  A0-A7/D0-D7 ; Restore registers
+0000125E  4E75                    1454          RTS                         ; Exit subroutine
+00001260                          1455  
+00001260  48A7 FFFF               1456  ISMOVEAW MOVEM.W    A0-A7/D0-D7, -(SP) ; Save registers
+00001264  43F8 0046               1457          LEA         MESSAGEMOVEAW, A1 *OPCODE is MOVEA.W so display MOVEA.W message
+00001268  103C 000E               1458          MOVE.B      #14, D0
+0000126C  4E4F                    1459          TRAP        #15
+0000126E  4C9F FFFF               1460          MOVEM.W     (SP)+,  A0-A7/D0-D7 ; Restore registers
+00001272  4E75                    1461          RTS                         ; Exit subroutine
+00001274                          1462  
+00001274  48A7 FFFF               1463  ISMOVEL MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
+00001278  43F8 000F               1464          LEA         MESSAGEMOVEL, A1 *OPCODE is MOVE.L so display MOVE.L message
+0000127C  103C 000E               1465          MOVE.B      #14, D0
+00001280  4E4F                    1466          TRAP        #15
+00001282  4C9F FFFF               1467          MOVEM.W     (SP)+,  A0-A7/D0-D7 ; Restore registers
+00001286  4E75                    1468          RTS                         ; Exit subroutine
+00001288                          1469  
+00001288  48A7 FFFF               1470  ISMOVEAL MOVEM.W    A0-A7/D0-D7, -(SP) ; Save registers
+0000128C  43F8 003C               1471          LEA         MESSAGEMOVEAL, A1 *OPCODE is MOVEA.L so display MOVEA.L message
+00001290  103C 000E               1472          MOVE.B      #14, D0
+00001294  4E4F                    1473          TRAP        #15
+00001296  4C9F FFFF               1474          MOVEM.W     (SP)+,  A0-A7/D0-D7 ; Restore registers
+0000129A  4E75                    1475          RTS                         ; Exit subroutine
+0000129C                          1476  
+0000129C  48A7 FFFF               1477  ISMOVEB MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
+000012A0  43F8 0018               1478          LEA         MESSAGEMOVEB, A1 *OPCODE is MOVE.B so display MOVEB message
+000012A4  103C 000E               1479          MOVE.B      #14, D0
+000012A8  4E4F                    1480          TRAP        #15
+000012AA  4C9F FFFF               1481          MOVEM.W     (SP)+,  A0-A7/D0-D7 ; Restore registers
+000012AE  4E75                    1482          RTS                         ; Exit subroutine
+000012B0                          1483  
+000012B0  48A7 FFFF               1484  ISADDIW MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
+000012B4  43F8 0021               1485          LEA         MESSAGEADDIW, A1 *OPCODE is ADDI.W so display ADDI.W message
+000012B8  103C 000E               1486          MOVE.B      #14, D0
+000012BC  4E4F                    1487          TRAP        #15
+000012BE  4C9F FFFF               1488          MOVEM.W     (SP)+,  A0-A7/D0-D7 ; Restore registers
+000012C2  4E75                    1489          RTS                         ; Exit subroutine
+000012C4                          1490  
+000012C4  48A7 FFFF               1491  ISADDIL MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
+000012C8  43F8 002A               1492          LEA         MESSAGEADDIL, A1 *OPCODE is ADDI.L so display ADDI.L message
+000012CC  103C 000E               1493          MOVE.B      #14, D0
+000012D0  4E4F                    1494          TRAP        #15
+000012D2  4C9F FFFF               1495          MOVEM.W     (SP)+,  A0-A7/D0-D7 ; Restore registers
+000012D6  4E75                    1496          RTS                         ; Exit subroutine
+000012D8                          1497  
+000012D8  48A7 FFFF               1498  ISADDIB MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
+000012DC  43F8 0033               1499          LEA         MESSAGEADDIB, A1 *OPCODE is ADDI.B so display ADDI.B message
+000012E0  103C 000E               1500          MOVE.B      #14, D0
+000012E4  4E4F                    1501          TRAP        #15
+000012E6  4C9F FFFF               1502          MOVEM.W     (SP)+,  A0-A7/D0-D7 ; Restore registers
+000012EA  4E75                    1503          RTS                         ; Exit subroutine
+000012EC                          1504  
+000012EC                          1505  
+000012EC                          1506  
+000012EC                          1507  
+000012EC                          1508  
+Line 1509 WARNING: END directive missing, starting address not set
+
+49 errors detected
+1 warning generated
+
+
+SYMBOL TABLE INFORMATION
+Symbol-name         Value
+-------------------------
+ADDCODE000          854
+ADDCODE001          85C
+ADDCODE010          864
+ADDCODE011          86C
+ADDCODE100          874
+ADDCODE101          87C
+ADDCODE110          884
+ADDCODE111          88C
+ADDIBCODE00         CA0
+ADDILCODE10         CB0
+ADDIWCODE01         CA8
+ADDI_BORADDI_WORADDI_L  C6E
+ADDQCODE00          9A4
+ADDQCODE01          9AC
+ADDQCODE10          9B4
+ADDQ_BORADDQ_WORADDQ_L  96C
+ADD_BORADD_WORADD_L  7FE
+ANDCODE000          7BE
+ANDCODE001          7C6
+ANDCODE010          7CE
+ANDCODE011          7D6
+ANDCODE100          7DE
+ANDCODE101          7E6
+ANDCODE110          7EE
+ANDCODE111          7F6
+AND_BORAND_WORAND_LORMULS_W  768
+ASLCODE00           4FE
+ASLCODE01           506
+ASLCODE10           50E
+ASL_ASR             6D2
+ASL_ASRCODE0        704
+ASL_ASRCODE1        70A
+ASRCODE00           4AE
+ASRCODE01           4B6
+ASRCODE10           4BE
+BCCORBGTORBLE       348
+BCCORBGTORBLECODE00  38C
+BCCORBGTORBLECODE01  394
+BCCORBGTORBLECODE10  39C
+BCCORBGTORBLECODE11  3A4
+CLRCODE00           9F4
+CLRCODE01           9FC
+CLRCODE10           A04
+CMPCODE000          954
+CMPCODE001          95C
+CMPCODE010          964
+CMP_BORCMP_WORCMP_L  91C
+CODE0000            29C
+CODE0001            2A2
+CODE0010            2AE
+CODE0011            2B4
+CODE0100            2BA
+CODE0101            2C6
+CODE0110            2D2
+CODE0111            2DE
+CODE1000            2EA
+CODE1001            2F6
+CODE1010            302
+CODE1011            30A
+CODE1100            316
+CODE1101            322
+CODE1110            32E
+CODE1111            33A
+CR                  D
+DONE                342
+INITIAL_TABLE       23C
+ISADDAL             106C
+ISADDAW             1058
+ISADDB              1080
+ISADDIB             12D8
+ISADDIL             12C4
+ISADDIW             12B0
+ISADDL              10A8
+ISADDQB             1134
+ISADDQL             115C
+ISADDQW             1148
+ISADDW              1094
+ISANDB              101C
+ISANDL              1044
+ISANDW              1030
+ISASLB              EC8
+ISASLL              EF0
+ISASLW              EDC
+ISASRB              E8C
+ISASRL              EB4
+ISASRW              EA0
+ISBCC               DEC
+ISBGT               E00
+ISBLE               E14
+ISCLR               1224
+ISCLRB              1184
+ISCLRL              11AC
+ISCLRW              1198
+ISCMPB              10F8
+ISCMPL              1120
+ISCMPW              110C
+ISDIVUL             E28
+ISDIVUW             E3C
+ISJSR               11FC
+ISLEA               11E8
+ISLSLB              F40
+ISLSLL              F68
+ISLSLW              F54
+ISLSRB              F04
+ISLSRL              F2C
+ISLSRW              F18
+ISMOVEAL            1288
+ISMOVEAW            1260
+ISMOVEB             129C
+ISMOVEL             1274
+ISMOVEML            11C0
+ISMOVEMW            11D4
+ISMOVEQL            1170
+ISMOVEW             124C
+ISMULSL             FF4
+ISMULSW             1008
+ISNOP               1238
+ISORB               E50
+ISORL               E78
+ISORW               E64
+ISROLB              FB8
+ISROLL              FE0
+ISROLW              FCC
+ISRORB              F7C
+ISRORL              FA4
+ISRORW              F90
+ISRTS               1210
+ISSUBB              10BC
+ISSUBL              10E4
+ISSUBW              10D0
+JSRORCLRCODE0000    AB0
+JSRORCLRCODE0001    AB8
+JSRORCLRCODE0010    AC0
+JSRORCLRCODE0011    AC6
+JSRORCLRCODE0100    ACE
+JSRORCLRCODE0101    AD6
+JSRORCLRCODE0110    ADE
+JSRORCLRCODE0111    AE6
+JSRORCLRCODE1000    AEE
+JSRORCLRCODE1001    AF6
+JSRORCLRCODE1010    AFE
+JSRORCLRCODE1011    B06
+JSRORCLRCODE1100    B0E
+JSRORCLRCODE1101    B16
+JSRORCLRCODE1110    B1E
+JSRORCLRCODE1111    B26
+LF                  A
+LOTSCODE0000        BF6
+LOTSCODE0001        BFC
+LOTSCODE0010        C04
+LOTSCODE0011        C0A
+LOTSCODE0100        C12
+LOTSCODE0101        C1A
+LOTSCODE0110        C22
+LOTSCODE0111        C2A
+LOTSCODE1000        C32
+LOTSCODE1001        C38
+LOTSCODE1010        C40
+LOTSCODE1011        C46
+LOTSCODE1100        C4E
+LOTSCODE1101        C56
+LOTSCODE1110        C5E
+LOTSCODE1111        C66
+LSLCODE00           59E
+LSLCODE01           5A6
+LSLCODE10           5AE
+LSL_LSR             694
+LSL_LSRCODE0        6C6
+LSL_LSRCODE1        6CC
+LSRCODE00           54E
+LSRCODE01           556
+LSRCODE10           55E
+MESSAGEADDAL        100
+MESSAGEADDAW        F7
+MESSAGEADDB         DF
+MESSAGEADDIB        33
+MESSAGEADDIL        2A
+MESSAGEADDIW        21
+MESSAGEADDL         EF
+MESSAGEADDQB        94
+MESSAGEADDQL        A6
+MESSAGEADDQW        9D
+MESSAGEADDW         E7
+MESSAGEANDB         113
+MESSAGEANDL         123
+MESSAGEANDW         11B
+MESSAGEASLB         155
+MESSAGEASLL         165
+MESSAGEASLW         15D
+MESSAGEASRB         13D
+MESSAGEASRL         14D
+MESSAGEASRW         145
+MESSAGEBCC          1F4
+MESSAGEBGT          1FA
+MESSAGEBLE          200
+MESSAGECLR          6A
+MESSAGECLRB         7C
+MESSAGECLRL         8C
+MESSAGECLRW         84
+MESSAGECMPB         AF
+MESSAGECMPL         BF
+MESSAGECMPW         B7
+MESSAGEDIVUL        1EB
+MESSAGEDIVUW        1E2
+MESSAGEJSR          64
+MESSAGELEA          76
+MESSAGELSLB         1B5
+MESSAGELSLL         1C5
+MESSAGELSLW         1BD
+MESSAGELSRB         19D
+MESSAGELSRL         1AD
+MESSAGELSRW         1A5
+MESSAGEMOVEAL       3C
+MESSAGEMOVEAW       46
+MESSAGEMOVEB        18
+MESSAGEMOVEL        F
+MESSAGEMOVEML       50
+MESSAGEMOVEMW       5A
+MESSAGEMOVEQL       109
+MESSAGEMOVEW        6
+MESSAGEMULSL        134
+MESSAGEMULSW        12B
+MESSAGENOP          0
+MESSAGEOPCODE_INVALID  206
+MESSAGEORB          1CD
+MESSAGEORL          1DB
+MESSAGEORW          1D4
+MESSAGEROLB         185
+MESSAGEROLL         195
+MESSAGEROLW         18D
+MESSAGERORB         16D
+MESSAGERORL         17D
+MESSAGERORW         175
+MESSAGERTS          70
+MESSAGESUBB         C7
+MESSAGESUBL         D7
+MESSAGESUBW         CF
+MOVEACODE001        D10
+MOVEAWCODE001       DA0
+MOVEA_LORMOVE_L     CB8
+MOVEA_WORMOVE_W     D48
+MOVECODE000         D08
+MOVECODE010         D18
+MOVECODE011         D20
+MOVECODE100         D28
+MOVECODE101         D30
+MOVECODE110         D38
+MOVECODE111         D40
+MOVEMCODE0          B60
+MOVEMCODE1          B68
+MOVEWCODE000        D98
+MOVEWCODE010        DA8
+MOVEWCODE011        DB0
+MOVEWCODE100        DB8
+MOVEWCODE101        DC0
+MOVEWCODE110        DC8
+MOVEWCODE111        DD0
+MULSLORDIVUL        434
+MULSLORDIVULCODE0   466
+MULSLORDIVULCODE1   46E
+NOPCOMMAND          AA8
+NOPORCLRORRTSORJSR  A0C
+NOP_MOVEM_LEA_JSR_CLR_RTS  B70
+OC_PARSE            21F
+OPCODE_INVALID      DD8
+OR_BOROR_WOROR_LORDIVU  3AC
+OR_DIVUCODE000      3FC
+OR_DIVUCODE001      404
+OR_DIVUCODE010      40C
+OR_DIVUCODE011      414
+OR_DIVUCODE100      41C
+OR_DIVUCODE101      424
+OR_DIVUCODE110      42C
+ROD_LSD_ASD         710
+ROD_LSD_ASDCODE00   74E
+ROD_LSD_ASDCODE01   754
+ROD_LSD_ASDCODE10   75A
+ROD_LSD_ASDCODE11   762
+ROLCODE00           5EE
+ROLCODE01           5F6
+ROLCODE10           5FE
+ROL_ROR             656
+ROL_RORCODE0        688
+ROL_RORCODE1        68E
+RORCODE00           63E
+RORCODE01           646
+RORCODE10           64E
+RTSCOMMAND          AA0
+SOMEASL             4C6
+SOMEASR             476
+SOMECLR             9BC
+SOMELSL             566
+SOMELSR             516
+SOMEMOVEM           B2E
+SOMEROL             5B6
+SOMEROR             606
+SUBCODE000          8E4
+SUBCODE001          8EC
+SUBCODE010          8F4
+SUBCODE011          8FC
+SUBCODE100          904
+SUBCODE101          90C
+SUBCODE110          914
+SUB_BORSUB_WORSUB_L  894
+TABLEADDI_BORADDI_WORADDI_L  C8E
+TABLEADDQ_BORADDQ_WORADDQ_L  992
+TABLEADD_BORADD_WORADD_L  824
+TABLEAND_BORAND_WORAND_LORMULS_W  78E
+TABLEASL_ASR        6F8
+TABLEBCCORBGTORBLE  374
+TABLECMP_BORCMP_WORCMP_L  942
+TABLELSL_LSR        6BA
+TABLEMOVEA_LORMOVE_L  CD8
+TABLEMOVEA_WORMOVE_W  D68
+TABLEMULSLORDIVUL   45A
+TABLENOPORCLRORRTSORJSR  A40
+TABLENOP_MOVEM_LEA_JSR_CLR_RTS  B96
+TABLEOR_BOROR_WOROR_LORDIVU  3D2
+TABLEROD_LSD_ASD    736
+TABLEROL_ROR        67C
+TABLESOMEASL        4EC
+TABLESOMEASR        49C
+TABLESOMECLR        9E2
+TABLESOMELSL        58C
+TABLESOMELSR        53C
+TABLESOMEMOVEM      B54
+TABLESOMEROL        5DC
+TABLESOMEROR        62C
+TABLESUB_BORSUB_WORSUB_L  8BA
