@@ -88,7 +88,7 @@ START
     MOVEA.L     BEGINADDR,A6        * Assign beginning address to A6 for use
 
 LOOP
-    * OC_PARSE Command doesn't work due to issues in the OpCode include
+    * OC_PARSE Command doesn't work due to issues in the Opcode include
     * many errors need to be fixed. Same with EA include
     *JSR         OC_PARSE            * Determine if there is an initial opcode match
     * decrement row count
