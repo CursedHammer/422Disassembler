@@ -333,7 +333,78 @@ ADDI_END:
 * the ADDQ opcode
 *-----------------------------------------------------------
 EA_ADDQ:
-    JSR         EA_UNIMPLEMENTED
+    MOVEM.L     A0-A5/D0-D7, -(SP)  ; Save registers (except A6, global pointer to word to read)
+    JSR         EA_COPY_PTR         ; Copy global pointer to A5
+*--- Parse data --------------------
+    MOVE.L      (A6), D1            ; Load opcode to data register 1
+    MOVE.B      #4, D2              ; Clear upper 4 bits of opcode word
+    LSL.W       D2, D1              ; Perform shift (zeros shifted in)
+    MOVE.B      #13, D2             ; 'Right-align' bits 9-11 to determine mode bits
+    LSR.W       D2, D1              ; Perform shift (zeros shifted in)
+    CMP.B       #$00, D1            ; Check for special case (if imm. data is 0, value is actually 8)
+    BNE         ADDQ_PRINT_IMM      ; If any value other than 0, print the data
+    MOVE.B      #$08, D1            ; Else, the value is 0 and therefore symbolic of the value 8, so replace with the value 8
+ADDQ_PRINT_IMM:
+    *PRINT HASH TODO
+    *PRINT IMM DATA IN D1 AS BYTE TODO
+    *PRINT COMMA TODO
+*-----------------------------------
+*--- Check validity based on mode value
+    JSR         EA_DEFAULT_COMBO
+    LEA         ADDQ_MODE, A0       ; Set index '0' for jump table
+    MULU        #6, D6              ; Form offset (move 6 bytes in memory for every 'JMP' command)
+    JMP         0(A0, D6)           ; Jump indirect with index, i.e. jump to 'table' + displacement
+ADDQ_MODE:
+    JMP         ADDQ_MODE_000       ; Dn
+    JMP         ADDQ_MODE_001       ; An
+    JMP         ADDQ_MODE_010       ; (An)
+    JMP         ADDQ_MODE_011       ; (An)+
+    JMP         ADDQ_MODE_100       ; -(An)
+    JMP         ADDQ_MODE_101       ; Invalid: Address Register Indirect with Displacement Mode
+    JMP         ADDQ_MODE_110       ; Invalid: Address Register Indirect with Index (8-Bit Displacement)
+    JMP         ADDQ_MODE_111       ; The rest (not all valid, validated by register number)
+*-----------------------------------
+*--- EA mode jump table options ----
+ADDQ_MODE_000: ; Dn
+    JSR         EA_PRINT_DN         ; Print data register direct operand
+    JMP         ADDQ_MODE_END       ; End evaluation of ea mode
+ADDQ_MODE_001: ; An
+    JSR         EA_PRINT_AN         ; Address register direct is invalid mode
+    JMP         ADDQ_MODE_END       ; End evaluation of ea mode
+ADDQ_MODE_010: ; (An)
+    JSR         EA_PRINT_AN_IND     ; Print address register indirect
+    JMP         ADDQ_MODE_END       ; End evaluation of ea mode
+ADDQ_MODE_011: ; (An)+
+    JSR         EA_PRINT_POSTINC    ; Print address register indirect with post increment
+    JMP         ADDQ_MODE_END       ; End evaluation of ea mode
+ADDQ_MODE_100: ; -(An)
+    JSR         EA_PRINT_PREDEC     ; Print address register indirect with pre decrement
+    JMP         ADDQ_MODE_END       ; End evaluation of ea mode
+ADDQ_MODE_101: ; Invalid: Address Register Indirect with Displacement Mode
+    JSR         EA_INVALID          ; Opcode word is Invalid
+    JMP         ADDQ_END
+ADDQ_MODE_110: ; Invalid: Address Register Indirect with Index (8-Bit Displacement)
+    JSR         EA_INVALID          ; Opcode word is Invalid
+    JMP         ADDQ_END
+ADDQ_MODE_111: ; The rest (not all valid, validated by register number)
+    CMP.B       #$00, D7            ; Test for absolute word address
+    BEQ         ADDQ_ABS_W
+    CMP.B       #$01, D7            ; Test for absolute long address
+    BEQ         ADDQ_ABS_L
+    JSR         EA_INVALID          ; Opcode word is Invalid
+    JMP         ADDQ_END
+*-----------------------------------
+*--- Valid options for mode 111 ----
+ADDQ_ABS_W:
+    JSR         EA_PRINT_ABS_W      ; Print absolute word address operand
+    JMP         ADDQ_END
+ADDQ_ABS_L:
+    JSR         EA_PRINT_ABS_L      ; Print absolute long address operand
+    JMP         ADDQ_END
+*-----------------------------------
+ADDQ_END:
+    JSR         EA_UPDATE_POINTER   ; Update global pointer
+    MOVEM.L     (SP)+, A0-A5/D0-D7  ; Restore registers (except A6, global pointer to word to read)
     RTS
 *---------- AND Effective Addresses -------------------------
 * Parses and prints the effective addressing information for
