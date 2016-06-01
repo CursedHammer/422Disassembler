@@ -82,12 +82,9 @@ BCCorBGTorBLE       LEA     STACK,SP            ; Load the SP
                     MOVE.W  (A6),D0         ; We'll play with it here
                     MOVE.B  #6,D1           ; Shift 6 bits left
                     ASL.W   D1,D0
-                    MOVE.B  #shift,D1           ; Shift 12 bits to the right
+                    MOVE.B  #14,D1           ; Shift 14 bits to the right
                     LSR.W   D1,D0               ; Move the bits (moves highest 4 bits to lowest 4 positions,
                                     ; and the rest are zeroed out)
-                    MOVE.B  #2,D1           ; Shift 2 bits right
-                    ASR.W   D1,D0
-
                     MULU    #6,D0               ; Form offset (move 6 bytes in memory for every 'JMP' command)
                     JMP     0(A0,D0)            ; Jump indirect with index, i.e. jump to 'table' + displacement
 
@@ -116,11 +113,9 @@ OR_BorOR_WorOR_LorDIVU:
         MOVE.W      (A6),D0     ; We'll play with it here
         MOVE.B      #7,D1           ; Shift 7 bits left
         ASL.W       D1,D0
-        MOVE.B      #shift,D1       ; Shift 12 bits to the right
+        MOVE.B      #13,D1          ; Shift 13 bits to the right
         LSR.W       D1,D0           ; Move the bits (moves highest 4 bits to lowest 4 positions,
                                     ; and the rest are zeroed out)
-        MOVE.B      #1,D1           ; Shift 1 bits right
-        ASR.W       D1,D0
         MULU        #6,D0           ; Form offset (move 6 bytes in memory for every 'JMP' command)
         JMP         0(A0,D0)        ; Jump indirect with index, i.e. jump to 'table' + displacement
 
@@ -160,9 +155,8 @@ MULSLorDIVUL        LEA     STACK,SP            ; Load the SP
                     MOVE.W  (A6),D0         ; We'll play with it here
                     MOVE.B  #6,D1           ; Shift 6 bits left
                     ASL.W   D1,D0
-                    MOVE.B  #shift,D1           ; Shift 12 bits to the right
+                    MOVE.B  #12,D1              ; Shift 12 bits to the right
                     LSR.W   D1,D0               ; Move the bits (moves highest 4 bits to lowest 4 positions,
-
                     MULU    #6,D0               ; Form offset (move 6 bytes in memory for every 'JMP' command)
                     JSR     0(A0,D0)            ; Jump indirect with index, i.e. jump to 'table' + displacement
 
@@ -180,14 +174,12 @@ MULSLorDIVULcode1   JSR     ISDIVUL
 someASR:
         LEA         tableSomeASR, A0 ; Index into the table
         CLR.L       D0              ; Zero it
-        MOVE.W      (A6),D0     ; We'll play with it here
+        MOVE.W      (A6),D0         ; We'll play with it here
         MOVE.B      #8,D1           ; Shift 8 bits left
         ASL.W       D1,D0
-        MOVE.B      #shift,D1       ; Shift 12 bits to the right
+        MOVE.B      #14,D1          ; Shift 14 bits to the right
         LSR.W       D1,D0           ; Move the bits (moves highest 4 bits to lowest 4 positions,
                                     ; and the rest are zeroed out)
-        MOVE.B      #2,D1           ; Shift 2 bits right
-        ASR.W       D1,D0
         MULU        #6,D0           ; Form offset (move 6 bytes in memory for every 'JMP' command)
         JMP         0(A0,D0)        ; Jump indirect with index, i.e. jump to 'table' + displacement
 
@@ -195,7 +187,7 @@ tableSomeASR:
         JMP         ASRcode00       *ASR.B
         JMP         ASRcode01       *ASR.W
         JMP         ASRcode10       *ASR.L
-        JMP         ASRcode11       ; INVALID
+        JMP         ASRcode11       *ASR.W
 
 ASRcode00 JSR       ISASRB
           RTS
@@ -203,7 +195,7 @@ ASRcode01 JSR       ISASRW
           RTS
 ASRcode10 JSR       ISASRL
           RTS
-ASRcode11 JSR    OPCODE_INVALID              ;INVALID
+ASRcode11 JSR       ISASRW
 		  RTS
 *----------- END someLSL -----------------------------------
 
@@ -214,11 +206,9 @@ someASL:
         MOVE.W      (A6),D0     ; We'll play with it here
         MOVE.B      #8,D1           ; Shift 8 bits left
         ASL.W       D1,D0
-        MOVE.B      #shift,D1       ; Shift 12 bits to the right
+        MOVE.B      #14,D1          ; Shift 14 bits to the right
         LSR.W       D1,D0           ; Move the bits (moves highest 4 bits to lowest 4 positions,
                                     ; and the rest are zeroed out)
-        MOVE.B      #2,D1           ; Shift 2 bits right
-        ASR.W       D1,D0
         MULU        #6,D0           ; Form offset (move 6 bytes in memory for every 'JMP' command)
         JMP         0(A0,D0)        ; Jump indirect with index, i.e. jump to 'table' + displacement
 
@@ -226,7 +216,7 @@ tableSomeASL:
         JMP         ASLcode00       *ASL.B
         JMP         ASLcode01       *ASL.W
         JMP         ASLcode10       *ASL.L
-        JMP         ASLcode11       ; INVALID
+        JMP         ASLcode11       *ASL.W
 
 ASLcode00 JSR       ISASLB
           RTS
@@ -234,7 +224,7 @@ ASLcode01 JSR       ISASLW
           RTS
 ASLcode10 JSR       ISASLL
           RTS
-ASLcode11 JSR       OPCODE_INVALID ; INVALID
+ASLcode11 JSR       ISASLW
 		  RTS
 *----------- END someLSL -----------------------------------
 
@@ -245,11 +235,9 @@ someLSR:
         MOVE.W      (A6),D0     ; We'll play with it here
         MOVE.B      #8,D1           ; Shift 8 bits left
         ASL.W       D1,D0
-        MOVE.B      #shift,D1       ; Shift 12 bits to the right
+        MOVE.B      #14,D1          ; Shift 14 bits to the right
         LSR.W       D1,D0           ; Move the bits (moves highest 4 bits to lowest 4 positions,
                                     ; and the rest are zeroed out)
-        MOVE.B      #2,D1           ; Shift 2 bits right
-        ASR.W       D1,D0
         MULU        #6,D0           ; Form offset (move 6 bytes in memory for every 'JMP' command)
         JMP         0(A0,D0)        ; Jump indirect with index, i.e. jump to 'table' + displacement
 
@@ -257,14 +245,14 @@ tableSomeLSR:
         JMP         LSRcode00       *LSR.B
         JMP         LSRcode01       *LSR.W
         JMP         LSRcode10       *LSR.L
-        JMP         LSRcode11       ; INVALID
+        JMP         LSRcode11       *LSR.W
 LSRcode00 JSR       ISLSRB
           RTS
 LSRcode01 JSR       ISLSRW
           RTS
 LSRcode10 JSR       ISLSRL
           RTS
-LSRcode11 JSR    OPCODE_INVALID              ;INVALID
+LSRcode11 JSR       ISLSRW
 		  RTS
 *----------- END someLSR -----------------------------------
 
@@ -275,11 +263,9 @@ someLSL:
         MOVE.W      (A6),D0     ; We'll play with it here
         MOVE.B      #8,D1           ; Shift 8 bits left
         ASL.W       D1,D0
-        MOVE.B      #shift,D1       ; Shift 12 bits to the right
+        MOVE.B      #14,D1          ; Shift 14 bits to the right
         LSR.W       D1,D0           ; Move the bits (moves highest 4 bits to lowest 4 positions,
                                     ; and the rest are zeroed out)
-        MOVE.B      #2,D1           ; Shift 2 bits right
-        ASR.W       D1,D0
         MULU        #6,D0           ; Form offset (move 6 bytes in memory for every 'JMP' command)
         JMP         0(A0,D0)        ; Jump indirect with index, i.e. jump to 'table' + displacement
 
@@ -287,7 +273,7 @@ tableSomeLSL:
         JMP         LSLcode00       *LSL.B
         JMP         LSLcode01       *LSL.W
         JMP         LSLcode10       *LSL.L
-        JMP         LSLcode11       ; INVALID
+        JMP         LSLcode11       *LSL.W
 
 LSLcode00 JSR       ISLSLB
           RTS
@@ -295,7 +281,7 @@ LSLcode01 JSR       ISLSLW
           RTS
 LSLcode10 JSR       ISLSLL
           RTS
-LSLcode11 JSR       OPCODE_INVALID              ;INVALID
+LSLcode11 JSR       ISLSLW
 		  RTS
 *----------- END someLSL -----------------------------------
 
@@ -306,11 +292,9 @@ someROL:
         MOVE.W      (A6),D0     ; We'll play with it here
         MOVE.B      #8,D1           ; Shift 8 bits left
         ASL.W       D1,D0
-        MOVE.B      #shift,D1       ; Shift 12 bits to the right
+        MOVE.B      #14,D1          ; Shift 14 bits to the right
         LSR.W       D1,D0           ; Move the bits (moves highest 4 bits to lowest 4 positions,
                                     ; and the rest are zeroed out)
-        MOVE.B      #2,D1           ; Shift 2 bits right
-        ASR.W       D1,D0
         MULU        #6,D0           ; Form offset (move 6 bytes in memory for every 'JMP' command)
         JMP         0(A0,D0)        ; Jump indirect with index, i.e. jump to 'table' + displacement
 
@@ -318,7 +302,7 @@ tableSomeROL:
         JMP         ROLcode00       *ROL.B
         JMP         ROLcode01       *ROL.W
         JMP         ROLcode10       *ROL.L
-        JMP         ROLcode11       ; INVALID
+        JMP         ROLcode11       *ROL.W
 
 ROLcode00 JSR       ISROLB
           RTS
@@ -326,7 +310,7 @@ ROLcode01 JSR       ISROLW
           RTS
 ROLcode10 JSR       ISROLL
           RTS
-ROLcode11 JSR       OPCODE_INVALID              ;INVALID
+ROLcode11 JSR       ISROLW
 		  RTS
 *----------- END someROR -----------------------------------
 
@@ -338,11 +322,9 @@ someROR:
         MOVE.W      (A6),D0     ; We'll play with it here
         MOVE.B      #8,D1           ; Shift 8 bits left
         ASL.W       D1,D0
-        MOVE.B      #shift,D1       ; Shift 12 bits to the right
+        MOVE.B      #14,D1          ; Shift 14 bits to the right
         LSR.W       D1,D0           ; Move the bits (moves highest 4 bits to lowest 4 positions,
                                     ; and the rest are zeroed out)
-        MOVE.B      #2,D1           ; Shift 2 bits right
-        ASR.W       D1,D0
         MULU        #6,D0           ; Form offset (move 6 bytes in memory for every 'JMP' command)
         JMP         0(A0,D0)        ; Jump indirect with index, i.e. jump to 'table' + displacement
 
@@ -350,7 +332,7 @@ tableSomeROR:
         JMP         RORcode00       *ROR.B
         JMP         RORcode01       *ROR.W
         JMP         RORcode10       *ROR.L
-        JMP         RORcode11       ; INVALID
+        JMP         RORcode11       *ROR.W
 
 RORcode00 JSR       ISRORB
           RTS
@@ -358,7 +340,7 @@ RORcode01 JSR       ISRORW
           RTS
 RORcode10 JSR       ISRORL
           RTS
-RORcode11 JSR       OPCODE_INVALID ; INVALID
+RORcode11 JSR       ISRORW
 		  RTS
 *----------- END someROR -----------------------------------
 
@@ -369,11 +351,9 @@ ROL_ROR:
         MOVE.W      (A6),D0     ; We'll play with it here
         MOVE.B      #7,D1           ; Shift 7 bits left
         ASL.W       D1,D0
-        MOVE.B      #shift,D1       ; Shift 12 bits to the right
+        MOVE.B      #15,D1          ; Shift 15 bits to the right
         LSR.W       D1,D0           ; Move the bits (moves highest 4 bits to lowest 4 positions,
                                     ; and the rest are zeroed out)
-        MOVE.B      #3,D1           ; Shift 3 bits right
-        ASR.W       D1,D0
         MULU        #6,D0           ; Form offset (move 6 bytes in memory for every 'JMP' command)
         JMP         0(A0,D0)        ; Jump indirect with index, i.e. jump to 'table' + displacement
 
@@ -394,11 +374,9 @@ LSL_LSR:
         MOVE.W      (A6),D0     ; We'll play with it here
         MOVE.B      #7,D1           ; Shift 7 bits left
         ASL.W       D1,D0
-        MOVE.B      #shift,D1       ; Shift 12 bits to the right
+        MOVE.B      #15,D1          ; Shift 15 bits to the right
         LSR.W       D1,D0           ; Move the bits (moves highest 4 bits to lowest 4 positions,
                                     ; and the rest are zeroed out)
-        MOVE.B      #3,D1           ; Shift 3 bits right
-        ASR.W       D1,D0
         MULU        #6,D0           ; Form offset (move 6 bytes in memory for every 'JMP' command)
         JMP         0(A0,D0)        ; Jump indirect with index, i.e. jump to 'table' + displacement
 
@@ -419,11 +397,9 @@ ASL_ASR:
         MOVE.W      (A6),D0     ; We'll play with it here
         MOVE.B      #7,D1           ; Shift 7 bits left
         ASL.W       D1,D0
-        MOVE.B      #shift,D1       ; Shift 12 bits to the right
+        MOVE.B      #15,D1          ; Shift 15 bits to the right
         LSR.W       D1,D0           ; Move the bits (moves highest 4 bits to lowest 4 positions,
                                     ; and the rest are zeroed out)
-        MOVE.B      #3,D1           ; Shift 3 bits right
-        ASR.W       D1,D0
         MULU        #6,D0           ; Form offset (move 6 bytes in memory for every 'JMP' command)
         JMP         0(A0,D0)        ; Jump indirect with index, i.e. jump to 'table' + displacement
 
@@ -444,11 +420,9 @@ ROd_LSd_ASd:
         MOVE.W      (A6),D0     ; We'll play with it here
         MOVE.B      #11,D1          ; Shift 11 bits left
         ASL.W       D1,D0
-        MOVE.B      #shift,D1       ; Shift 12 bits to the right
+        MOVE.B      #15,D1          ; Shift 12 bits to the right
         LSR.W       D1,D0           ; Move the bits (moves highest 4 bits to lowest 4 positions,
                                     ; and the rest are zeroed out)
-        MOVE.B      #2,D1           ; Shift 2 bits right
-        ASR.W       D1,D0
         MULU        #6,D0           ; Form offset (move 6 bytes in memory for every 'JMP' command)
         JMP         0(A0,D0)        ; Jump indirect with index, i.e. jump to 'table' + displacement
 
@@ -475,11 +449,9 @@ AND_BorAND_WorAND_LorMULS_W:
         MOVE.W      (A6),D0         ; We'll play with it here
         MOVE.B      #7,D1           ; Shift 7 bits left
         ASL.W       D1,D0
-        MOVE.B      #shift,D1           ; Shift 12 bits to the right
+        MOVE.B      #13,D1              ; Shift 13 bits to the right
         LSR.W       D1,D0               ; Move the bits (moves highest 4 bits to lowest 4 positions,
                                 ; and the rest are zeroed out)
-        MOVE.B      #1,D1           ; Shift 1 bits right
-        ASR.W       D1,D0
         MULU        #6,D0               ; Form offset (move 6 bytes in memory for every 'JMP' command)
         JMP         0(A0,D0)            ; Jump indirect with index, i.e. jump to 'table' + displacement
 
@@ -518,11 +490,9 @@ ADD_BorADD_WorADD_L:
         MOVE.W      (A6),D0     ; We'll play with it here
         MOVE.B      #7,D1           ; Shift 7 bits left
         ASL.W       D1,D0
-        MOVE.B      #shift,D1       ; Shift 12 bits to the right
+        MOVE.B      #13,D1          ; Shift 13 bits to the right
         LSR.W       D1,D0           ; Move the bits (moves highest 4 bits to lowest 4 positions,
                                     ; and the rest are zeroed out)
-        MOVE.B      #1,D1           ; Shift 1 bits right
-        ASR.W       D1,D0
         MULU        #6,D0           ; Form offset (move 6 bytes in memory for every 'JMP' command)
         JMP         0(A0,D0)        ; Jump indirect with index, i.e. jump to 'table' + displacement
 
@@ -561,11 +531,9 @@ SUB_BorSUB_WorSUB_L:
         MOVE.W      (A6),D0     ; We'll play with it here
         MOVE.B      #7,D1           ; Shift 7 bits left
         ASL.W       D1,D0
-        MOVE.B      #shift,D1       ; Shift 12 bits to the right
+        MOVE.B      #13,D1          ; Shift 13 bits to the right
         LSR.W       D1,D0           ; Move the bits (moves highest 4 bits to lowest 4 positions,
                                     ; and the rest are zeroed out)
-        MOVE.B      #1,D1           ; Shift 1 bits right
-        ASR.W       D1,D0
         MULU        #6,D0           ; Form offset (move 6 bytes in memory for every 'JMP' command)
         JMP         0(A0,D0)        ; Jump indirect with index, i.e. jump to 'table' + displacement
 
@@ -604,11 +572,9 @@ CMP_BorCMP_WorCMP_L:
         MOVE.W      (A6),D0     ; We'll play with it here
         MOVE.B      #8,D1           ; Shift 8 bits left
         ASL.W       D1,D0
-        MOVE.B      #shift,D1       ; Shift 12 bits to the right
+        MOVE.B      #14,D1          ; Shift 14 bits to the right
         LSR.W       D1,D0           ; Move the bits (moves highest 4 bits to lowest 4 positions,
                                     ; and the rest are zeroed out)
-        MOVE.B      #2,D1           ; Shift 2 bits right
-        ASR.W       D1,D0
         MULU        #6,D0           ; Form offset (move 6 bytes in memory for every 'JMP' command)
         JMP         0(A0,D0)        ; Jump indirect with index, i.e. jump to 'table' + displacement
 
@@ -635,11 +601,9 @@ ADDQ_BorADDQ_WorADDQ_L:
         MOVE.W      (A6),D0     ; We'll play with it here
         MOVE.B      #8,D1           ; Shift 8 bits left
         ASL.W       D1,D0
-        MOVE.B      #shift,D1       ; Shift 12 bits to the right
+        MOVE.B      #14,D1          ; Shift 14 bits to the right
         LSR.W       D1,D0           ; Move the bits (moves highest 4 bits to lowest 4 positions,
                                     ; and the rest are zeroed out)
-        MOVE.B      #2,D1           ; Shift 2 bits right
-        ASR.W       D1,D0
         MULU        #6,D0           ; Form offset (move 6 bytes in memory for every 'JMP' command)
         JMP         0(A0,D0)        ; Jump indirect with index, i.e. jump to 'table' + displacement
 
@@ -666,11 +630,9 @@ someCLR:
         MOVE.W      (A6),D0     ; We'll play with it here
         MOVE.B      #8,D1           ; Shift 8 bits left
         ASL.W       D1,D0
-        MOVE.B      #shift,D1       ; Shift 12 bits to the right
+        MOVE.B      #14,D1       ; Shift 12 bits to the right
         LSR.W       D1,D0           ; Move the bits (moves highest 4 bits to lowest 4 positions,
                                     ; and the rest are zeroed out)
-        MOVE.B      #2,D1           ; Shift 2 bits right
-        ASR.W       D1,D0
         MULU        #6,D0           ; Form offset (move 6 bytes in memory for every 'JMP' command)
         JMP         0(A0,D0)        ; Jump indirect with index, i.e. jump to 'table' + displacement
 
@@ -706,7 +668,7 @@ NOPorCLRorRTSorJSR:
 
         MOVE.B      #4,D1           ; Shift 4 bits left
         ASL.W       D1,D0
-        MOVE.B      #shift,D1       ; Shift 12 bits to the right
+        MOVE.B      #12,D1          ; Shift 12 bits to the right
         LSR.W       D1,D0           ; Move the bits (moves highest 4 bits to lowest 4 positions,
                                     ; and the rest are zeroed out)
         MULU        #6,D0           ; Form offset (move 6 bytes in memory for every 'JMP' command)
@@ -775,11 +737,9 @@ someMOVEM:
         MOVE.W      (A6),D0     ; We'll play with it here
         MOVE.B      #9,D1           ; Shift 9 bits left
         ASL.W       D1,D0
-        MOVE.B      #shift,D1       ; Shift 12 bits to the right
+        MOVE.B      #15,D1       ; Shift 12 bits to the right
         LSR.W       D1,D0           ; Move the bits (moves highest 4 bits to lowest 4 positions,
                                     ; and the rest are zeroed out)
-        MOVE.B      #3,D1           ; Shift 3 bits right
-        ASR.W       D1,D0
         MULU        #6,D0           ; Form offset (move 6 bytes in memory for every 'JMP' command)
         JMP         0(A0,D0)        ; Jump indirect with index, i.e. jump to 'table' + displacement
 
@@ -802,7 +762,7 @@ NOP_MOVEM_LEA_JSR_CLR_RTS:
         ASR.W       D1,D0
         MOVE.B      #13,D1          ; Shift 13 bits left
         ASL.W       D1,D0
-        MOVE.B      #shift,D1       ; Shift 12 bits to the right
+        MOVE.B      #12,D1          ; Shift 12 bits to the right
         LSR.W       D1,D0           ; Move the bits (moves highest 4 bits to lowest 4 positions,
                                     ; and the rest are zeroed out)
         MULU        #6,D0           ; Form offset (move 6 bytes in memory for every 'JMP' command)
@@ -867,7 +827,7 @@ ADDI_BorADDI_WorADDI_L:
         MOVE.W      (A6),D0     ; We'll play with it here
         MOVE.B      #7,D1           ; Shift 7 bits left
         ASL.W       D1,D0
-        MOVE.B      #13,D1
+        MOVE.B      #13,D1          ; Shift 13 bits right
         ASR.W       D1,D0
         MULU        #6,D0           ; Form offset (move 6 bytes in memory for every 'JMP' command)
         JMP         0(A0,D0)        ; Jump indirect with index, i.e. jump to 'table' + displacement
