@@ -24,9 +24,9 @@ START:                  ; first instruction of program
 *example EQU     %0000011010000101 ; ADDI.L D5, D7 = 0000 0110 1000 0101
 *example EQU     %0100100111010101 ; LEA D5, (A5) = 0100 1001 1101 0101
 *example EQU     %0100111001110101 ; RTS  = 0100 1110 0111 0101
-*example EQU     %0100001010000111 ; CLR.L  = 0100 0010 1000 0111
-*example EQU     %0100001000000111 ; CLR.B  = 0100 0010 0000 0111
-*example EQU     %0100001001000111 ; CLR.W  = 0100 0010 0100 0111
+*example EQU     %0100001010000111 ; CLR.L D7 = 0100 0010 1000 0111
+*example EQU     %0100001000000111 ; CLR.B D7 = 0100 0010 0000 0111
+*example EQU     %0100001001000111 ; CLR.W D7 = 0100 0010 0100 0111
 
 example EQU     %0100001011000111 ; INVALID = 0100 0010 1100 0111
 
@@ -172,7 +172,7 @@ code1000 JSR    OR_BorOR_WorOR_LorDIVU
 code1001 JSR    SUB_BorSUB_WorSUB_L
          JSR    DONE
 code1010 JSR    OPCODE_INVALID              ;INVALID
-         RTS   
+         RTS
 code1011 JSR    CMP_BorCMP_WorCMP_L
          JSR DONE
 code1100 JSR    AND_BorAND_WorAND_LorMULS_W
@@ -182,7 +182,7 @@ code1101 JSR    ADD_BorADD_WorADD_L
 code1110 JSR    ROd_LSd_ASd
          JSR    DONE
 code1111 JSR    OPCODE_INVALID              ;INVALID
-		 RTS 
+		 RTS
 
 *****************************  BCCorBGTorBLE ************************************
 BCCorBGTorBLE       LEA     STACK,SP            ; Load the SP
@@ -210,7 +210,7 @@ tableBCCorBGTorBLE   JMP    BCCorBGTorBLEcode00   ; BCC
 BCCorBGTorBLEcode00    JSR     ISBCC
                        RTS
 BCCorBGTorBLEcode01    JSR    OPCODE_INVALID              ;INVALID
-					   RTS 
+					   RTS
 BCCorBGTorBLEcode10    JSR     ISBGT
                        RTS
 BCCorBGTorBLEcode11    JSR     ISBLE
@@ -282,7 +282,7 @@ OR_DIVUcode101      JSR     ISORW
 OR_DIVUcode110      JSR     ISORL
                     RTS
 OR_DIVUcode111      JSR    OPCODE_INVALID              ;INVALID
-		            RTS                
+		            RTS
 
 ***************************** END  ADD_BorADD_WorADD_L ************************************
 
@@ -373,7 +373,7 @@ tableSomeLSR        JMP     LSRcode00   *LSR.B
                     JMP     LSRcode01   *LSR.W
                     JMP     LSRcode10   *LSR.L
                     JMP     LSRcode11   ; INVALID
-                    
+
 LSRcode00   JSR     ISLSRB
             RTS
 LSRcode01   JSR     ISLSRW
@@ -602,7 +602,7 @@ ROd_LSd_ASdcode00   JSR     ASL_ASR
 ROd_LSd_ASdcode01   JSR     LSL_LSR
                     RTS
 ROd_LSd_ASdcode10   JSR    OPCODE_INVALID              ;INVALID
-					RTS 
+					RTS
 ROd_LSd_ASdcode11   JSR     ROL_ROR
                     RTS
 
@@ -642,7 +642,7 @@ ANDcode001   JSR     ISANDW
 ANDcode010   JSR     ISANDL
              RTS
 ANDcode011   JSR    OPCODE_INVALID              ;INVALID
-			 RTS 
+			 RTS
 ANDcode100   JSR     ISANDB
              RTS
 ANDcode101   JSR     ISANDW
@@ -734,7 +734,7 @@ SUBcode001   JSR     ISSUBW
 SUBcode010   JSR     ISSUBL
              RTS
 SUBcode011   JSR    OPCODE_INVALID              ;INVALID
-		     RTS 
+		     RTS
 SUBcode100   JSR     ISSUBB
              RTS
 SUBcode101   JSR     ISSUBW
@@ -776,7 +776,7 @@ CMPcode10   JSR     ISCMPL
             RTS
 CMPcode11   JSR    OPCODE_INVALID              ;INVALID
 		    RTS
- 
+
 ***************************** END CMP_BorCMP_WorCMP_L ************************************
 
 
@@ -889,37 +889,37 @@ RTScommand          JSR     ISRTS
 NOPcommand          JSR     ISNOP
                     RTS
 JSRorCLRcode0000     JSR    OPCODE_INVALID              ;INVALID
-					RTS 
+					RTS
 JSRorCLRcode0001     JSR    OPCODE_INVALID              ;INVALID
-					RTS 
+					RTS
 JSRorCLRcode0010    JSR      someCLR
                     RTS
 JSRorCLRcode0011     JSR    OPCODE_INVALID              ;INVALID
-					RTS 
+					RTS
 JSRorCLRcode0100     JSR    OPCODE_INVALID              ;INVALID
-					RTS 
+					RTS
 JSRorCLRcode0101     JSR    OPCODE_INVALID              ;INVALID
-					RTS 
+					RTS
 JSRorCLRcode0110     JSR    OPCODE_INVALID              ;INVALID
-					RTS 
+					RTS
 JSRorCLRcode0111     JSR    OPCODE_INVALID              ;INVALID
-					RTS 
+					RTS
 JSRorCLRcode1000     JSR    OPCODE_INVALID              ;INVALID
-					RTS 
+					RTS
 JSRorCLRcode1001     JSR    OPCODE_INVALID              ;INVALID
-					RTS 
+					RTS
 JSRorCLRcode1010     JSR    OPCODE_INVALID              ;INVALID
-					RTS 
+					RTS
 JSRorCLRcode1011     JSR    OPCODE_INVALID              ;INVALID
-					RTS 
+					RTS
 JSRorCLRcode1100     JSR    OPCODE_INVALID              ;INVALID
-					RTS 
+					RTS
 JSRorCLRcode1101     JSR    OPCODE_INVALID              ;INVALID
-					RTS 
+					RTS
 JSRorCLRcode1110    JSR     ISJSR
                     RTS
 JSRorCLRcode1111     JSR    OPCODE_INVALID              ;INVALID
-					RTS 
+					RTS
 
 *****************************END NOPorCLRorRTSorJSR ************************************
 
@@ -991,35 +991,35 @@ tableNOP_MOVEM_LEA_JSR_CLR_RTS    JMP     LOTScode0000
 LOTScode0000        JSR   MULSLorDIVUL
                     JSR    DONE
 LOTScode0001        JSR    OPCODE_INVALID              ;INVALID
-					RTS 
+					RTS
 LOTScode0010        JSR    someMOVEM
                     JSR    DONE
 LOTScode0011        JSR    OPCODE_INVALID              ;INVALID
-					RTS 
+					RTS
 LOTScode0100        JSR    OPCODE_INVALID              ;INVALID
-					RTS 
+					RTS
 LOTScode0101        JSR    OPCODE_INVALID              ;INVALID
-					RTS 
+					RTS
 LOTScode0110        JSR    ISLEA
                     JSR    DONE
 LOTScode0111        JSR    OPCODE_INVALID              ;INVALID
-					RTS 
+					RTS
 LOTScode1000        JSR    NOPorCLRorRTSorJSR
                     JSR    DONE
 LOTScode1001        JSR    OPCODE_INVALID              ;INVALID
-					RTS 
+					RTS
 LOTScode1010        JSR    NOPorCLRorRTSorJSR
                     JSR    DONE
 LOTScode1011        JSR    OPCODE_INVALID              ;INVALID
-					RTS 
+					RTS
 LOTScode1100        JSR    OPCODE_INVALID              ;INVALID
-					RTS 
+					RTS
 LOTScode1101        JSR    OPCODE_INVALID              ;INVALID
-					RTS 
+					RTS
 LOTScode1110        JSR    ISLEA
                     JSR    DONE
 LOTScode1111        JSR    OPCODE_INVALID              ;INVALID
-					RTS 
+					RTS
 
 *****************************END NOP_MOVEM_LEA_JSR_CLR_RTS ************************************
 
@@ -1051,7 +1051,7 @@ ADDIWcode01        JSR     ISADDIW
 ADDILcode10        JSR     ISADDIL
                     JSR    DONE
 ADDILcode11        JSR    OPCODE_INVALID              ;INVALID
-					RTS 
+					RTS
 *****************************END ADDI_BorADDI_WorADDI_L ************************************
 
 
