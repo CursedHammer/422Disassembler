@@ -187,7 +187,7 @@ tableSomeASR:
         JMP         ASRcode00       *ASR.B
         JMP         ASRcode01       *ASR.W
         JMP         ASRcode10       *ASR.L
-        JMP         ASRcode11       ; INVALID
+        JMP         ASRcode11       *ASR.W
 
 ASRcode00 JSR       ISASRB
           RTS
@@ -195,7 +195,7 @@ ASRcode01 JSR       ISASRW
           RTS
 ASRcode10 JSR       ISASRL
           RTS
-ASRcode11 JSR    OPCODE_INVALID              ;INVALID
+ASRcode11 JSR       ISASRW
 		  RTS
 *----------- END someLSL -----------------------------------
 
@@ -216,7 +216,7 @@ tableSomeASL:
         JMP         ASLcode00       *ASL.B
         JMP         ASLcode01       *ASL.W
         JMP         ASLcode10       *ASL.L
-        JMP         ASLcode11       ; INVALID
+        JMP         ASLcode11       *ASL.W
 
 ASLcode00 JSR       ISASLB
           RTS
@@ -224,7 +224,7 @@ ASLcode01 JSR       ISASLW
           RTS
 ASLcode10 JSR       ISASLL
           RTS
-ASLcode11 JSR       OPCODE_INVALID ; INVALID
+ASLcode11 JSR       ISASLW
 		  RTS
 *----------- END someLSL -----------------------------------
 
@@ -245,14 +245,14 @@ tableSomeLSR:
         JMP         LSRcode00       *LSR.B
         JMP         LSRcode01       *LSR.W
         JMP         LSRcode10       *LSR.L
-        JMP         LSRcode11       ; INVALID
+        JMP         LSRcode11       *LSR.W
 LSRcode00 JSR       ISLSRB
           RTS
 LSRcode01 JSR       ISLSRW
           RTS
 LSRcode10 JSR       ISLSRL
           RTS
-LSRcode11 JSR    OPCODE_INVALID              ;INVALID
+LSRcode11 JSR       ISLSRW
 		  RTS
 *----------- END someLSR -----------------------------------
 
@@ -273,7 +273,7 @@ tableSomeLSL:
         JMP         LSLcode00       *LSL.B
         JMP         LSLcode01       *LSL.W
         JMP         LSLcode10       *LSL.L
-        JMP         LSLcode11       ; INVALID
+        JMP         LSLcode11       *LSL.W
 
 LSLcode00 JSR       ISLSLB
           RTS
@@ -281,7 +281,7 @@ LSLcode01 JSR       ISLSLW
           RTS
 LSLcode10 JSR       ISLSLL
           RTS
-LSLcode11 JSR       OPCODE_INVALID              ;INVALID
+LSLcode11 JSR       ISLSLW
 		  RTS
 *----------- END someLSL -----------------------------------
 
@@ -302,7 +302,7 @@ tableSomeROL:
         JMP         ROLcode00       *ROL.B
         JMP         ROLcode01       *ROL.W
         JMP         ROLcode10       *ROL.L
-        JMP         ROLcode11       ; INVALID
+        JMP         ROLcode11       *ROL.W
 
 ROLcode00 JSR       ISROLB
           RTS
@@ -310,7 +310,7 @@ ROLcode01 JSR       ISROLW
           RTS
 ROLcode10 JSR       ISROLL
           RTS
-ROLcode11 JSR       OPCODE_INVALID              ;INVALID
+ROLcode11 JSR       ISROLW
 		  RTS
 *----------- END someROR -----------------------------------
 
@@ -332,7 +332,7 @@ tableSomeROR:
         JMP         RORcode00       *ROR.B
         JMP         RORcode01       *ROR.W
         JMP         RORcode10       *ROR.L
-        JMP         RORcode11       ; INVALID
+        JMP         RORcode11       *ROR.W
 
 RORcode00 JSR       ISRORB
           RTS
@@ -340,7 +340,7 @@ RORcode01 JSR       ISRORW
           RTS
 RORcode10 JSR       ISRORL
           RTS
-RORcode11 JSR       OPCODE_INVALID ; INVALID
+RORcode11 JSR       ISRORW
 		  RTS
 *----------- END someROR -----------------------------------
 
