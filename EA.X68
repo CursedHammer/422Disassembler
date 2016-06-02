@@ -664,6 +664,8 @@ EA_Bcc: *ONLY BCC (0100), BGT (1110), BLE (1111)
     LSL.W       D2, D1              ; Perform shift (zeros shifted in)
     MOVE.B      #8, D2              ; 'Right-align' bits 0-7 to determine condition
     LSR.W       D2, D1              ; Perform shift (zeros shifted in)
+    *save ultimate address to be printed
+    MOVEA.L     A6, A4              ; Copy global pointer for dislay
     CMP.B       #$00, D1            ; If value is zero, real value is next word in memory
     BEQ         BCC_W
     CMP.B       #$FF, D1            ; If value is FF, real value is next longword
@@ -671,6 +673,7 @@ EA_Bcc: *ONLY BCC (0100), BGT (1110), BLE (1111)
     JMP         BCC_B               ; Else, parse lower-order byte of opcode word
 *--- Sign Extension for byte displacement
 BCC_B:
+    ADDA.B      #$02, A4            ; Increment display pointer past opcode word
     MOVE.W      (A6), D3            ; Save opcode word
     MOVE.B      #8, D2              ; Clear upper 8 bits of opcode word
     LSL.W       D2, D3              ; Perform shift (zeros shifted in)
@@ -683,6 +686,8 @@ BCC_B:
 *-----------------------------------
 *--- Sign extension for word displacement
 BCC_W:
+    ADDA.B      #$04, A4            ; Increment display pointer past opcode word
+                                    ; and displacement word in memory
     ADDA.B      #$02, A5            ; Increment A5 past opcode word
     MOVE.W      (A5), D3            ; Read word displacement from memory
     ADDA.B      #$02, A5            ; Increment A5 past word read
@@ -695,13 +700,14 @@ BCC_W:
 *-----------------------------------
 *--- Read longword displacement ----
 BCC_L:
+    ADDA.B      #$06, A4            ; Increment display pointer past opcode word
+                                    ; and displacement longword in memory
     ADDA.B      #$02, A5            ; Increment A5 past opcode word
     MOVE.L      (A5), D1            ; Read longword displacement from memory
     ADDA.B      #$04, A5            ; Increment A5 past longword read
     JMP         BCC_DISPLAY
 *-----------------------------------
 BCC_DISPLAY:
-    MOVEA.L     A6, A4              ; Copy global pointer
     ADDA.B      D1, A4              ; add displacement to current addressing
     *print address in A4
     JSR         EA_UPDATE_POINTER   ; Updates global pointer
