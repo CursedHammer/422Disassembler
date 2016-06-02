@@ -1487,6 +1487,138 @@ MULS_W_END:
 EA_OR:
     MOVEM.L     A0-A5/D0-D7, -(SP)  ; Save registers (except A6, global pointer to word to read)
     JSR         EA_COPY_PTR         ; Copy global pointer to A5
+    JSR         EA_OPMODE_COMBO     ; opmode: D6, register: D7
+    LEA         OR_OPMODE, A0       ; Set index '0' for jump table
+    MULU        #6, D6              ; Form offset (move 6 bytes in memory for every 'JMP' command)
+    JMP         0(A0, D6)           ; Jump indirect with index, i.e. jump to 'table' + displacement
+*--- determine mode: mode 1 is '<ea>, Dn', mode 2 is 'Dn, <ea>'
+OR_OPMODE:
+    JMP         OR_OPMODE_000       ; mode 1, byte
+    JMP         OR_OPMODE_001       ; mode 1, word
+    JMP         OR_OPMODE_010       ; mode 1, long
+    JMP         OR_OPMODE_011       ; Invalid value
+    JMP         OR_OPMODE_100       ; mode 2, byte
+    JMP         OR_OPMODE_101       ; mode 2, word
+    JMP         OR_OPMODE_110       ; mode 2, long
+    JMP         OR_OPMODE_111       ; Invalid value
+*-----------------------------------
+*--- Opmode jump table options -----
+OR_OPMODE_000: ; mode 1, byte
+    MOVE.B      #1, D5              ; Store size in the case of an immediate operand
+    JMP         OR_MODE_1
+OR_OPMODE_001: ; mode 1, word
+    MOVE.B      #2, D5              ; Store size in the case of an immediate operand
+    JMP         OR_MODE_1
+OR_OPMODE_010: ; mode 1, long
+    MOVE.B      #3, D5              ; Store size in the case of an immediate operand
+    JMP         OR_MODE_1
+OR_OPMODE_011: ; Invalid value
+    JSR         EA_INVALID
+    JMP         OR_END
+OR_OPMODE_100: ; mode 2, byte
+    MOVE.B      #1, D5              ; Store size in the case of an immediate operand
+    JMP         OR_MODE_2
+OR_OPMODE_101: ; mode 2, word
+    MOVE.B      #1, D5              ; Store size in the case of an immediate operand
+    JMP         OR_MODE_2
+OR_OPMODE_110: ; mode 2, long
+    MOVE.B      #1, D5              ; Store size in the case of an immediate operand
+    JMP         OR_MODE_2
+OR_OPMODE_111: ; Invalid value
+    JSR         EA_INVALID
+    JMP         OR_END
+*-----------------------------------
+*--- Mode 1 ------------------------
+OR_MODE_1:
+    CLR.L       D0                  ; Clear data register 0
+    MOVE.B      #1, D0              ; Save mode number to D0
+    MOVE.W      D7, D1              ; Save register value for printing dest. operand
+    JSR         EA_DEFAULT_COMBO    ; Stores mode bits in D6, register bits in D7
+    JSR         OR_EVAL_EA          ; Evaluate the results of subroutine call
+    *PRINT COMMA TODO
+    MOVE.W      D1, D7              ; Return register value to D7 for use by subroutine
+    JSR         EA_PRINT_DN         ; Print data register
+    JMP         OR_END
+*-----------------------------------
+*--- Mode 2 ------------------------
+OR_MODE_2:
+    CLR.L       D0                  ; Clear data register 0
+    MOVE.B      #2, D0              ; Save mode number to D0
+    JSR         EA_PRINT_DN         ; Print data register
+    *PRINT COMMA TODO
+    JSR         EA_DEFAULT_COMBO    ; Stores mode bits in D6, register bits in D7
+    JSR         OR_EVAL_EA          ; Evaluate the results of subroutine call
+    JMP         OR_END
+*-----------------------------------
+*--- Evaluate EA bits --------------
+OR_EVAL_EA:
+    LEA         OR_MODE, A0         ; Set index '0' for jump table
+    MULU        #6, D6              ; Form offset (move 6 bytes in memory for every 'JMP' command)
+    JMP         0(A0, D6)           ; Jump indirect with index, i.e. jump to 'table' + displacement
+*--- Check validity based on mode value
+OR_MODE:
+    JMP         OR_MODE_000         ; Invalid: Dn
+    JMP         OR_MODE_001         ; An (invalid if opmode 2)
+    JMP         OR_MODE_010         ; (An)
+    JMP         OR_MODE_011         ; (An)+
+    JMP         OR_MODE_100         ; -(An)
+    JMP         OR_MODE_101         ; Invalid: Address Register Indirect with Displacement Mode
+    JMP         OR_MODE_110         ; Invalid: Address Register Indirect with Index (8-Bit Displacement)
+    JMP         OR_MODE_111         ; The rest (not all valid, validated by register number)
+*-----------------------------------
+*--- EA mode jump table options ----
+OR_MODE_000: ; Invalid: Dn
+    JSR         EA_INVALID          ; Invalid for both opmodes
+    JMP         OR_MODE_END         ; End evaluation of ea mode
+OR_MODE_001: ; An (invalid if opmode 2)
+    CMP         #2, D0
+    BEQ         OR_MODE_INVALID     ; If opmode 2, An is invalid addressing mode
+    JSR         EA_PRINT_AN         ; Address register direct is invalid mode
+    JMP         OR_MODE_END         ; End evaluation of ea mode
+OR_MODE_010: ; (An)
+    JSR         EA_PRINT_AN_IND     ; Print address register indirect
+    JMP         OR_MODE_END         ; End evaluation of ea mode
+OR_MODE_011: ; (An)+
+    JSR         EA_PRINT_POSTINC    ; Print address register indirect with post increment
+    JMP         OR_MODE_END         ; End evaluation of ea mode
+OR_MODE_100: ; -(An)
+    JSR         EA_PRINT_PREDEC     ; Print address register indirect with pre decrement
+    JMP         OR_MODE_END         ; End evaluation of ea mode
+OR_MODE_101: ; Invalid: Address Register Indirect with Displacement Mode
+    JMP         OR_MODE_INVALID
+OR_MODE_110: ; Invalid: Address Register Indirect with Index (8-Bit Displacement)
+    JMP         OR_MODE_INVALID
+OR_MODE_111: ; The rest (not all valid, validated by register number)
+    CMP.B       #$00, D7            ; Test for absolute word address
+    BEQ         OR_ABS_W
+    CMP.B       #$01, D7            ; Test for absolute long address
+    BEQ         OR_ABS_L
+    CMP.B       #$04, D7            ; Test for immediate data
+    BEQ         OR_IMM
+    JMP         OR_MODE_INVALID     ; else, invalid
+*-----------------------------------
+*--- Valid options for mode 111 ----
+OR_ABS_W:
+    JSR         EA_PRINT_ABS_W      ; Print absolute word address operand
+    JMP         OR_MODE_END
+OR_ABS_L:
+    JSR         EA_PRINT_ABS_L      ; Print absolute long address operand
+    JMP         OR_MODE_END
+OR_IMM: ; invalid if opmode is 2
+    CMP         #2, D0
+    BEQ         OR_MODE_INVALID     ; If opmode 2, An is invalid addressing mode
+    JSR         EA_PRINT_IMM        ; Print immediate data
+    JMP         OR_MODE_END
+*-----------------------------------
+OR_MODE_END:
+    RTS                             ; Finish evaluating EA bits
+OR_MODE_INVALID:
+    JSR         EA_INVALID          ; Opcode word is Invalid
+    RTS
+OR_END:
+    JSR         EA_UPDATE_POINTER   ; Updates global pointer
+    MOVEM.L     (SP)+, A0-A5/D0-D7  ; Restore registers (except A6, global pointer to word to read)
+    RTS
 *---------- ROd Effective Addresses ------------------------
 * Parses and prints the effective addressing information for
 * the ROd opcode
