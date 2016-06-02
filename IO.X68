@@ -35,8 +35,6 @@ MOD       EQU   2
 CR        EQU   $0D
 LF        EQU   $0A 
 
-          ORG   $1000 
-
 ******************************************************************************
 *           BEGIN CODE                                                       *
 ******************************************************************************
@@ -397,6 +395,7 @@ ADR_ERR_NOTLT   DC.B 'THE BEGINNING ADDRESS MUST BE LESS THAN THE ENDING ADDRESS
 HEXSTRING       DS.B 80             * Var for hex string
 
 ILLEGAL         DC.B '1000    DATA    $WXYZ',CR,LF,0
+
 
 
 
