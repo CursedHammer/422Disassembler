@@ -55,7 +55,9 @@ RERUN
     
 NOTDONE
     MOVE.B      #1,(RUNAGAIN)       * 1 for true to rerun program
-    BRA.W       CLEARSCRN           * Clear screen and return from subroutine         
+    BSR.W       CLEAR               * Clear all values
+    BSR.W       CLEARSCRN           * Clear screen and return from subroutine
+    RTS         
         
 *---------- END - RERUN ------------------------------------------------------
 
@@ -65,6 +67,7 @@ NOTDONE
 ******************************************************************************
 
 ENDQUESTION     DC.B 'WOULD YOU LIKE TO RUN THE PROGRAM AGAIN (Y/N)? ',0
+
 
 
 
