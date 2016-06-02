@@ -8,11 +8,12 @@
 ******************************************************************************
 *
 * TODO:
-*    Hex to ASCII
-*    Write end function to ask user if they are done
 *    Write data error
+*    Chase down bug when you enter more the 8chars for address and it loops
 *
 * DONE:
+*    Hex to ASCII
+*    Write end function to ask user if they are done
 *    Make sure addresses are even
 *    ASCII to Hex
 *    Make sure all hex values (nearly none)
@@ -136,7 +137,7 @@ CLEAR
 
         
 *---------- GET_HEXSTRING ----------------------------------------------------
-* Read in the starting address and verify length is <= 8.
+* Read in the ASCII string address and verify length is <= 8.
 *-----------------------------------------------------------------------------
 GET_HEXSTRING
     MOVE.B      #14,D0              * Moves the Task 14 into D0
@@ -149,16 +150,16 @@ GET_HEXSTRING
     MOVE.B      D1,STR_LEN          * Save length of input string
     
     CMPI.B      #8,(STR_LEN)        * Is length > 8?
-    BGT         GET_HEXSTRING       * If yes, get hex again
+    BGT         GET_FIRST_ADDRESS   * If yes, get hex again
        
     LEA         HEXSTRING,A0        * Load address for verification     
     MOVE.B      #1,(HEXFLAG)   
     RTS                             * Return from subroutine
         
-*---------- END - GET_START_ADDR ---------------------------------------------
+*---------- END - GET_HEXSTRING ----------------------------------------------
 
 
-*---------- ASCII_TO_HEX -----------------------------------------------------------
+*---------- ASCII_TO_HEX -----------------------------------------------------
 * Checks to see if each character is hexadecimal
 *-----------------------------------------------------------------------------
 ASCII_TO_HEX      
@@ -328,8 +329,7 @@ NOTEVEN
 *-----------------------------------------------------------------------------
 PRINT_HEXVALUE
     MOVE.B      #14,D0              * Moves the Task 14 into D0
-    TRAP        #15                 * Displays contents of A1
-    
+    TRAP        #15                 * Displays contents of A1    
     
     MOVE.B      #3,D0               * Moves the Task 3 into D0
     TRAP        #15                 * Displays contents of D1
@@ -376,7 +376,46 @@ ADDRESS_ERR
     TRAP        #15                 * The keyboard into D1.B
     RTS                             * Return from subroutine
 
-*---------- END - CLEARSCRN --------------------------------------------------
+*---------- END - ADDRESS_ERR ------------------------------------------------
+
+
+*---------- INVALID_DATA -----------------------------------------------------
+* Invalid data to print out to the user
+*-----------------------------------------------------------------------------
+INVALID_DATA
+    MOVE.L      A6,D1               * Move the address location to D1
+    MOVE.B      #16,D2              * Move base 16 to D2
+    MOVE.B      #15,D0              * Moves Task 15 into D0
+    TRAP        #15                 * Displays contents of D1
+    
+    LEA         TAB,A1              * Load TAB to A1
+    MOVE.B      #14,D0              * Moves the Task 14 into D0
+    TRAP        #15                 * Displays a tab of A1
+    
+    LEA         DATA,A1             * Load address location to A1
+    MOVE.B      #14,D0              * Moves the Task 14 into D0
+    TRAP        #15                 * Displays location of A1
+    
+    LEA         TAB,A1              * Load TAB to A1
+    MOVE.B      #14,D0              * Moves the Task 14 into D0
+    TRAP        #15                 * Displays a tab of A1
+    
+    LEA         DOLLAR,A1           * Load TAB to A1
+    MOVE.B      #14,D0              * Moves the Task 14 into D0
+    TRAP        #15                 * Displays a tab of A1
+    
+    MOVE.W      (A6),D1             * Move the address value to D1
+    MOVE.B      #16,D2              * Move base 16 to D2
+    MOVE.B      #15,D0              * Moves Task 15 into D0
+    TRAP        #15                 * Displays value of D1
+    
+    LEA         ENDL,A1             * Load TAB to A1
+    MOVE.B      #14,D0              * Moves the Task 14 into D0
+    TRAP        #15                 * Displays a tab of A1
+    
+    RTS                             * Return from subroutine
+
+*---------- END - INVALID_DATA -----------------------------------------------
 
 
 ******************************************************************************
@@ -389,12 +428,15 @@ PS2             DC.B 'PLEASE ENTER THE ENDING HEX ADDRESS',CR,LF,'(MAX 8 DIGITS 
 BMESSAGE        DC.B CR,LF,'BEGINNING ADDRESS GIVEN IS: ',0
 EMESSAGE        DC.B CR,LF,'ENDING ADDRESS GIVEN IS   : ',0
 ENDL            DC.B CR,LF,0
+TAB             DC.B '    ',0
+DOLLAR          DC.B '$',0
 
 ADR_ERR_NOTLT   DC.B 'THE BEGINNING ADDRESS MUST BE LESS THAN THE ENDING ADDRESS.',CR,LF,'PRESS ANY KEY TO TRY AGAIN...',0
 
 HEXSTRING       DS.B 80             * Var for hex string
 
-ILLEGAL         DC.B '1000    DATA    $WXYZ',CR,LF,0
+DATA            DC.B 'DATA',0
+
 
 
 
