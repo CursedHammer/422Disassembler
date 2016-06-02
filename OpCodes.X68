@@ -910,9 +910,7 @@ MOVEWcode111 JSR    ISMOVEW
 ; TODO: adjust workflow to:
 ;   1) save message address to buffer pointer
 OPCODE_INVALID  MOVEM.L     A0-A6/D0-D7, -(SP) ; Save registers
-            LEA MESSAGEOPCODE_INVALID, A1
-            MOVE.B  #14, D0
-            TRAP    #15
+            JSR     INVALID_DATA
 
             MOVEM.L (SP)+,  A0-A6/D0-D7         ; Restore registers
             RTS
