@@ -683,7 +683,7 @@ CLR_MODE:
 *-----------------------------------
 *--- Jump table options ------------
 CLR_MODE_000: ; Dn
-    JSR         EA_PRINT_DN         ; Data register direct is invalid mode
+    JSR         EA_PRINT_DN
     JMP         CLR_END
 CLR_MODE_001: ; Invalid: An
     JSR         EA_INVALID          ; Address register direct is invalid mode
@@ -883,18 +883,18 @@ EA_JSR:
 *--------------------------------------
 *--- Check validity based on mode value
 JSR_MODE:
-    JMP         JSR_MODE_000        ; Dn
+    JMP         JSR_MODE_000        ; Invalid: Dn
     JMP         JSR_MODE_001        ; Invalid: An
     JMP         JSR_MODE_010        ; (An)
-    JMP         JSR_MODE_011        ; (An)+
-    JMP         JSR_MODE_100        ; -(An)
+    JMP         JSR_MODE_011        ; Invalid: (An)+
+    JMP         JSR_MODE_100        ; Invalid: -(An)
     JMP         JSR_MODE_101        ; Invalid: Address Register Indirect with Displacement Mode
     JMP         JSR_MODE_110        ; Invalid: Address Register Indirect with Index (8-Bit Displacement)
     JMP         JSR_MODE_111        ; The rest (not all valid, validated by register number)
 *-----------------------------------
 *--- Jump table options ------------
-JSR_MODE_000: ; Dn
-    JSR         EA_PRINT_DN         ; Data register direct is invalid mode
+JSR_MODE_000: ; Invalid: Dn
+    JSR         EA_INVALID          ; Data register direct is invalid mode
     JMP         JSR_END
 JSR_MODE_001: ; Invalid: An
     JSR         EA_INVALID          ; Address register direct is invalid mode
@@ -903,11 +903,11 @@ JSR_MODE_010: ; (An)
     JSR         EA_PRINT_AN_IND     ; Print address register indirect
     JMP         JSR_END
 JSR_MODE_011: ; (An)+
-    JSR         EA_PRINT_POSTINC    ; Print address register indirect with post increment
+    JSR         EA_INVALID          ; Address register indirect w/ post increment is invalid mode
     JMP         JSR_END
 JSR_MODE_100: ; -(An)
-    JSR         EA_PRINT_PREDEC     ; Print address register indirect with pre decrement
-    JMP         JSR_END             ; Continue with parsing destination operand
+    JSR         EA_INVALID          ; Address register indirect w/ pre decrement is invalid mode
+    JMP         JSR_END
 JSR_MODE_101: ; Invalid: Address Register Indirect with Displacement Mode
     JSR         EA_INVALID          ; Opcode word is Invalid
     JMP         JSR_END
