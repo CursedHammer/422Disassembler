@@ -549,17 +549,17 @@ AND_END:
 * Parses and prints the effective addressing information for
 * the ASd opcode
 *-----------------------------------------------------------
-EA_ASD:
+EA_ASd:
     MOVEM.L     A0-A5/D0-D7, -(SP)  ; Save registers (except A6, global pointer to word to read)
     JSR         EA_COPY_PTR         ; Copy global pointer to A5
     JSR         EA_SIZE_BITS        ; get size bits in D7
-*--- Branch based on size ----------
+*--- Branch based on size bits -----
     CMP.B       #$03, D7            ; test if memory shift
-    BEQ         ASD_MEM
-    BRA         ASD_REG             ; else, register shfit
+    BEQ         ASd_MEM
+    BRA         ASd_REG             ; else, register shfit
 *-----------------------------------
 *--- Register Shift ----------------
-ASD_REG:
+ASd_REG:
 * In preparation, isolate count/register field
     MOVE.W      (A6), D7            ; read opcode word in memory and save,
                                     ; (using D7 because EA_PRINT_DN uses D7)
@@ -574,76 +574,76 @@ ASD_REG:
     MOVE.B      #15, D2             ; 'Right-align' bit 5 to get value
     LSR.W       D2, D0              ; Perform shift (zeros shifted in)
     CMP.B       #$00, D0            ; If i/r bit is 0, count/register field contains shift count (modulo 64)
-    BEQ         ASD_REG_COUNT
-ASD_REG_REG:                        ; Else, count/register field contains register number
+    BEQ         ASd_REG_COUNT
+ASd_REG_REG:                        ; Else, count/register field contains register number
     JSR         EA_PRINT_DN         ; Print register value, stored in D7
-    JMP         ASD_REG_END         ; Jump to end of ASD_REG
-ASD_REG_COUNT:
+    JMP         ASd_REG_END         ; Jump to end of ASd_REG
+ASd_REG_COUNT:
     *print hash todo
-    *print hex value in D7 as byte todo, continue on to ASD_REG_END
-ASD_REG_END:
+    *print hex value in D7 as byte todo, continue on to ASd_REG_END
+ASd_REG_END:
     *PRINT COMMA todo
     JSR         EA_DEFAULT_COMBO    ; To get register bits in D7, 'mode' bits are irrelevant
     JSR         EA_PRINT_DN         ; Print register value in D7
-    JMP         ASD_END
+    JMP         ASd_END
 *-----------------------------------
 *--- Memory Shift ------------------
-ASD_MEM:
+ASd_MEM:
     JSR         EA_DEFAULT_COMBO    ; mode: D6, register: D7
     LEA         MULS_W_MODE, A0     ; Set index '0' for jump table
     MULU        #6, D6              ; Form offset (move 6 bytes in memory for every 'JMP' command)
     JMP         0(A0, D6)           ; Jump indirect with index, i.e. jump to 'table' + displacement
 *--------------------------------------
 *--- Check validity based on mode value
-ASD_MEM_MODE:
-    JMP         ASD_MEM_MODE_000     ; Invalid: Dn
-    JMP         ASD_MEM_MODE_001     ; Invalid: An
-    JMP         ASD_MEM_MODE_010     ; (An)
-    JMP         ASD_MEM_MODE_011     ; (An)+
-    JMP         ASD_MEM_MODE_100     ; -(An)
-    JMP         ASD_MEM_MODE_101     ; Invalid: Address Register Indirect with Displacement Mode
-    JMP         ASD_MEM_MODE_110     ; Invalid: Address Register Indirect with Index (8-Bit Displacement)
-    JMP         ASD_MEM_MODE_111     ; The rest (not all valid, validated by register number)
+ASd_MEM_MODE:
+    JMP         ASd_MEM_MODE_000     ; Invalid: Dn
+    JMP         ASd_MEM_MODE_001     ; Invalid: An
+    JMP         ASd_MEM_MODE_010     ; (An)
+    JMP         ASd_MEM_MODE_011     ; (An)+
+    JMP         ASd_MEM_MODE_100     ; -(An)
+    JMP         ASd_MEM_MODE_101     ; Invalid: Address Register Indirect with Displacement Mode
+    JMP         ASd_MEM_MODE_110     ; Invalid: Address Register Indirect with Index (8-Bit Displacement)
+    JMP         ASd_MEM_MODE_111     ; The rest (not all valid, validated by register number)
 *-----------------------------------
 *--- Jump table options ------------
-ASD_MEM_MODE_000: ; Invalid: Dn
+ASd_MEM_MODE_000: ; Invalid: Dn
     JSR         EA_INVALID          ; Data register direct is invalid mode
-    JMP         ASD_END
-ASD_MEM_MODE_001: ; Invalid: An
+    JMP         ASd_END
+ASd_MEM_MODE_001: ; Invalid: An
     JSR         EA_INVALID          ; Address register direct is invalid mode
-    JMP         ASD_END
-ASD_MEM_MODE_010: ; (An)
+    JMP         ASd_END
+ASd_MEM_MODE_010: ; (An)
     JSR         EA_PRINT_AN_IND     ; Print address register indirect
-    JMP         ASD_END
-ASD_MEM_MODE_011: ; (An)+
+    JMP         ASd_END
+ASd_MEM_MODE_011: ; (An)+
     JSR         EA_PRINT_POSTINC    ; Print address register indirect with post increment
-    JMP         ASD_END
-ASD_MEM_MODE_100: ; -(An)
+    JMP         ASd_END
+ASd_MEM_MODE_100: ; -(An)
     JSR         EA_PRINT_PREDEC     ; Print address register indirect with pre decrement
-    JMP         ASD_END         ; Continue with parsing destination operand
-ASD_MEM_MODE_101: ; Invalid: Address Register Indirect with Displacement Mode
+    JMP         ASd_END         ; Continue with parsing destination operand
+ASd_MEM_MODE_101: ; Invalid: Address Register Indirect with Displacement Mode
     JSR         EA_INVALID          ; Opcode word is Invalid
-    JMP         ASD_END
-ASD_MEM_MODE_110: ; Invalid: Address Register Indirect with Index (8-Bit Displacement)
+    JMP         ASd_END
+ASd_MEM_MODE_110: ; Invalid: Address Register Indirect with Index (8-Bit Displacement)
     JSR         EA_INVALID          ; Opcode word is Invalid
-    JMP         ASD_END
-ASD_MEM_MODE_111: ; The rest (not all valid, validated by register number)
+    JMP         ASd_END
+ASd_MEM_MODE_111: ; The rest (not all valid, validated by register number)
     CMP.B       #$00, D7            ; Test for absolute word address
-    BEQ         ASD_MEM_ABS_W
+    BEQ         ASd_MEM_ABS_W
     CMP.B       #$01, D7            ; Test for absolute long address
-    BEQ         ASD_MEM_ABS_L
+    BEQ         ASd_MEM_ABS_L
     JSR         EA_INVALID          ; Else: invalid
-    JMP         ASD_END
+    JMP         ASd_END
 *-----------------------------------
 *--- Valid options for mode 111 ----
-ASD_MEM_ABS_W:
+ASd_MEM_ABS_W:
     JSR         EA_PRINT_ABS_W      ; Print absolute word address operand
-    JMP         ASD_END             ; Continue with parsing destination operand
-ASD_MEM_ABS_L:
+    JMP         ASd_END             ; Continue with parsing destination operand
+ASd_MEM_ABS_L:
     JSR         EA_PRINT_ABS_L      ; Print absolute long address operand
-    JMP         ASD_END             ; Continue with parsing destination operand
+    JMP         ASd_END             ; Continue with parsing destination operand
 *-----------------------------------
-ASD_END:
+ASd_END:
     JSR         EA_UPDATE_POINTER   ; Updates global pointer
     MOVEM.L     (SP)+, A0-A5/D0-D7  ; Restore registers (except A6, global pointer to word to read)
     RTS
@@ -694,7 +694,102 @@ EA_LEA:
 * the LSd opcode
 *-----------------------------------------------------------
 EA_LSd:
-    JSR         EA_UNIMPLEMENTED
+    MOVEM.L     A0-A5/D0-D7, -(SP)  ; Save registers (except A6, global pointer to word to read)
+    JSR         EA_COPY_PTR         ; Copy global pointer to A5
+    JSR         EA_SIZE_BITS        ; get size bits in D7
+*--- Branch based on size bits -----
+    CMP.B       #$03, D7            ; test if memory shift
+    BEQ         LSd_MEM
+    BRA         LSd_REG             ; else, register shfit
+*-----------------------------------
+*--- Register Shift ----------------
+LSd_REG:
+* In preparation, isolate count/register field
+    MOVE.W      (A6), D7            ; read opcode word in memory and save,
+                                    ; (using D7 because EA_PRINT_DN uses D7)
+    MOVE.B      #4, D2              ; Clear upper 4 bits of operand word
+    LSL.W       D2, D7              ; Perform shift (zeros shifted in)
+    MOVE.B      #13, D2             ; 'Right-align' bits 9-11 to get count/register field
+    LSR.W       D2, D7              ; Perform shift (zeros shifted in)
+* Isolate i/r field
+    MOVE.W      (A6), D0            ; read opcode word in memory and save
+    MOVE.B      #10, D2             ; Clear upper 10 bits of operand word
+    LSL.W       D2, D0              ; Perform shift (zeros shifted in)
+    MOVE.B      #15, D2             ; 'Right-align' bit 5 to get value
+    LSR.W       D2, D0              ; Perform shift (zeros shifted in)
+    CMP.B       #$00, D0            ; If i/r bit is 0, count/register field contains shift count (modulo 64)
+    BEQ         LSd_REG_COUNT
+LSd_REG_REG:                        ; Else, count/register field contains register number
+    JSR         EA_PRINT_DN         ; Print register value, stored in D7
+    JMP         LSd_REG_END         ; Jump to end of LSd_REG
+LSd_REG_COUNT:
+    *print hash todo
+    *print hex value in D7 as byte todo, continue on to LSd_REG_END
+LSd_REG_END:
+    *PRINT COMMA todo
+    JSR         EA_DEFAULT_COMBO    ; To get register bits in D7, 'mode' bits are irrelevant
+    JSR         EA_PRINT_DN         ; Print register value in D7
+    JMP         LSd_END
+*-----------------------------------
+*--- Memory Shift ------------------
+LSd_MEM:
+    JSR         EA_DEFAULT_COMBO    ; mode: D6, register: D7
+    LEA         MULS_W_MODE, A0     ; Set index '0' for jump table
+    MULU        #6, D6              ; Form offset (move 6 bytes in memory for every 'JMP' command)
+    JMP         0(A0, D6)           ; Jump indirect with index, i.e. jump to 'table' + displacement
+*--------------------------------------
+*--- Check validity based on mode value
+LSd_MEM_MODE:
+    JMP         LSd_MEM_MODE_000     ; Invalid: Dn
+    JMP         LSd_MEM_MODE_001     ; Invalid: An
+    JMP         LSd_MEM_MODE_010     ; (An)
+    JMP         LSd_MEM_MODE_011     ; (An)+
+    JMP         LSd_MEM_MODE_100     ; -(An)
+    JMP         LSd_MEM_MODE_101     ; Invalid: Address Register Indirect with Displacement Mode
+    JMP         LSd_MEM_MODE_110     ; Invalid: Address Register Indirect with Index (8-Bit Displacement)
+    JMP         LSd_MEM_MODE_111     ; The rest (not all valid, validated by register number)
+*-----------------------------------
+*--- Jump table options ------------
+LSd_MEM_MODE_000: ; Invalid: Dn
+    JSR         EA_INVALID          ; Data register direct is invalid mode
+    JMP         LSd_END
+LSd_MEM_MODE_001: ; Invalid: An
+    JSR         EA_INVALID          ; Address register direct is invalid mode
+    JMP         LSd_END
+LSd_MEM_MODE_010: ; (An)
+    JSR         EA_PRINT_AN_IND     ; Print address register indirect
+    JMP         LSd_END
+LSd_MEM_MODE_011: ; (An)+
+    JSR         EA_PRINT_POSTINC    ; Print address register indirect with post increment
+    JMP         LSd_END
+LSd_MEM_MODE_100: ; -(An)
+    JSR         EA_PRINT_PREDEC     ; Print address register indirect with pre decrement
+    JMP         LSd_END         ; Continue with parsing destination operand
+LSd_MEM_MODE_101: ; Invalid: Address Register Indirect with Displacement Mode
+    JSR         EA_INVALID          ; Opcode word is Invalid
+    JMP         LSd_END
+LSd_MEM_MODE_110: ; Invalid: Address Register Indirect with Index (8-Bit Displacement)
+    JSR         EA_INVALID          ; Opcode word is Invalid
+    JMP         LSd_END
+LSd_MEM_MODE_111: ; The rest (not all valid, validated by register number)
+    CMP.B       #$00, D7            ; Test for absolute word address
+    BEQ         LSd_MEM_ABS_W
+    CMP.B       #$01, D7            ; Test for absolute long address
+    BEQ         LSd_MEM_ABS_L
+    JSR         EA_INVALID          ; Else: invalid
+    JMP         LSd_END
+*-----------------------------------
+*--- Valid options for mode 111 ----
+LSd_MEM_ABS_W:
+    JSR         EA_PRINT_ABS_W      ; Print absolute word address operand
+    JMP         LSd_END             ; Continue with parsing destination operand
+LSd_MEM_ABS_L:
+    JSR         EA_PRINT_ABS_L      ; Print absolute long address operand
+    JMP         LSd_END             ; Continue with parsing destination operand
+*-----------------------------------
+LSd_END:
+    JSR         EA_UPDATE_POINTER   ; Updates global pointer
+    MOVEM.L     (SP)+, A0-A5/D0-D7  ; Restore registers (except A6, global pointer to word to read)
     RTS
 *---------- MOVE Effective Addresses -----------------------
 * Parses and prints the effective addressing information for
