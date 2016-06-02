@@ -27,7 +27,7 @@ EA_UNIMPLEMENTED:
 EA_INVALID:
     MOVEA.L     A6, A5              ; Copy global pointer
     ADDA.L      #$00000002, A5      ; Increment past current opcode word
-    *print or indicate invalidity
+    JSR         INVALID_DATA        ; Print data error message
     RTS
 
 *---------- Update Global Pointer --------------------------
