@@ -339,7 +339,7 @@ EA_ADDQ:
     MOVEM.L     A0-A5/D0-D7, -(SP)  ; Save registers (except A6, global pointer to word to read)
     JSR         EA_COPY_PTR         ; Copy global pointer to A5
 *--- Parse data --------------------
-    MOVE.L      (A6), D1            ; Load opcode to data register 1
+    MOVE.W      (A6), D1            ; Load opcode to data register 1
     MOVE.B      #4, D2              ; Clear upper 4 bits of opcode word
     LSL.W       D2, D1              ; Perform shift (zeros shifted in)
     MOVE.B      #13, D2             ; 'Right-align' bits 9-11 to determine mode bits
@@ -664,7 +664,7 @@ EA_Bcc:
     MOVEM.L     A0-A5/D0-D7, -(SP)  ; Save registers (except A6, global pointer to word to read)
     JSR         EA_COPY_PTR         ; Copy global pointer to A5
 *--- Parse 8-bit displacement bits ----------
-    MOVE.L      (A6), D1            ; Load opcode to data register 1
+    MOVE.W      (A6), D1            ; Load opcode to data register 1
     MOVE.B      #8, D2              ; Clear upper 8 bits of opcode word
     LSL.W       D2, D1              ; Perform shift (zeros shifted in)
     MOVE.B      #8, D2              ; 'Right-align' bits 0-7 to determine condition
@@ -1180,7 +1180,7 @@ EA_MOVE:
     MOVEM.L     A0-A5/D0-D7, -(SP)  ; Save registers (except A6, global pointer to word to read)
     JSR         EA_COPY_PTR         ; Copy global pointer to ASd
 *--- Parse size bits ---------------
-    MOVE.L      (A6), D5            ; Load opcode to data register 5 (for using size bits in immediate data)
+    MOVE.W      (A6), D5            ; Load opcode to data register 5 (for using size bits in immediate data)
     MOVE.B      #2, D2              ; Clear upper 10 bits of opcode word
     LSL.W       D2, D5              ; Perform shift (zeros shifted in)
     MOVE.B      #14, D2             ; 'Right-align' bits 12-13 to determine mode bits
@@ -1329,7 +1329,7 @@ EA_MOVEA:
     MOVEM.L     A0-A5/D0-D7, -(SP)  ; Save registers (except A6, global pointer to word to read)
     JSR         EA_COPY_PTR         ; Copy global pointer to ASd
 *--- Parse size bits ---------------
-    MOVE.L      (A6), D5            ; Load opcode to data register 5 (for using size bits in immediate data)
+    MOVE.W      (A6), D5            ; Load opcode to data register 5 (for using size bits in immediate data)
     MOVE.B      #2, D2              ; Clear upper 10 bits of opcode word
     LSL.W       D2, D5              ; Perform shift (zeros shifted in)
     MOVE.B      #14, D2             ; 'Right-align' bits 12-13 to determine mode bits
@@ -1435,13 +1435,13 @@ EA_MOVEQ:
     MOVEM.L     A0-A5/D0-D7, -(SP)  ; Save registers (except A6, global pointer to word to read)
     JSR         EA_COPY_PTR         ; Copy global pointer to A5
 *isolate data
-    MOVE.L      (A6), D1            ; Load opcode to data register 1
+    MOVE.W      (A6), D1            ; Load opcode to data register 1
     MOVE.B      #8, D2              ; Clear upper 8 bits of opcode word
     LSL.W       D2, D1              ; Perform shift (zeros shifted in)
     MOVE.B      #8, D2              ; 'Right-align' bits 0-7 to determine data bits
     LSR.W       D2, D1              ; Perform shift (zeros shifted in)
 *Isolate MSB to do sign extension
-    MOVE.L      (A6), D3            ; Save mode bits to D6
+    MOVE.W      (A6), D3            ; load opcode word
     MOVE.B      #8, D2              ; Clear upper 8 bits of opcode word
     LSL.W       D2, D3              ; Perform shift (zeros shifted in)
     MOVE.B      #15, D2             ; 'Right-align' bit 7 to determine MSB
