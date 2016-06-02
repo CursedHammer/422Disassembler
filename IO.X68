@@ -49,44 +49,22 @@ GET_ADDRESSES
             
 GET_FIRST_ADDRESS
     LEA         PS1,A1              * Loads message into A1
-    JSR         GET_HEXSTRING       * Get string from user
-    CMPI.B      #1,HEXFLAG          * Does HEXFLAG = 1
-    BNE         GET_FIRST_ADDRESS   * If no, get hex again
-   
-    JSR         ASCII_TO_HEX        * Convert ascii to hex
-    CMPI.B      #1,HEXFLAG          * Does HEXFLAG = 1
-    BNE         GET_FIRST_ADDRESS   * If no, get hex again
-    
-    JSR         IS_HEX_EVEN         * Check that hex value is even
+    JSR         MAKE_CHECKS         * Get address and perform checks
     CMPI.B      #1,HEXFLAG          * Does HEXFLAG = 1
     BNE         GET_FIRST_ADDRESS   * If no, get hex again
    
     MOVE.L      HEXVALUE,BEGINADDR  * Copy hex value to begin
-    LEA         BMESSAGE,A1         * Load message in A1 for display
-    MOVE.L      (HEXVALUE),D1       * Load hex value into A1 for display 
-    JSR         NEW_LINE            * Space
-    
+    JSR         NEW_LINE            * Space    
     JSR         CLEAR               * Clear values for next hex
     
 GET_SECOND_ADDRESS
     LEA         PS2,A1              * Loads message into A1
-    JSR         GET_HEXSTRING       * Get string from user
-    CMPI.B      #1,HEXFLAG          * Does HEXFLAG = 1
-    BNE         GET_SECOND_ADDRESS  * If no, get hex again
-   
-    JSR         ASCII_TO_HEX        * Convert ascii to hex
-    CMPI.B      #1,HEXFLAG          * Does HEXFLAG = 1
-    BNE         GET_SECOND_ADDRESS  * If no, get hex again
-    
-    JSR         IS_HEX_EVEN         * Check that hex value is even
+    JSR         MAKE_CHECKS         * Get address and perform checks
     CMPI.B      #1,HEXFLAG          * Does HEXFLAG = 1
     BNE         GET_SECOND_ADDRESS  * If no, get hex again
    
     MOVE.L      HEXVALUE,ENDADDR    * Copy hex value to begin
-    LEA         EMESSAGE,A1         * Load message in A1 for display
-    MOVE.L      (HEXVALUE),D1       * Load hex value into A1 for display
-    JSR         NEW_LINE            * Space
-    
+    JSR         NEW_LINE            * Space    
     JSR         CLEAR               * Clear values for next hex
     
 CHECK_BADDR_IS_LESS_THAN_EADDR
@@ -150,11 +128,15 @@ GET_HEXSTRING
     MOVE.B      D1,STR_LEN          * Save length of input string
     
     CMPI.B      #8,(STR_LEN)        * Is length > 8?
-    BGT         GET_FIRST_ADDRESS   * If yes, get hex again
+    BGT         BAD_LENGTH          * If yes, get hex again
        
     LEA         HEXSTRING,A0        * Load address for verification     
     MOVE.B      #1,(HEXFLAG)   
     RTS                             * Return from subroutine
+    
+BAD_LENGTH
+    MOVE.B      #0,(HEXFLAG)        * Bad length set HEXFLAG to false
+    RTS                             * Return to subroutine
         
 *---------- END - GET_HEXSTRING ----------------------------------------------
 
@@ -324,6 +306,30 @@ NOTEVEN
 *---------- END - IS_HEX_EVEN ------------------------------------------------
 
 
+*---------- MAKE_CHECKS ------------------------------------------------------
+* Prints a new line
+*-----------------------------------------------------------------------------
+MAKE_CHECKS
+    JSR         GET_HEXSTRING       * Get string from user
+    CMPI.B      #1,HEXFLAG          * Does HEXFLAG = 1
+    BNE         BAD_CHECK           * If no, get hex again
+   
+    JSR         ASCII_TO_HEX        * Convert ascii to hex
+    CMPI.B      #1,HEXFLAG          * Does HEXFLAG = 1
+    BNE         BAD_CHECK           * If no, get hex again
+    
+    JSR         IS_HEX_EVEN         * Check that hex value is even
+    CMPI.B      #1,HEXFLAG          * Does HEXFLAG = 1
+    BNE         BAD_CHECK           * If no, get hex again
+
+    RTS                             * Return from subroutine
+
+BAD_CHECK    
+    RTS                             * Return from subroutine
+
+*---------- END - MAKE_CHECKS ------------------------------------------------
+
+
 *---------- PRINT_HEXVALUE ---------------------------------------------------
 * Prints out to display whatever is in A1
 *-----------------------------------------------------------------------------
@@ -436,6 +442,7 @@ ADR_ERR_NOTLT   DC.B 'THE BEGINNING ADDRESS MUST BE LESS THAN THE ENDING ADDRESS
 HEXSTRING       DS.B 80             * Var for hex string
 
 DATA            DC.B 'DATA',0
+
 
 
 

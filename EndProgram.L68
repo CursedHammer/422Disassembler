@@ -1,6 +1,6 @@
-00001516 Starting Address
+000040FE Starting Address
 Assembler used: EASy68K Editor/Assembler v5.15.04
-Created On: 6/2/2016 11:03:45 AM
+Created On: 6/2/2016 2:50:36 PM
 
 00000000                             1  ******************************************************************************
 00000000                             2  * Title      : I/O End Program
@@ -19,84 +19,66 @@ Created On: 6/2/2016 11:03:45 AM
 00000000  =00000059                 15  UPYES     EQU   'Y'
 00000000  =00000079                 16  LOWYES    EQU   'y'
 00000000                            17  
-00000000                            18            *ORG   $1000
-00000000                            19  
-00000000                            20  ******************************************************************************
-00000000                            21  *           BEGIN CODE                                                       *
-00000000                            22  ******************************************************************************
-00000000                            23  
-00000000                            24  *---------- START ------------------------------------------------------------
-00000000                            25  * Begins program's logical flow. Similar to main in C/C++
-00000000                            26  *-----------------------------------------------------------------------------           
-00000000                            27  KEEP_RUNNING
-00000000  6100 000E                 28      BSR.W       RERUN               * Run welcome subroutine
-Line 29 ERROR: Undefined symbol
-00000004  0C39 0001 0054448C        29      CMPI.B      #1,(RUNAGAIN)       * Is true?
-0000000C  67F2                      30      BEQ         KEEP_RUNNING        * If yes, keep running program
-0000000E                            31  *    BRA         FINISHED            * Else, finished    
-0000000E                            32  *      
-0000000E                            33  *FINISHED
-0000000E                            34  *    *SIMHALT                         * halt simulator
-0000000E  4E75                      35      RTS                             * Return to Disassembler
-00000010                            36      
-00000010                            37  *---------- END - START ------------------------------------------------------
-00000010                            38  
-00000010                            39  
-00000010                            40  ******************************************************************************
-00000010                            41  *           SUB ROUTINES                                                     *
-00000010                            42  ******************************************************************************
-00000010                            43             
-00000010                            44  *---------- RERUN ------------------------------------------------------------
-00000010                            45  * Check to see if the user would like to rerun the program
-00000010                            46  *-----------------------------------------------------------------------------
-00000010                            47  
-00000010                            48  RERUN 
-00000010  43F9 00000048             49      LEA         ENDQUESTION,A1      * Loads message into A1
-00000016  103C 000E                 50      MOVE.B      #14,D0              * Moves the Task 14 into D0
-0000001A  4E4F                      51      TRAP        #15                 * Displays Intro Message
-0000001C                            52      
-0000001C  103C 0005                 53      MOVE.B      #5,D0               * Move task 5 to read one char
-00000020  4E4F                      54      TRAP        #15                 * Trap 15 for IO
-00000022                            55      
-00000022  0C01 0059                 56      CMPI.B      #UPYES,D1           * Is char = Y
-00000026  6700 0014                 57      BEQ         NOTDONE             * If yes, notdone
-0000002A  0C01 0079                 58      CMPI.B      #LOWYES,D1          * Is char = y   
-0000002E  6700 000C                 59      BEQ         NOTDONE             * If yes, notdone
-Line 60 ERROR: Undefined symbol
-00000032  13FC 0000 0054449C        60      MOVE.B      #0,(RUNAGAIN)       * 0 for false to end program
-0000003A  4E75                      61      RTS 
-0000003C                            62      
-0000003C                            63  NOTDONE
-Line 64 ERROR: Undefined symbol
-0000003C  13FC 0001 0054449C        64      MOVE.B      #1,(RUNAGAIN)       * 1 for true to rerun program
-Line 65 ERROR: Undefined symbol
-00000044  6000 BB48                 65      BRA.W       CLEARSCRN           * Clear screen and return from subroutine         
-00000048                            66          
-00000048                            67  *---------- END - RERUN ------------------------------------------------------
-00000048                            68  * Put program code here
-00000048                            69  
-00000048                            70  *---------- CLEARSCRN --------------------------------------------------------
-00000048                            71  * Clear all output on screen
-00000048                            72  *-----------------------------------------------------------------------------
-00000048                            73  *CLEARSCRN     
-00000048                            74  *    MOVE.B      #11,D0              * Task 11 for clearing screen
-00000048                            75  *    MOVE.W      #$FF00,D1           * FF00, Clear screen
-00000048                            76  *    TRAP        #15                 * Wait for keystroke
-00000048                            77  *    RTS                             * Return from subroutine
-00000048                            78  
-00000048                            79  *---------- END - CLEARSCRN --------------------------------------------------
-00000048                            80  
-00000048                            81  
-00000048                            82  ******************************************************************************
-00000048                            83  *           VARIABLES AND CONSTANTS                                          *
-00000048                            84  ******************************************************************************
-00000048                            85  
-00000048= 57 4F 55 4C 44 20 ...     86  ENDQUESTION     DC.B 'WOULD YOU LIKE TO RUN THE PROGRAM AGAIN (Y/N)? ',0
-00000078                            87  
-00000078                            88      *END         KEEP_RUNNING
-00000078                            89  
-00000078                            90  
-Line 91 WARNING: END directive missing, starting address not set
+00000000                            18  
+00000000                            19  ******************************************************************************
+00000000                            20  *           BEGIN CODE                                                       *
+00000000                            21  ******************************************************************************
+00000000                            22  
+00000000                            23  *---------- START ------------------------------------------------------------
+00000000                            24  * Begins program's logical flow. Similar to main in C/C++
+00000000                            25  *-----------------------------------------------------------------------------           
+00000000                            26  KEEP_RUNNING
+00000000  6100 0004                 27      BSR.W       RERUN               * Run welcome subroutine
+00000004  4E75                      28      RTS                             * Return to Disassembler
+00000006                            29      
+00000006                            30  *---------- END - START ------------------------------------------------------
+00000006                            31  
+00000006                            32  
+00000006                            33  ******************************************************************************
+00000006                            34  *           SUB ROUTINES                                                     *
+00000006                            35  ******************************************************************************
+00000006                            36             
+00000006                            37  *---------- RERUN ------------------------------------------------------------
+00000006                            38  * Check to see if the user would like to rerun the program
+00000006                            39  *-----------------------------------------------------------------------------
+00000006                            40  
+00000006                            41  RERUN 
+00000006  43F9 00000044             42      LEA         ENDQUESTION,A1      * Loads message into A1
+0000000C  103C 000E                 43      MOVE.B      #14,D0              * Moves the Task 14 into D0
+00000010  4E4F                      44      TRAP        #15                 * Displays Intro Message
+00000012                            45      
+00000012  103C 0005                 46      MOVE.B      #5,D0               * Move task 5 to read one char
+00000016  4E4F                      47      TRAP        #15                 * Trap 15 for IO
+00000018                            48      
+00000018  0C01 0059                 49      CMPI.B      #UPYES,D1           * Is char = Y
+0000001C  6700 0014                 50      BEQ         NOTDONE             * If yes, notdone
+00000020  0C01 0079                 51      CMPI.B      #LOWYES,D1          * Is char = y   
+00000024  6700 000C                 52      BEQ         NOTDONE             * If yes, notdone
+Line 53 ERROR: Undefined symbol
+00000028  13FC 0000 0054449C        53      MOVE.B      #0,(RUNAGAIN)       * 0 for false to end program
+00000030  4E75                      54      RTS 
+00000032                            55      
+00000032                            56  NOTDONE
+Line 57 ERROR: Undefined symbol
+00000032  13FC 0001 0054449C        57      MOVE.B      #1,(RUNAGAIN)       * 1 for true to rerun program
+Line 58 ERROR: Undefined symbol
+0000003A  6100 BB52                 58      BSR.W       CLEAR               * Clear all values
+Line 59 ERROR: Undefined symbol
+0000003E  6100 BB4E                 59      BSR.W       CLEARSCRN           * Clear screen and return from subroutine
+00000042  4E75                      60      RTS         
+00000044                            61          
+00000044                            62  *---------- END - RERUN ------------------------------------------------------
+00000044                            63  
+00000044                            64  
+00000044                            65  ******************************************************************************
+00000044                            66  *           VARIABLES AND CONSTANTS                                          *
+00000044                            67  ******************************************************************************
+00000044                            68  
+00000044= 57 4F 55 4C 44 20 ...     69  ENDQUESTION     DC.B 'WOULD YOU LIKE TO RUN THE PROGRAM AGAIN (Y/N)? ',0
+00000074                            70  
+00000074                            71  
+00000074                            72  
+Line 73 WARNING: END directive missing, starting address not set
 
 4 errors detected
 1 warning generated
@@ -105,9 +87,9 @@ Line 91 WARNING: END directive missing, starting address not set
 SYMBOL TABLE INFORMATION
 Symbol-name         Value
 -------------------------
-ENDQUESTION         48
+ENDQUESTION         44
 KEEP_RUNNING        0
 LOWYES              79
-NOTDONE             3C
-RERUN               10
+NOTDONE             32
+RERUN               6
 UPYES               59
