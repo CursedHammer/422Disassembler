@@ -1,0 +1,108 @@
+00001000 Starting Address
+Assembler used: EASy68K Editor/Assembler v5.15.04
+Created On: 6/1/2016 11:10:57 PM
+
+00000000                             1  ******************************************************************************
+00000000                             2  * Title      : I/O End Program
+00000000                             3  * Written by : Brandon Authier (Hblkr), Jack S. Eldridge
+00000000                             4  *              (JackScottie), Marijn Burger (marijnburger)
+00000000                             5  * Date       : 1 Jun 2016
+00000000                             6  * Description: This function asks the user if they would like to rerun the 
+00000000                             7  *              program or end it.
+00000000                             8  ******************************************************************************
+00000000                             9  
+00000000                            10  
+00000000                            11  ******************************************************************************
+00000000                            12  *           DEFINITIONS                                                      *
+00000000                            13  ******************************************************************************
+00000000                            14  
+00000000  =00000059                 15  UPYES     EQU   'Y'
+00000000  =00000079                 16  LOWYES    EQU   'y'
+00000000                            17  
+00001000                            18            ORG   $1000
+00001000                            19  
+00001000                            20  ******************************************************************************
+00001000                            21  *           BEGIN CODE                                                       *
+00001000                            22  ******************************************************************************
+00001000                            23  
+00001000                            24  *---------- START ------------------------------------------------------------
+00001000                            25  * Begins program's logical flow. Similar to main in C/C++
+00001000                            26  *-----------------------------------------------------------------------------           
+00001000                            27  KEEP_RUNNING
+00001000  6100 0012                 28      BSR.W       RERUN               * Run welcome subroutine
+00001004  0C05 0001                 29      CMPI.B      #1,D5               * Is true?
+00001008  67F6                      30      BEQ         KEEP_RUNNING        * If yes, keep running program
+0000100A  6000 0002                 31      BRA         FINISHED            * Else, finished    
+0000100E                            32        
+0000100E                            33  FINISHED
+0000100E  FFFF FFFF                 34      SIMHALT                         * halt simulator
+00001012  4E75                      35      RTS                             * Return to Disassembler
+00001014                            36      
+00001014                            37  *---------- END - START ------------------------------------------------------
+00001014                            38  
+00001014                            39  
+00001014                            40  ******************************************************************************
+00001014                            41  *           SUB ROUTINES                                                     *
+00001014                            42  ******************************************************************************
+00001014                            43             
+00001014                            44  *---------- RERUN ------------------------------------------------------------
+00001014                            45  * Prints a welcome message
+00001014                            46  *-----------------------------------------------------------------------------
+00001014                            47  
+00001014                            48  RERUN 
+00001014  43F9 00001050             49      LEA         ENDQUESTION,A1      * Loads message into A1
+0000101A  103C 000E                 50      MOVE.B      #14,D0              * Moves the Task 14 into D0
+0000101E  4E4F                      51      TRAP        #15                 * Displays Intro Message
+00001020                            52      
+00001020  103C 0005                 53      MOVE.B      #5,D0               * Move task 5 to read one char
+00001024  4E4F                      54      TRAP        #15                 * Trap 15 for IO
+00001026                            55      
+00001026  0C01 0059                 56      CMPI.B      #UPYES,D1           * Is char = Y
+0000102A  6700 0010                 57      BEQ         NOTDONE             * If yes, notdone
+0000102E  0C01 0079                 58      CMPI.B      #LOWYES,D1          * Is char = y   
+00001032  6700 0008                 59      BEQ         NOTDONE             * If yes, notdone
+00001036  1A3C 0000                 60      MOVE.B      #0,D5               * 0 for false to end program
+0000103A  4E75                      61      RTS 
+0000103C                            62      
+0000103C                            63  NOTDONE
+0000103C  1A3C 0001                 64      MOVE.B      #1,D5               * 1 for true to rerun program
+00001040  6000 0002                 65      BRA.W       CLEARSCRN           * Clear screen and return from subroutine         
+00001044                            66          
+00001044                            67  *---------- END - RERUN ------------------------------------------------------
+00001044                            68  * Put program code here
+00001044                            69  
+00001044                            70  *---------- CLEARSCRN --------------------------------------------------------
+00001044                            71  * Clear all output on screen
+00001044                            72  *-----------------------------------------------------------------------------
+00001044                            73  CLEARSCRN     
+00001044  103C 000B                 74      MOVE.B      #11,D0              * Task 11 for clearing screen
+00001048  323C FF00                 75      MOVE.W      #$FF00,D1           * FF00, Clear screen
+0000104C  4E4F                      76      TRAP        #15                 * Wait for keystroke
+0000104E  4E75                      77      RTS                             * Return from subroutine
+00001050                            78  
+00001050                            79  *---------- END - CLEARSCRN --------------------------------------------------
+00001050                            80  
+00001050                            81  
+00001050                            82  ******************************************************************************
+00001050                            83  *           VARIABLES AND CONSTANTS                                          *
+00001050                            84  ******************************************************************************
+00001050                            85  
+00001050= 57 4F 55 4C 44 20 ...     86  ENDQUESTION     DC.B 'WOULD YOU LIKE TO RUN THE PROGRAM AGAIN (Y/N)? ',0
+00001080                            87  
+00001080                            88      END         KEEP_RUNNING
+
+No errors detected
+No warnings generated
+
+
+SYMBOL TABLE INFORMATION
+Symbol-name         Value
+-------------------------
+CLEARSCRN           1044
+ENDQUESTION         1050
+FINISHED            100E
+KEEP_RUNNING        1000
+LOWYES              79
+NOTDONE             103C
+RERUN               1014
+UPYES               59
