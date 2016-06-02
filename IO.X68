@@ -8,10 +8,10 @@
 ******************************************************************************
 *
 * TODO:
-*    Write data error
-*    Chase down bug when you enter more the 8chars for address and it loops
 *
 * DONE:
+*    Write data error
+*    Chase down bug when you enter more the 8chars for address and it loops
 *    Hex to ASCII
 *    Write end function to ask user if they are done
 *    Make sure addresses are even
