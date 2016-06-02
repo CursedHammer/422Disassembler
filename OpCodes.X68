@@ -969,7 +969,7 @@ ISORW   MOVEM.L     A0-A6/D0-D7, -(SP) ; Save registers
         RTS
 
 ISORL   MOVEM.L     A0-A6/D0-D7, -(SP) ; Save registers
-        LEA         MESSAGEORL, 4
+        LEA         MESSAGEORL, A4
         JSR    WRITE2MEM
         LEA    MESSAGESPACE, A4
         JSR    WRITE2MEM
@@ -1465,6 +1465,7 @@ ISADDIB MOVEM.L     A0-A6/D0-D7, -(SP) ; Save registers
         JSR         EA_ADDI
         MOVEM.L     (SP)+,  A0-A6/D0-D7 ; Restore registers
         RTS                         ; Exit subroutine
+
 
 
 

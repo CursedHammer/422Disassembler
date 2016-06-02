@@ -96,7 +96,7 @@ LOOP
     LEA         BUFFER, A2
     JSR         OC_PARSE            * Determine if there is an initial opcode match
     JSR         WRITE_ENDL
-    JSR         PRINTLINE
+    JSR         PRINTLN
     LEA         BUFFER, A2
     JSR         CLEAN_BUFF
 
@@ -149,6 +149,7 @@ END_LOOP
 
 *---------- End --------------------------------------------
                END  START          * Last line of source
+
 
 
 
