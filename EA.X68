@@ -67,7 +67,8 @@ ADD_MODE_1:
     MOVE.W      D7, D1              ; Save register value for printing dest. operand
     JSR         EA_DEFAULT_COMBO    ; Stores mode bits in D6, register bits in D7
     JSR         ADD_EVAL_EA         ; Evaluate the results of subroutine call
-    *PRINT COMMA TODO
+    LEA         COMMA, A4        ; Print comma
+    JSR         WRITE2MEM
     MOVE.W      D1, D7              ; Return register value to D7 for use by subroutine
     JSR         EA_PRINT_DN         ; Print data register
     JMP         ADD_END
@@ -77,7 +78,8 @@ ADD_MODE_2:
     CLR.L       D0                  ; Clear data register 0
     MOVE.B      #2, D0              ; Save mode number to D0
     JSR         EA_PRINT_DN         ; Print data register
-    *PRINT COMMA TODO
+    LEA         COMMA, A4        ; Print comma
+    JSR         WRITE2MEM
     JSR         EA_DEFAULT_COMBO    ; Stores mode bits in D6, register bits in D7
     JSR         ADD_EVAL_EA         ; Evaluate the results of subroutine call
     JMP         ADD_END
@@ -222,7 +224,8 @@ ADDA_MODE_INVALID:
     JSR         EA_INVALID          ; Opcode word is Invalid
     JMP         ADDA_END
 ADDA_MODE_END:
-    *PRINT COMMA TODO
+    LEA         COMMA, A4        ; Print comma
+    JSR         WRITE2MEM
     JSR         EA_OPMODE_COMBO     ; Opmode: D6, register: D7
     JSR         EA_PRINT_AN         ; Print address register
 ADDA_END:
@@ -347,9 +350,11 @@ EA_ADDQ:
     BNE         ADDQ_PRINT_IMM      ; If any value other than 0, print the data
     MOVE.B      #$08, D1            ; Else, the value is 0 and therefore symbolic of the value 8, so replace with the value 8
 ADDQ_PRINT_IMM:
-    *PRINT HASH TODO
-    *PRINT IMM DATA IN D1 AS BYTE TODO
-    *PRINT COMMA TODO
+    LEA         POUND, A4         ; Print '#'
+    JSR         WRITE2MEM
+    JSR         EA_PRINT_DATA
+    LEA         COMMA, A4        ; Print comma
+    JSR         WRITE2MEM
 *-----------------------------------
 *--- Check validity based on mode value
     JSR         EA_DEFAULT_COMBO
@@ -464,7 +469,8 @@ AND_MODE_1:
     MOVE.W      D7, D1              ; Save register value for printing dest. operand
     JSR         EA_DEFAULT_COMBO    ; Stores mode bits in D6, register bits in D7
     JSR         AND_EVAL_EA         ; Evaluate the results of subroutine call
-    *PRINT COMMA TODO
+    LEA         COMMA, A4        ; Print comma
+    JSR         WRITE2MEM
     MOVE.W      D1, D7              ; Return register value to D7 for use by subroutine
     JSR         EA_PRINT_DN         ; Print data register
     JMP         AND_END
@@ -474,7 +480,8 @@ AND_MODE_2:
     CLR.L       D0                  ; Clear data register 0
     MOVE.B      #2, D0              ; Save mode number to D0
     JSR         EA_PRINT_DN         ; Print data register
-    *PRINT COMMA TODO
+    LEA         COMMA, A4        ; Print comma
+    JSR         WRITE2MEM
     JSR         EA_DEFAULT_COMBO    ; Stores mode bits in D6, register bits in D7
     JSR         AND_EVAL_EA         ; Evaluate the results of subroutine call
     JMP         AND_END
@@ -582,10 +589,12 @@ ASd_REG_REG:                        ; Else, count/register field contains regist
     JSR         EA_PRINT_DN         ; Print register value, stored in D7
     JMP         ASd_REG_END         ; Jump to end of ASd_REG
 ASd_REG_COUNT:
-    *print hash todo
-    *print hex value in D7 as byte todo, continue on to ASd_REG_END
+    LEA         POUND, A4        ; Print '#'
+    JSR         WRITE2MEM
+    JSR         EA_PRINT_DATA *print hex value in D7 as byte todo, continue on to ASd_REG_END
 ASd_REG_END:
-    *PRINT COMMA todo
+    LEA         COMMA, A4        ; Print comma
+    JSR         WRITE2MEM
     JSR         EA_DEFAULT_COMBO    ; To get register bits in D7, 'mode' bits are not used
     JSR         EA_PRINT_DN         ; Print register value in D7
     JMP         ASd_END
@@ -654,8 +663,7 @@ ASd_END:
 * Parses and prints the effective addressing information for
 * the BCC opcode
 *-----------------------------------------------------------
-EA_Bcc: *ONLY BCC (0100), BGT (1110), BLE (1111)
-        *two's complement and stuff. for later TODO
+EA_Bcc:
     MOVEM.L     A0-A5/D0-D7, -(SP)  ; Save registers (except A6, global pointer to word to read)
     JSR         EA_COPY_PTR         ; Copy global pointer to A5
 *--- Parse 8-bit displacement bits ----------
@@ -840,7 +848,8 @@ CMP_ABS_L:
 *-----------------------------------
 *--- Evaluate and print register ---
 CMP_MODE_END:
-*print comma TODO
+    LEA         COMMA, A4        ; Print comma
+    JSR         WRITE2MEM
     JSR         EA_OPMODE_COMBO     ; get register bits in D7, opmode bits not used
     JSR         EA_PRINT_DN         ; print register
 CMP_END:
@@ -914,7 +923,7 @@ DIVU_W_IMM:
     JMP         DIVU_W_DEST         ; Continue with parsing destination operand
 *-----------------------------------
 DIVU_W_DEST:
-    *print EA_MSG_COMMA
+    *print COMMA
     *Get destination register
     MOVE.W      (A6), D7            ; Load word at current pointer to D1
     MOVE.B      #4, D2              ; Clear upper 4 bits of opcode word
@@ -1054,7 +1063,8 @@ LEA_ABS_L:
 *-----------------------------------
 *--- Parse destination address register
 LEA_DEST:
-    *print comma TODO
+    LEA         COMMA, A4        ; Print comma
+    JSR         WRITE2MEM
     JSR         EA_OPMODE_COMBO     ; Get register bits in D7, opmode bits unused
     JSR         EA_PRINT_AN         ; Print address register
 LEA_END:
@@ -1095,10 +1105,12 @@ LSd_REG_REG:                        ; Else, count/register field contains regist
     JSR         EA_PRINT_DN         ; Print register value, stored in D7
     JMP         LSd_REG_END         ; Jump to end of LSd_REG
 LSd_REG_COUNT:
-    *print hash todo
-    *print hex value in D7 as byte todo, continue on to LSd_REG_END
+    LEA         POUND, A4         ; Print '#'
+    JSR         WRITE2MEM
+    JSR         EA_PRINT_DATA  *print hex value in D7 as byte todo, continue on to LSd_REG_END
 LSd_REG_END:
-    *PRINT COMMA todo
+    LEA         COMMA, A4        ; Print comma
+    JSR         WRITE2MEM
     JSR         EA_DEFAULT_COMBO    ; To get register bits in D7, 'mode' bits are not used
     JSR         EA_PRINT_DN         ; Print register value in D7
     JMP         LSd_END
@@ -1192,8 +1204,6 @@ MOVE_ADJUST_L:
 *-----------------------------------
 *--- Source operand ----------------
 MOVE_SOURCE:
-    MOVEM.L     A0-A5/D0-D7, -(SP)  ; Save registers (except A6, global pointer to word to read)
-    JSR         EA_COPY_PTR         ; Copy global pointer to ASd
     JSR         EA_DEFAULT_COMBO    ; mode: D6, register: D7
     LEA         MOVE_SRC_MODE, A0   ; Set index '0' for jump table
     MULU        #6, D6              ; Form offset (move 6 bytes in memory for every 'JMP' command)
@@ -1254,9 +1264,8 @@ MOVE_SRC_IMM:
     JMP         MOVE_DESTINATION
 *-----------------------------------
 MOVE_DESTINATION:
-    *PRINT COMMA TODO
-    MOVEM.L     A0-A5/D0-D7, -(SP)  ; Save registers (except A6, global pointer to word to read)
-    JSR         EA_COPY_PTR         ; Copy global pointer to ASd
+    LEA         COMMA, A4        ; Print comma
+    JSR         WRITE2MEM
     JSR         EA_OPMODE_COMBO     ; mode: D6, register: D7 (destination bits)
     LEA         MOVE_DST_MODE, A0   ; Set index '0' for jump table
     MULU        #6, D6              ; Form offset (move 6 bytes in memory for every 'JMP' command)
@@ -1344,8 +1353,6 @@ MOVEA_ADJUST_L:
 *-----------------------------------
 *--- Source operand ----------------
 MOVEA_SOURCE:
-    MOVEM.L     A0-A5/D0-D7, -(SP)  ; Save registers (except A6, global pointer to word to read)
-    JSR         EA_COPY_PTR         ; Copy global pointer to ASd
     JSR         EA_DEFAULT_COMBO    ; mode: D6, register: D7
     LEA         MOVEA_SRC_MODE, A0   ; Set index '0' for jump table
     MULU        #6, D6              ; Form offset (move 6 bytes in memory for every 'JMP' command)
@@ -1406,9 +1413,8 @@ MOVEA_SRC_IMM:
     JMP         MOVEA_DESTINATION
 *-----------------------------------
 MOVEA_DESTINATION:
-    *PRINT COMMA TODO
-    MOVEM.L     A0-A5/D0-D7, -(SP)  ; Save registers (except A6, global pointer to word to read)
-    JSR         EA_COPY_PTR         ; Copy global pointer to ASd
+    LEA         COMMA, A4        ; Print comma
+    JSR         WRITE2MEM
     JSR         EA_OPMODE_COMBO     ; Get register bits in D7, mode bits not used
     JSR         EA_PRINT_AN         ; Print address register, continue to end
 *-----------------------------------
@@ -1447,9 +1453,11 @@ EA_MOVEQ:
     BEQ         MOVEQ_PRINT_DATA
     ADD.L       #$FFFFFF00, D1      ; Else, sign extend data with F
 MOVEQ_PRINT_DATA:
-    *print hash TODO
-    *print data in
-    *PRINT COMMA TODO
+    LEA         POUND, A4         ; Print '#'
+    JSR         WRITE2MEM
+    JSR         EA_PRINT_DATA *print data todo
+    LEA         COMMA, A4        ; Print comma
+    JSR         WRITE2MEM
     JSR         EA_OPMODE_COMBO     ; Get register bits in D7, mode bits not used
     JSR         EA_PRINT_DN         ; Print data register
     JSR         EA_UPDATE_POINTER   ; Updates global pointer
@@ -1522,7 +1530,7 @@ MULS_W_IMM:
     JMP         MULS_W_DEST         ; Continue with parsing destination operand
 *-----------------------------------
 MULS_W_DEST:
-    *print EA_MSG_COMMA
+    *print COMMA
     *Get destination register
     MOVE.W      (A6), D7            ; Load word at current pointer to D1
     MOVE.B      #4, D2              ; Clear upper 4 bits of opcode word
@@ -1590,7 +1598,8 @@ OR_MODE_1:
     MOVE.W      D7, D1              ; Save register value for printing dest. operand
     JSR         EA_DEFAULT_COMBO    ; Stores mode bits in D6, register bits in D7
     JSR         OR_EVAL_EA          ; Evaluate the results of subroutine call
-    *PRINT COMMA TODO
+    LEA         COMMA, A4        ; Print comma
+    JSR         WRITE2MEM
     MOVE.W      D1, D7              ; Return register value to D7 for use by subroutine
     JSR         EA_PRINT_DN         ; Print data register
     JMP         OR_END
@@ -1600,7 +1609,8 @@ OR_MODE_2:
     CLR.L       D0                  ; Clear data register 0
     MOVE.B      #2, D0              ; Save mode number to D0
     JSR         EA_PRINT_DN         ; Print data register
-    *PRINT COMMA TODO
+    LEA         COMMA, A4        ; Print comma
+    JSR         WRITE2MEM
     JSR         EA_DEFAULT_COMBO    ; Stores mode bits in D6, register bits in D7
     JSR         OR_EVAL_EA          ; Evaluate the results of subroutine call
     JMP         OR_END
@@ -1708,10 +1718,12 @@ ROd_REG_REG:                        ; Else, count/register field contains regist
     JSR         EA_PRINT_DN         ; Print register value, stored in D7
     JMP         ROd_REG_END         ; Jump to end of ROd_REG
 ROd_REG_COUNT:
-    *print hash todo
-    *print hex value in D7 as byte todo, continue on to ROd_REG_END
+    LEA         POUND, A4         ; Print '#'''
+    JSR         WRITE2MEM
+    JSR         EA_PRINT_DATA       *print hex value in D7 as byte todo, continue on to ROd_REG_END
 ROd_REG_END:
-    *PRINT COMMA todo
+    LEA         COMMA, A4        ; Print comma
+    JSR         WRITE2MEM
     JSR         EA_DEFAULT_COMBO    ; To get register bits in D7, 'mode' bits are not used
     JSR         EA_PRINT_DN         ; Print register value in D7
     JMP         ROd_END
@@ -1829,7 +1841,8 @@ SUB_MODE_1:
     MOVE.W      D7, D1              ; Save register value for printing dest. operand
     JSR         EA_DEFAULT_COMBO    ; Stores mode bits in D6, register bits in D7
     JSR         SUB_EVAL_EA         ; Evaluate the results of subroutine call
-*PRINT COMMA TODO
+    LEA         COMMA, A4        ; Print comma
+    JSR         WRITE2MEM
     MOVE.W      D1, D7              ; Return register value to D7 for use by subroutine
     JSR         EA_PRINT_DN         ; Print data register
     JMP         SUB_END
@@ -1839,7 +1852,8 @@ SUB_MODE_2:
     CLR.L       D0                  ; Clear data register 0
     MOVE.B      #2, D0              ; Save mode number to D0
     JSR         EA_PRINT_DN         ; Print data register
-*PRINT COMMA TODO
+    LEA         COMMA, A4        ; Print comma
+    JSR         WRITE2MEM
     JSR         EA_DEFAULT_COMBO    ; Stores mode bits in D6, register bits in D7
     JSR         SUB_EVAL_EA         ; Evaluate the results of subroutine call
     JMP         SUB_END

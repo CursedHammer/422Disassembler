@@ -36,7 +36,7 @@ EA_MSG_A6           DC.B    'A6',0
 EA_MSG_A7           DC.B    'A7',0
 
 EA_MSG_UNIMP        DC.B    '[EA CODE NOT IMPLEMENTED]',0
-
+EA_MSG_PRINT_DATA   DC.B    '[PRINTING DATA NOT IMPLEMENTED]',0
 
 *~Font name~Courier New~
 *~Font size~10~
