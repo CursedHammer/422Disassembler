@@ -1366,6 +1366,7 @@ MOVEA_END:
 * the MOVEM opcode
 *-----------------------------------------------------------
 EA_MOVEM:
+    *seems complicated, todo
     JSR         EA_UNIMPLEMENTED
     RTS
 *---------- MOVEQ Effective Addresses ----------------------
@@ -1373,7 +1374,31 @@ EA_MOVEM:
 * the MOVEQ opcode
 *-----------------------------------------------------------
 EA_MOVEQ:
-    JSR         EA_UNIMPLEMENTED
+    MOVEM.L     A0-A5/D0-D7, -(SP)  ; Save registers (except A6, global pointer to word to read)
+    JSR         EA_COPY_PTR         ; Copy global pointer to A5
+*isolate data
+    MOVE.L      (A6), D1            ; Load opcode to data register 1
+    MOVE.B      #8, D2              ; Clear upper 8 bits of opcode word
+    LSL.W       D2, D1              ; Perform shift (zeros shifted in)
+    MOVE.B      #8, D2              ; 'Right-align' bits 0-7 to determine data bits
+    LSR.W       D2, D1              ; Perform shift (zeros shifted in)
+*Isolate MSB to do sign extension
+    MOVE.L      (A6), D3            ; Save mode bits to D6
+    MOVE.B      #8, D2              ; Clear upper 8 bits of opcode word
+    LSL.W       D2, D3              ; Perform shift (zeros shifted in)
+    MOVE.B      #15, D2             ; 'Right-align' bit 7 to determine MSB
+    LSR.W       D2, D3              ; Perform shift (zeros shifted in)
+    CMP.B       #$00, D3            ; If 0, sign extend with 0 (already done by isolation code)
+    BEQ         MOVEQ_PRINT_DATA
+    ADD.L       #$FFFFFF00, D1      ; Else, sign extend data with F
+MOVEQ_PRINT_DATA:
+    *print hash TODO
+    *print data in
+    *PRINT COMMA TODO
+    JSR         EA_OPMODE_COMBO     ; Get register bits in D7, mode bits not used
+    JSR         EA_PRINT_DN         ; Print data register
+    JSR         EA_UPDATE_POINTER   ; Updates global pointer
+    MOVEM.L     (SP)+, A0-A5/D0-D7  ; Restore registers (except A6, global pointer to word to read)
     RTS
 *---------- MULS.W Effective Addresses ---------------------
 * Parses and prints the effective addressing information for
@@ -1455,20 +1480,13 @@ MULS_W_END:
     MOVEM.L     (SP)+, A0-A5/D0-D7  ; Restore registers (except A6, global pointer to word to read)
     RTS
 
-*---------- NOP Effective Addresses ------------------------
-* Parses and prints the effective addressing information for
-* the NOP opcode
-*-----------------------------------------------------------
-EA_NOP:
-    JSR         EA_UNIMPLEMENTED
-    RTS
 *---------- OR Effective Addresses -------------------------
 * Parses and prints the effective addressing information for
 * the OR opcode
 *-----------------------------------------------------------
 EA_OR:
-    JSR         EA_UNIMPLEMENTED
-    RTS
+    MOVEM.L     A0-A5/D0-D7, -(SP)  ; Save registers (except A6, global pointer to word to read)
+    JSR         EA_COPY_PTR         ; Copy global pointer to A5
 *---------- ROd Effective Addresses ------------------------
 * Parses and prints the effective addressing information for
 * the ROd opcode
