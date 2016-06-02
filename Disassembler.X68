@@ -133,11 +133,11 @@ END_LOOP
     INCLUDE 'EA.X68'
     INCLUDE 'EndProgram.X68'
     INCLUDE 'WriteBuffer.X68'
-    
+
     INCLUDE 'IOMessages.X68'
     INCLUDE 'OCMessages.X68'
     INCLUDE 'EAMessages.X68'
-    INCLUDE 'EPMessages.x68'        ; EndProgram messages
+    INCLUDE 'EPMessages.X68'        ; EndProgram messages
     INCLUDE 'WBMessages.X68'        ; WriteBuffer messages
 
 *********** END INCLUDES *****************************************************

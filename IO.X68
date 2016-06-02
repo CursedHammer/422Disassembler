@@ -49,60 +49,22 @@ GET_ADDRESSES
 
 GET_FIRST_ADDRESS
     LEA         PS1,A1              * Loads message into A1
-<<<<<<< HEAD
-    JSR         GET_HEXSTRING       * Get string from user
-    CMPI.B      #1,HEXFLAG          * Does HEXFLAG = 1
-    BNE         GET_FIRST_ADDRESS   * If no, get hex again
-
-    JSR         ASCII_TO_HEX        * Convert ascii to hex
-    CMPI.B      #1,HEXFLAG          * Does HEXFLAG = 1
-    BNE         GET_FIRST_ADDRESS   * If no, get hex again
-
-    JSR         IS_HEX_EVEN         * Check that hex value is even
-=======
     JSR         MAKE_CHECKS         * Get address and perform checks
->>>>>>> master
     CMPI.B      #1,HEXFLAG          * Does HEXFLAG = 1
     BNE         GET_FIRST_ADDRESS   * If no, get hex again
 
     MOVE.L      HEXVALUE,BEGINADDR  * Copy hex value to begin
-<<<<<<< HEAD
-    LEA         BMESSAGE,A1         * Load message in A1 for display
-    MOVE.L      (HEXVALUE),D1       * Load hex value into A1 for display
     JSR         NEW_LINE            * Space
-
-=======
-    JSR         NEW_LINE            * Space
->>>>>>> master
     JSR         CLEAR               * Clear values for next hex
 
 GET_SECOND_ADDRESS
     LEA         PS2,A1              * Loads message into A1
-<<<<<<< HEAD
-    JSR         GET_HEXSTRING       * Get string from user
-    CMPI.B      #1,HEXFLAG          * Does HEXFLAG = 1
-    BNE         GET_SECOND_ADDRESS  * If no, get hex again
-
-    JSR         ASCII_TO_HEX        * Convert ascii to hex
-    CMPI.B      #1,HEXFLAG          * Does HEXFLAG = 1
-    BNE         GET_SECOND_ADDRESS  * If no, get hex again
-
-    JSR         IS_HEX_EVEN         * Check that hex value is even
-=======
     JSR         MAKE_CHECKS         * Get address and perform checks
->>>>>>> master
     CMPI.B      #1,HEXFLAG          * Does HEXFLAG = 1
     BNE         GET_SECOND_ADDRESS  * If no, get hex again
 
     MOVE.L      HEXVALUE,ENDADDR    * Copy hex value to begin
-<<<<<<< HEAD
-    LEA         EMESSAGE,A1         * Load message in A1 for display
-    MOVE.L      (HEXVALUE),D1       * Load hex value into A1 for display
     JSR         NEW_LINE            * Space
-
-=======
-    JSR         NEW_LINE            * Space
->>>>>>> master
     JSR         CLEAR               * Clear values for next hex
 
 CHECK_BADDR_IS_LESS_THAN_EADDR
