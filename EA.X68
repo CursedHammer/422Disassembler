@@ -367,19 +367,19 @@ ADDQ_MODE:
 *--- EA mode jump table options ----
 ADDQ_MODE_000: ; Dn
     JSR         EA_PRINT_DN         ; Print data register direct operand
-    JMP         ADDQ_MODE_END       ; End evaluation of ea mode
+    JMP         ADDQ_END            ; End evaluation of ea mode
 ADDQ_MODE_001: ; An
     JSR         EA_PRINT_AN         ; Address register direct is invalid mode
-    JMP         ADDQ_MODE_END       ; End evaluation of ea mode
+    JMP         ADDQ_END            ; End evaluation of ea mode
 ADDQ_MODE_010: ; (An)
     JSR         EA_PRINT_AN_IND     ; Print address register indirect
-    JMP         ADDQ_MODE_END       ; End evaluation of ea mode
+    JMP         ADDQ_END            ; End evaluation of ea mode
 ADDQ_MODE_011: ; (An)+
     JSR         EA_PRINT_POSTINC    ; Print address register indirect with post increment
-    JMP         ADDQ_MODE_END       ; End evaluation of ea mode
+    JMP         ADDQ_END            ; End evaluation of ea mode
 ADDQ_MODE_100: ; -(An)
     JSR         EA_PRINT_PREDEC     ; Print address register indirect with pre decrement
-    JMP         ADDQ_MODE_END       ; End evaluation of ea mode
+    JMP         ADDQ_END            ; End evaluation of ea mode
 ADDQ_MODE_101: ; Invalid: Address Register Indirect with Displacement Mode
     JSR         EA_INVALID          ; Opcode word is Invalid
     JMP         ADDQ_END
@@ -400,7 +400,8 @@ ADDQ_ABS_W:
     JMP         ADDQ_END
 ADDQ_ABS_L:
     JSR         EA_PRINT_ABS_L      ; Print absolute long address operand
-    JMP         ADDQ_END
+    JMP         ADDQ
+
 *-----------------------------------
 ADDQ_END:
     JSR         EA_UPDATE_POINTER   ; Update global pointer
@@ -583,7 +584,7 @@ ASd_REG_COUNT:
     *print hex value in D7 as byte todo, continue on to ASd_REG_END
 ASd_REG_END:
     *PRINT COMMA todo
-    JSR         EA_DEFAULT_COMBO    ; To get register bits in D7, 'mode' bits are irrelevant
+    JSR         EA_DEFAULT_COMBO    ; To get register bits in D7, 'mode' bits are not used
     JSR         EA_PRINT_DN         ; Print register value in D7
     JMP         ASd_END
 *-----------------------------------
@@ -725,7 +726,67 @@ CLR_END:
 * the CMP opcode
 *-----------------------------------------------------------
 EA_CMP:
-    JSR         EA_UNIMPLEMENTED
+*--- Check validity based on mode value
+    JSR         EA_DEFAULT_COMBO
+    LEA         CMP_MODE, A0       ; Set index '0' for jump table
+    MULU        #6, D6              ; Form offset (move 6 bytes in memory for every 'JMP' command)
+    JMP         0(A0, D6)           ; Jump indirect with index, i.e. jump to 'table' + displacement
+CMP_MODE:
+    JMP         CMP_MODE_000       ; Dn
+    JMP         CMP_MODE_001       ; An
+    JMP         CMP_MODE_010       ; (An)
+    JMP         CMP_MODE_011       ; (An)+
+    JMP         CMP_MODE_100       ; -(An)
+    JMP         CMP_MODE_101       ; Invalid: Address Register Indirect with Displacement Mode
+    JMP         CMP_MODE_110       ; Invalid: Address Register Indirect with Index (8-Bit Displacement)
+    JMP         CMP_MODE_111       ; The rest (not all valid, validated by register number)
+*-----------------------------------
+*--- EA mode jump table options ----
+CMP_MODE_000: ; Dn
+    JSR         EA_PRINT_DN         ; Print data register direct operand
+    JMP         CMP_MODE_END        ; End evaluation of ea mode
+CMP_MODE_001: ; An
+    JSR         EA_PRINT_AN         ; Address register direct is invalid mode
+    JMP         CMP_MODE_END        ; End evaluation of ea mode
+CMP_MODE_010: ; (An)
+    JSR         EA_PRINT_AN_IND     ; Print address register indirect
+    JMP         CMP_MODE_END        ; End evaluation of ea mode
+CMP_MODE_011: ; (An)+
+    JSR         EA_PRINT_POSTINC    ; Print address register indirect with post increment
+    JMP         CMP_MODE_END        ; End evaluation of ea mode
+CMP_MODE_100: ; -(An)
+    JSR         EA_PRINT_PREDEC     ; Print address register indirect with pre decrement
+    JMP         CMP_MODE_END        ; End evaluation of ea mode
+CMP_MODE_101: ; Invalid: Address Register Indirect with Displacement Mode
+    JSR         EA_INVALID          ; Opcode word is Invalid
+    JMP         CMP_END
+CMP_MODE_110: ; Invalid: Address Register Indirect with Index (8-Bit Displacement)
+    JSR         EA_INVALID          ; Opcode word is Invalid
+    JMP         CMP_END
+CMP_MODE_111: ; The rest (not all valid, validated by register number)
+    CMP.B       #$00, D7            ; Test for absolute word address
+    BEQ         CMP_ABS_W
+    CMP.B       #$01, D7            ; Test for absolute long address
+    BEQ         CMP_ABS_L
+    JSR         EA_INVALID          ; Opcode word is Invalid
+    JMP         CMP_END
+*-----------------------------------
+*--- Valid options for mode 111 ----
+CMP_ABS_W:
+    JSR         EA_PRINT_ABS_W      ; Print absolute word address operand
+    JMP         CMP_MODE_END
+CMP_ABS_L:
+    JSR         EA_PRINT_ABS_L      ; Print absolute long address operand
+    JMP         CMP_MODE_END
+*-----------------------------------
+*--- Evaluate and print register ---
+CMP_MODE_END:
+*print comma TODO
+    JSR         EA_OPMODE_COMBO     ; get register bits in D7, opmode bits not used
+    JSR         EA_PRINT_DN         ; print register
+CMP_END:
+    JSR         EA_UPDATE_POINTER   ; Update global pointer
+    MOVEM.L     (SP)+, A0-A5/D0-D7  ; Restore registers (except A6, global pointer to word to read)
     RTS
 *---------- DIVU Effective Addresses -----------------------
 * Parses and prints the effective addressing information for
@@ -786,7 +847,7 @@ LSd_REG_COUNT:
     *print hex value in D7 as byte todo, continue on to LSd_REG_END
 LSd_REG_END:
     *PRINT COMMA todo
-    JSR         EA_DEFAULT_COMBO    ; To get register bits in D7, 'mode' bits are irrelevant
+    JSR         EA_DEFAULT_COMBO    ; To get register bits in D7, 'mode' bits are not used
     JSR         EA_PRINT_DN         ; Print register value in D7
     JMP         LSd_END
 *-----------------------------------
@@ -1009,7 +1070,7 @@ ROd_REG_COUNT:
     *print hex value in D7 as byte todo, continue on to ROd_REG_END
 ROd_REG_END:
     *PRINT COMMA todo
-    JSR         EA_DEFAULT_COMBO    ; To get register bits in D7, 'mode' bits are irrelevant
+    JSR         EA_DEFAULT_COMBO    ; To get register bits in D7, 'mode' bits are not used
     JSR         EA_PRINT_DN         ; Print register value in D7
     JMP         ROd_END
 *-----------------------------------
