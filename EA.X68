@@ -728,6 +728,8 @@ CLR_END:
 * the CMP opcode
 *-----------------------------------------------------------
 EA_CMP:
+    MOVEM.L     A0-A5/D0-D7, -(SP)  ; Save registers (except A6, global pointer to word to read)
+    JSR         EA_COPY_PTR         ; Copy global pointer to A5
 *--- Check validity based on mode value
     JSR         EA_DEFAULT_COMBO
     LEA         CMP_MODE, A0       ; Set index '0' for jump table
