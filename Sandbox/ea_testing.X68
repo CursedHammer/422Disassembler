@@ -10,11 +10,11 @@ START:                  ; first instruction of program
 * Put program code here
 
     SIMHALT             ; halt simulator
-    ADD.B           #255, D0
-
+    MOVE.L          #$1234, D0
 * Put variables and constants here
 
     END    START        ; last line of source
+
 
 *~Font name~Courier New~
 *~Font size~10~
