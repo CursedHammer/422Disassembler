@@ -945,7 +945,7 @@ ISDIVUW     MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
             LEA MESSAGEDIVUW, A1
             MOVE.B  #14, D0
             TRAP    #15
-            JSR     EA_DIVU
+            JSR     EA_DIVU_W
             MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
             RTS
 

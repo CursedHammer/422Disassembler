@@ -213,6 +213,7 @@ ADDA_ABS_L:
     JSR         EA_PRINT_ABS_L      ; Print absolute long address operand
     JMP         ADDA_MODE_END
 ADDA_IMM:
+    JSR         EA_OPMODE_COMBO     ; Get opmode bits in
     JSR         EA_PRINT_IMM        ; Print immediate data
     JMP         ADDA_MODE_END
 *-----------------------------------
@@ -793,7 +794,79 @@ CMP_END:
 * the DIVU opcode
 *-----------------------------------------------------------
 EA_DIVU:
-    JSR         EA_UNIMPLEMENTED
+    MOVEM.L     A0-A5/D0-D7, -(SP)  ; Save registers (except A6, global pointer to word to read)
+    JSR         EA_COPY_PTR         ; Copy global pointer to A5
+    JSR         EA_DEFAULT_COMBO    ; mode: D6, register: D7
+    LEA         DIVU_MODE, A0       ; Set index '0' for jump table
+    MULU        #6, D6              ; Form offset (move 6 bytes in memory for every 'JMP' command)
+    JMP         0(A0, D6)           ; Jump indirect with index, i.e. jump to 'table' + displacement
+*--- Check validity based on mode value
+DIVU_MODE:
+    JMP         DIVU_MODE_000       ; Dn
+    JMP         DIVU_MODE_001       ; Invalid: An
+    JMP         DIVU_MODE_010       ; (An)
+    JMP         DIVU_MODE_011       ; (An)+
+    JMP         DIVU_MODE_100       ; -(An)
+    JMP         DIVU_MODE_101       ; Invalid: Address Register Indirect with Displacement Mode
+    JMP         DIVU_MODE_110       ; Invalid: Address Register Indirect with Index (8-Bit Displacement)
+    JMP         DIVU_MODE_111       ; The rest (not all valid, validated by register number)
+*-----------------------------------
+*--- Jump table options ------------
+DIVU_MODE_000: ; Dn
+    JSR         EA_PRINT_DN         ; Print data register direct operand
+    JMP         DIVU_DEST           ; Go to: print destination operand
+DIVU_MODE_001: ; Invalid: An
+    JSR         EA_INVALID          ; Address register direct is invalid mode
+    JMP         DIVU_END
+DIVU_MODE_010: ; (An)
+    JSR         EA_PRINT_AN_IND     ; Print address register indirect
+    JMP         DIVU_DEST
+DIVU_MODE_011: ; (An)+
+    JSR         EA_PRINT_POSTINC    ; Print address register indirect with post increment
+    JMP         DIVU_DEST
+DIVU_MODE_100: ; -(An)
+    JSR         EA_PRINT_PREDEC     ; Print address register indirect with pre decrement
+    JMP         DIVU_DEST         ; Continue with parsing destination operand
+DIVU_MODE_101: ; Invalid: Address Register Indirect with Displacement Mode
+    JSR         EA_INVALID          ; Opcode word is Invalid
+    JMP         DIVU_END
+DIVU_MODE_110: ; Invalid: Address Register Indirect with Index (8-Bit Displacement)
+    JSR         EA_INVALID          ; Opcode word is Invalid
+    JMP         DIVU_END
+DIVU_MODE_111: ; The rest (not all valid, validated by register number)
+    CMP.B       #$00, D7            ; Test for absolute word address
+    BEQ         DIVU_ABS_W
+    CMP.B       #$01, D7            ; Test for absolute long address
+    BEQ         DIVU_ABS_L
+    CMP.B       #$04, D7            ; Test for immediate data
+    BEQ         DIVU_IMM
+    JSR         EA_INVALID          ; Else: invalid
+    JMP         DIVU_END
+*-----------------------------------
+*--- Valid options for mode 111 ----
+DIVU_ABS_W:
+    JSR         EA_PRINT_ABS_W      ; Print absolute word address operand
+    JMP         DIVU_DEST           ; Continue with parsing destination operand
+DIVU_ABS_L:
+    JSR         EA_PRINT_ABS_L      ; Print absolute long address operand
+    JMP         DIVU_DEST           ; Continue with parsing destination operand
+DIVU_IMM:
+    MOVE.B      #2, D5              ; Size is word
+    JSR         EA_PRINT_IMM        ; Print immediate data
+    JMP         DIVU_DEST           ; Continue with parsing destination operand
+*-----------------------------------
+DIVU_DEST:
+    *print EA_MSG_COMMA
+    *Get destination register
+    MOVE.W      (A6), D7            ; Load word at current pointer to D1
+    MOVE.B      #4, D2              ; Clear upper 4 bits of opcode word
+    LSL.W       D2, D7              ; Perform shift (zeros shifted in)
+    MOVE.B      #13, D2             ; 'Right-align' bits 9-11 to determine register
+    LSR.W       D2, D7              ; Perform shift (zeros shifted in)
+    JSR         EA_PRINT_DN         ; Print data register direct operand
+DIVU_END:
+    JSR         EA_UPDATE_POINTER   ; Update global pointer
+    MOVEM.L     (SP)+, A0-A5/D0-D7  ; Restore registers (except A6, global pointer to word to read)
     RTS
 *---------- JSR Effective Addresses ------------------------
 * Parses and prints the effective addressing information for
@@ -1001,6 +1074,7 @@ MULS_W_ABS_L:
     JSR         EA_PRINT_ABS_L      ; Print absolute long address operand
     JMP         MULS_W_DEST         ; Continue with parsing destination operand
 MULS_W_IMM:
+    MOVE.B      #2, D5              ; Size is word
     JSR         EA_PRINT_IMM        ; Print immediate data
     JMP         MULS_W_DEST         ; Continue with parsing destination operand
 *-----------------------------------
