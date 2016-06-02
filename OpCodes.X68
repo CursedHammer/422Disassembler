@@ -1011,9 +1011,10 @@ ISASLB  MOVEM.L     A0-A6/D0-D7, -(SP) ; Save registers
         RTS
 
 ISASLW  MOVEM.L     A0-A6/D0-D7, -(SP) ; Save registers
-        LEA         MESSAGEASLW, A1
-        MOVE.B      #14, D0
-        TRAP        #15
+        LEA         MESSAGEASLW, A4
+        JSR    WRITE2MEM
+        LEA    MESSAGESPACE, A4
+        JSR    WRITE2MEM
         JSR         EA_ASd
         MOVEM.L     (SP)+,  A0-A6/D0-D7 ; Restore registers
         RTS
@@ -1055,9 +1056,10 @@ ISLSRL  MOVEM.L     A0-A6/D0-D7, -(SP) ; Save registers
         RTS
 
 ISLSLB  MOVEM.L     A0-A6/D0-D7, -(SP) ; Save registers
-        LEA         MESSAGELSLB, A1
-        MOVE.B      #14, D0
-        TRAP        #15
+        LEA         MESSAGELSLB, A4
+        JSR    WRITE2MEM
+        LEA    MESSAGESPACE, A4
+        JSR    WRITE2MEM
         JSR         EA_LSd
         MOVEM.L     (SP)+,  A0-A6/D0-D7 ; Restore registers
         RTS
@@ -1090,9 +1092,10 @@ ISRORB  MOVEM.L     A0-A6/D0-D7, -(SP) ; Save registers
         RTS
 
 ISRORW  MOVEM.L     A0-A6/D0-D7, -(SP) ; Save registers
-        LEA         MESSAGERORW, A1
-        MOVE.B      #14, D0
-        TRAP        #15
+        LEA         MESSAGERORW, A4
+        JSR    WRITE2MEM
+        LEA    MESSAGESPACE, A4
+        JSR    WRITE2MEM
         JSR         EA_ROd
         MOVEM.L     (SP)+,  A0-A6/D0-D7 ; Restore registers
         RTS
@@ -1376,9 +1379,10 @@ ISRTS   MOVEM.L     A0-A6/D0-D7, -(SP) ; Save registers
         RTS
 
 ISCLR   MOVEM.L     A0-A6/D0-D7, -(SP) ; Save registers
-        LEA         MESSAGECLR, A1  *OPCODE is CLR
-        MOVE.B      #14, D0
-        TRAP        #15
+        LEA         MESSAGECLR, A4
+        JSR    WRITE2MEM
+        LEA    MESSAGESPACE, A4
+        JSR    WRITE2MEM
         JSR         EA_CLR
         MOVEM.L     (SP)+,  A0-A6/D0-D7 ; Restore registers
         RTS
@@ -1429,9 +1433,10 @@ ISMOVEAL MOVEM.L    A0-A6/D0-D7, -(SP) ; Save registers
         RTS                         ; Exit subroutine
 
 ISMOVEB MOVEM.L     A0-A6/D0-D7, -(SP) ; Save registers
-        LEA         MESSAGEMOVEB, A1 *OPCODE is MOVE.B so display MOVEB message
-        MOVE.B      #14, D0
-        TRAP        #15
+        LEA         MESSAGEMOVEB, A4
+        JSR    WRITE2MEM
+        LEA    MESSAGESPACE, A4
+        JSR    WRITE2MEM
         JSR         EA_MOVE
         MOVEM.L     (SP)+,  A0-A6/D0-D7 ; Restore registers
         RTS                         ; Exit subroutine

@@ -1,6 +1,6 @@
 00001000 Starting Address
 Assembler used: EASy68K Editor/Assembler v5.15.04
-Created On: 6/2/2016 3:47:33 PM
+Created On: 6/2/2016 3:52:54 PM
 
 00000000                             1  ******************************************************************************
 00000000                             2  * Title      : 68k Disassembler
@@ -485,7 +485,7 @@ Created On: 6/2/2016 3:47:33 PM
 0000137C  48E7 FFFE                481          MOVEM.L     A0-A6/D0-D7, -(SP) ; Save registers
 00001380  41F9 00001398            482          LEA         initial_table,A0 ; Index into the table
 00001386  4280                     483          CLR.L       D0              ; Zero it
-00001388  3012                     484          MOVE.W      (A2),D0         ; We'll play with it here
+00001388  3016                     484          MOVE.W      (A6),D0         ; We'll play with it here
 0000138A  123C 000C                485          MOVE.B      #12,D1          ; Shift 12 bits to the right
 0000138E  E268                     486          LSR.W       D1,D0           ; Move the bits (moves highest 4 bits to lowest 4 positions,
 00001390                           487                                      ; and the rest are zeroed out)
