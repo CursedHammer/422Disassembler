@@ -638,10 +638,10 @@ ASd_MEM_MODE_111: ; The rest (not all valid, validated by register number)
 *--- Valid options for mode 111 ----
 ASd_MEM_ABS_W:
     JSR         EA_PRINT_ABS_W      ; Print absolute word address operand
-    JMP         ASd_END             ; Continue with parsing destination operand
+    JMP         ASd_END
 ASd_MEM_ABS_L:
     JSR         EA_PRINT_ABS_L      ; Print absolute long address operand
-    JMP         ASd_END             ; Continue with parsing destination operand
+    JMP         ASd_END
 *-----------------------------------
 ASd_END:
     JSR         EA_UPDATE_POINTER   ; Updates global pointer
@@ -660,7 +660,65 @@ EA_BCC: *ONLY BCC, BGT, BLE
 * the CLR opcode
 *-----------------------------------------------------------
 EA_CLR:
-    JSR         EA_UNIMPLEMENTED
+    MOVEM.L     A0-A5/D0-D7, -(SP)  ; Save registers (except A6, global pointer to word to read)
+    JSR         EA_COPY_PTR         ; Copy global pointer to ASd
+    JSR         EA_DEFAULT_COMBO    ; mode: D6, register: D7
+    LEA         CLR_MODE, A0        ; Set index '0' for jump table
+    MULU        #6, D6              ; Form offset (move 6 bytes in memory for every 'JMP' command)
+    JMP         0(A0, D6)           ; Jump indirect with index, i.e. jump to 'table' + displacement
+*--------------------------------------
+*--- Check validity based on mode value
+CLR_MODE:
+    JMP         CLR_MODE_000        ; Dn
+    JMP         CLR_MODE_001        ; Invalid: An
+    JMP         CLR_MODE_010        ; (An)
+    JMP         CLR_MODE_011        ; (An)+
+    JMP         CLR_MODE_100        ; -(An)
+    JMP         CLR_MODE_101        ; Invalid: Address Register Indirect with Displacement Mode
+    JMP         CLR_MODE_110        ; Invalid: Address Register Indirect with Index (8-Bit Displacement)
+    JMP         CLR_MODE_111        ; The rest (not all valid, validated by register number)
+*-----------------------------------
+*--- Jump table options ------------
+CLR_MODE_000: ; Dn
+    JSR         EA_PRINT_DN         ; Data register direct is invalid mode
+    JMP         CLR_END
+CLR_MODE_001: ; Invalid: An
+    JSR         EA_INVALID          ; Address register direct is invalid mode
+    JMP         CLR_END
+CLR_MODE_010: ; (An)
+    JSR         EA_PRINT_AN_IND     ; Print address register indirect
+    JMP         CLR_END
+CLR_MODE_011: ; (An)+
+    JSR         EA_PRINT_POSTINC    ; Print address register indirect with post increment
+    JMP         CLR_END
+CLR_MODE_100: ; -(An)
+    JSR         EA_PRINT_PREDEC     ; Print address register indirect with pre decrement
+    JMP         CLR_END             ; Continue with parsing destination operand
+CLR_MODE_101: ; Invalid: Address Register Indirect with Displacement Mode
+    JSR         EA_INVALID          ; Opcode word is Invalid
+    JMP         CLR_END
+CLR_MODE_110: ; Invalid: Address Register Indirect with Index (8-Bit Displacement)
+    JSR         EA_INVALID          ; Opcode word is Invalid
+    JMP         CLR_END
+CLR_MODE_111: ; The rest (not all valid, validated by register number)
+    CMP.B       #$00, D7            ; Test for absolute word address
+    BEQ         CLR_ABS_W
+    CMP.B       #$01, D7            ; Test for absolute long address
+    BEQ         CLR_ABS_L
+    JSR         EA_INVALID          ; Else: invalid
+    JMP         CLR_END
+*-----------------------------------
+*--- Valid options for mode 111 ----
+CLR_ABS_W:
+    JSR         EA_PRINT_ABS_W      ; Print absolute word address operand
+    JMP         CLR_END
+CLR_ABS_L:
+    JSR         EA_PRINT_ABS_L      ; Print absolute long address operand
+    JMP         CLR_END
+*-----------------------------------
+CLR_END:
+    JSR         EA_UPDATE_POINTER   ; Updates global pointer
+    MOVEM.L     (SP)+, A0-A5/D0-D7  ; Restore registers (except A6, global pointer to word to read)
     RTS
 *---------- CMP Effective Addresses ------------------------
 * Parses and prints the effective addressing information for
@@ -783,10 +841,10 @@ LSd_MEM_MODE_111: ; The rest (not all valid, validated by register number)
 *--- Valid options for mode 111 ----
 LSd_MEM_ABS_W:
     JSR         EA_PRINT_ABS_W      ; Print absolute word address operand
-    JMP         LSd_END             ; Continue with parsing destination operand
+    JMP         LSd_END
 LSd_MEM_ABS_L:
     JSR         EA_PRINT_ABS_L      ; Print absolute long address operand
-    JMP         LSd_END             ; Continue with parsing destination operand
+    JMP         LSd_END
 *-----------------------------------
 LSd_END:
     JSR         EA_UPDATE_POINTER   ; Updates global pointer
@@ -1006,10 +1064,10 @@ ROd_MEM_MODE_111: ; The rest (not all valid, validated by register number)
 *--- Valid options for mode 111 ----
 ROd_MEM_ABS_W:
     JSR         EA_PRINT_ABS_W      ; Print absolute word address operand
-    JMP         ROd_END             ; Continue with parsing destination operand
+    JMP         ROd_END
 ROd_MEM_ABS_L:
     JSR         EA_PRINT_ABS_L      ; Print absolute long address operand
-    JMP         ROd_END             ; Continue with parsing destination operand
+    JMP         ROd_END
 *-----------------------------------
 ROd_END:
     JSR         EA_UPDATE_POINTER   ; Updates global pointer
