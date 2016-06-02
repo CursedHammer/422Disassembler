@@ -17,6 +17,7 @@
 * implemented yet
 *-----------------------------------------------------------
 EA_UNIMPLEMENTED:
+    ADDA.W      #$02, A6            ; Increment past current opcode word
     *print unimplemented message
     RTS
 
@@ -24,6 +25,8 @@ EA_UNIMPLEMENTED:
 * Prints error message for current opcode in memory
 *-----------------------------------------------------------
 EA_INVALID:
+    MOVEA.L     A6, A5              ; Copy global pointer
+    ADDA.W      #$02, A5            ; Increment past current opcode word
     *print or indicate invalidity
     RTS
 
