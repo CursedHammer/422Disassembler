@@ -57,7 +57,7 @@ STACK     EQU   $7000               * Beginning address for stack pointer
 BEGINADDR EQU   $5000               * Variable to hold beginning address value
 ENDADDR   EQU   $5010               * Variable to hold ending address value
 
-TRUE      EQU   $01                 * Value equivalent to 'true'
+RUNAGAIN  EQU   $6000               * Value equivalent to 'true'
 
           ORG   $1000               * Program begins at address 1000
           
@@ -71,6 +71,7 @@ TRUE      EQU   $01                 * Value equivalent to 'true'
     INCLUDE 'IO.X68'
     *INCLUDE 'OpCodes.X68'
     *INCLUDE 'EA.X68'
+    INCLUDE 'EndProgram.X68'
 
 *********** END INCLUDES *****************************************************    
       
@@ -110,12 +111,14 @@ LOOP_CHECK
     BNE         LOOP                * If not, continue processing addresses
     ; If at end of address range, check if user wants to continue
     ; if user wants to continue, restart
-    ; else, end
+    ; else, end    
 
 END_LOOP
-    STOP        #$3000              * End program
-*    JMP         START               * Restart program (optional workflow)
-
+    JSR         KEEP_RUNNING        * Does the user want to run program again
+    CMPI.B      #1,(RUNAGAIN)       * Does RUNAGAIN = TRUE?
+    BEQ         START               * If yes, rerun program
+    STOP        #$3000              * Else, end program
+    
 *---------- END - START ------------------------------------------------------
 
 *********** END BEGIN CODE ***************************************************
@@ -136,6 +139,7 @@ END_LOOP
 
 *---------- End --------------------------------------------
                END  START          * Last line of source
+
 
 
 *~Font name~Courier New~
