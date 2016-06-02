@@ -17,7 +17,7 @@
 * implemented yet
 *-----------------------------------------------------------
 EA_UNIMPLEMENTED:
-    ADDA.W      #$02, A6            ; Increment past current opcode word
+    ADDA.L      #$00000002, A6      ; Increment past current opcode word
     *print unimplemented message
     RTS
 
@@ -26,7 +26,7 @@ EA_UNIMPLEMENTED:
 *-----------------------------------------------------------
 EA_INVALID:
     MOVEA.L     A6, A5              ; Copy global pointer
-    ADDA.W      #$02, A5            ; Increment past current opcode word
+    ADDA.L      #$00000002, A5      ; Increment past current opcode word
     *print or indicate invalidity
     RTS
 
@@ -38,7 +38,7 @@ EA_UPDATE_POINTER:
     BNE         UPDATE_PTR          ; If NOT equal (a.k.a if any extra operands
                                     ; were read, and is already up to date),
                                     ; update global with current
-    ADDA.W      #$02, A5            ; Else, increment past current opcode word, then update
+    ADDA.L      #$00000002, A5      ; Else, increment past current opcode word, then update
 UPDATE_PTR:
     MOVEA.L     A5, A6              ; Update global pointer
     RTS
@@ -133,9 +133,9 @@ EA_PRINT_DN_JMP:
     JMP         DN_110 ; D6
     JMP         DN_111 ; D7
 *print value TODO
-EA_PRINT_DN_000: ; D0
-    MOVE.L      #DREG0, A4
-    JSR         WRITE_LINE
+DN_000: ; D0
+    *MOVE.L      #DREG0, A4
+    *JSR         WRITE_LINE
 DN_001 ; D1
 DN_010 ; D2
 DN_011 ; D3
@@ -212,17 +212,17 @@ EA_PRINT_IND_END:
 *-----------------------------------------------------------
 EA_PRINT_IMM:
     MOVEA.L     A5, A1              ; copy pointer to temp
-    ADDA.W      #$2, A1             ; Advance temp pointer to next word
+    ADDA.L      #$00000002, A1      ; Advance temp pointer to next word
     CMP         #3, D5
     BEQ         PRINT_IMM_L         ; if L, branch
     MOVE.W      (A1), D0            ; store value in a register (todo, register tbd)
     *print value TODO
-    ADDA.W      #$2, A1             ; move temp pointer past word that has been read
+    ADDA.L      #$00000002, A1      ; move temp pointer past word that has been read
     JMP         PRINT_IMM_END
 PRINT_IMM_L:
     MOVE.L      (A1), D0            ; store value in a register (todo, register tbd)
     *print value TODO
-    ADDA.W      #$4, A1             ; move temp pointer past longword that has been read
+    ADDA.L      #$00000004, A1      ; move temp pointer past longword that has been read
 PRINT_IMM_END:
     MOVEA.L     A1, A5              ; store new pointer location to pass back
     RTS
@@ -288,10 +288,10 @@ EA_PRINT_PD_END:
 *-----------------------------------------------------------
 EA_PRINT_ABS_L:
     MOVEA.L     A5, A1              ; copy pointer to temp
-    ADDA.W      #$2, A1             ; Advance temp pointer to next word
+    ADDA.L      #$00000002, A1      ; Advance temp pointer to next word
     MOVE.L      (A1), D0            ; store longword address to print TODO
     *print value TODO
-    ADDA.W      #$4, A1             ; move temp pointer past longword that has been read
+    ADDA.L      #$00000004, A1      ; move temp pointer past longword that has been read
     MOVEA.L     A1, A5              ; store new pointer location to pass back
     RTS
 *---------- Absolute Word Address --------------------------
@@ -300,12 +300,14 @@ EA_PRINT_ABS_L:
 *-----------------------------------------------------------
 EA_PRINT_ABS_W:
     MOVEA.L     A5, A1              ; copy pointer to temp
-    ADDA.W      #$2, A1             ; Advance temp pointer to next word
-    MOVE.W      (A1), D0            ; store word address to print in TODO
+    ADDA.L      #$00000002, A1      ; Advance temp pointer to next word
+    MOVE.L      (A1), D0            ; store word address to print in TODO
     *print value TODO
-    ADDA.W      #$2, A1             ; move temp pointer past word that has been read
+    ADDA.L      #$00000002, A1      ; move temp pointer past word that has been read
     MOVEA.L     A1, A5              ; store new pointer location to pass back
     RTS
+
+
 *~Font name~Courier New~
 *~Font size~10~
 *~Tab type~1~

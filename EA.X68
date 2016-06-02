@@ -110,7 +110,7 @@ ADD_MODE_001: ; An (invalid if opmode 2)
     JSR         EA_PRINT_AN         ; Address register direct is invalid mode
     JMP         ADD_MODE_END        ; End evaluation of ea mode
 ADD_MODE_010: ; (An)
-    JSR         EA_PRINT_AN_IND     ; Print address register indirect
+    JSR         EA_PRINT_IND         ; Print address register indirect
     JMP         ADD_MODE_END        ; End evaluation of ea mode
 ADD_MODE_011: ; (An)+
     JSR         EA_PRINT_POSTINC    ; Print address register indirect with post increment
@@ -185,7 +185,7 @@ ADDA_MODE_001: ; An
     JSR         EA_PRINT_AN         ; Address register direct is invalid mode
     JMP         ADDA_MODE_END       ; End evaluation of ea mode
 ADDA_MODE_010: ; (An)
-    JSR         EA_PRINT_AN_IND     ; Print address register indirect
+    JSR         EA_PRINT_IND         ; Print address register indirect
     JMP         ADDA_MODE_END       ; End evaluation of ea mode
 ADDA_MODE_011: ; (An)+
     JSR         EA_PRINT_POSTINC    ; Print address register indirect with post increment
@@ -249,7 +249,7 @@ EA_ADDI:
     JMP         ADDI_END
 *--- Print immediate data ----------
 ADDI_B:
-    ADDA.W      #$2, A5             ; Increment A5 past current word
+    ADDA.L      #$00000002, A5      ; Increment A5 past current word
     CLR.L       D0
     MOVE.W      (A5), D0            ; read next word in memory and save
     MOVE.B      #8, D2              ; Clear upper 8 bits of operand word
@@ -257,19 +257,19 @@ ADDI_B:
     MOVE.B      #8, D2             ; 'Right-align' bits 0-7 to get value
     LSR.W       D2, D0              ; Perform shift (zeros shifted in)
     *print data
-    ADDA.W      #$2, A5             ; Increment A5 past operand word
+    ADDA.L      #$00000002, A5      ; Increment A5 past operand word
     JMP         ADDI_GET_DEST
 ADDI_W:
-    ADDA.W      #$2, A5             ; Increment A5 past current word
+    ADDA.L      #$00000002, A5      ; Increment A5 past current word
     CLR.L       D0
     MOVE.W      (A5), D0            ; read next word in memory and save
     *print data
-    ADDA.W      #$2, A5             ; Increment A5 past operand word
+    ADDA.L      #$00000002, A5      ; Increment A5 past operand word
     JMP         ADDI_GET_DEST
 ADDI_L:
-    ADDA.W      #$2, A5             ; Increment A5 past current word
+    ADDA.L      #$00000002, A5      ; Increment A5 past current word
     MOVE.L      (A5), D0            ; read next two words in memory and save
-    ADDA.W      #$4, A5             ; Increment A5 past operand longword
+    ADDA.L      #$00000004, A5      ; Increment A5 past operand longword
 *--- Get destination operand -------
 ADDI_GET_DEST:
     *PRINT COMMA
@@ -296,7 +296,7 @@ ADDI_MODE_001: ; Invalid: An
     JSR         EA_INVALID          ; Opcode word is Invalid
     JMP         ADDI_END
 ADDI_MODE_010: ; (An)
-    JSR         EA_PRINT_AN_IND     ; Print address register indirect
+    JSR         EA_PRINT_IND         ; Print address register indirect
     JMP         ADDI_END            ; End evaluation of ea mode
 ADDI_MODE_011: ; (An)+
     JSR         EA_PRINT_POSTINC    ; Print address register indirect with post increment
@@ -374,7 +374,7 @@ ADDQ_MODE_001: ; An
     JSR         EA_PRINT_AN         ; Address register direct is invalid mode
     JMP         ADDQ_END            ; End evaluation of ea mode
 ADDQ_MODE_010: ; (An)
-    JSR         EA_PRINT_AN_IND     ; Print address register indirect
+    JSR         EA_PRINT_IND         ; Print address register indirect
     JMP         ADDQ_END            ; End evaluation of ea mode
 ADDQ_MODE_011: ; (An)+
     JSR         EA_PRINT_POSTINC    ; Print address register indirect with post increment
@@ -402,7 +402,7 @@ ADDQ_ABS_W:
     JMP         ADDQ_END
 ADDQ_ABS_L:
     JSR         EA_PRINT_ABS_L      ; Print absolute long address operand
-    JMP         ADDQ
+    JMP         ADDQ_END
 
 *-----------------------------------
 ADDQ_END:
@@ -504,7 +504,7 @@ AND_MODE_000: ; Dn (invalid if opmode 2)
 AND_MODE_001: ; Invalid: An
     JMP         AND_MODE_INVALID
 AND_MODE_010: ; (An)
-    JSR         EA_PRINT_AN_IND     ; Print address register indirect
+    JSR         EA_PRINT_IND         ; Print address register indirect
     JMP         AND_MODE_END        ; End evaluation of ea mode
 AND_MODE_011: ; (An)+
     JSR         EA_PRINT_POSTINC    ; Print address register indirect with post increment
@@ -616,7 +616,7 @@ ASd_MEM_MODE_001: ; Invalid: An
     JSR         EA_INVALID          ; Address register direct is invalid mode
     JMP         ASd_END
 ASd_MEM_MODE_010: ; (An)
-    JSR         EA_PRINT_AN_IND     ; Print address register indirect
+    JSR         EA_PRINT_IND         ; Print address register indirect
     JMP         ASd_END
 ASd_MEM_MODE_011: ; (An)+
     JSR         EA_PRINT_POSTINC    ; Print address register indirect with post increment
@@ -673,7 +673,7 @@ EA_Bcc: *ONLY BCC (0100), BGT (1110), BLE (1111)
     JMP         BCC_B               ; Else, parse lower-order byte of opcode word
 *--- Sign Extension for byte displacement
 BCC_B:
-    ADDA.B      #$02, A4            ; Increment display pointer past opcode word
+    ADDA.L      #$00000002, A4      ; Increment display pointer past opcode word
     MOVE.W      (A6), D3            ; Save opcode word
     MOVE.B      #8, D2              ; Clear upper 8 bits of opcode word
     LSL.W       D2, D3              ; Perform shift (zeros shifted in)
@@ -686,11 +686,11 @@ BCC_B:
 *-----------------------------------
 *--- Sign extension for word displacement
 BCC_W:
-    ADDA.B      #$04, A4            ; Increment display pointer past opcode word
+    ADDA.L      #$00000004, A4      ; Increment display pointer past opcode word
                                     ; and displacement word in memory
-    ADDA.B      #$02, A5            ; Increment A5 past opcode word
+    ADDA.L      #$00000002, A5      ; Increment A5 past opcode word
     MOVE.W      (A5), D3            ; Read word displacement from memory
-    ADDA.B      #$02, A5            ; Increment A5 past word read
+    ADDA.L      #$00000002, A5      ; Increment A5 past word read
     MOVE.B      #15, D2             ; 'Right-align' bit 15 to determine MSB
     LSR.W       D2, D3              ; Perform shift (zeros shifted in)
     CMP.B       #$00, D3            ; If 0, sign extend with 0 (already done by isolation code)
@@ -700,15 +700,15 @@ BCC_W:
 *-----------------------------------
 *--- Read longword displacement ----
 BCC_L:
-    ADDA.B      #$06, A4            ; Increment display pointer past opcode word
+    ADDA.L      #$00000006, A4      ; Increment display pointer past opcode word
                                     ; and displacement longword in memory
-    ADDA.B      #$02, A5            ; Increment A5 past opcode word
+    ADDA.L      #$00000002, A5      ; Increment A5 past opcode word
     MOVE.L      (A5), D1            ; Read longword displacement from memory
-    ADDA.B      #$04, A5            ; Increment A5 past longword read
+    ADDA.L      #$00000004, A5      ; Increment A5 past longword read
     JMP         BCC_DISPLAY
 *-----------------------------------
 BCC_DISPLAY:
-    ADDA.B      D1, A4              ; add displacement to current addressing
+    ADDA.L      D1, A4              ; add displacement to current addressing
     *print address in A4
     JSR         EA_UPDATE_POINTER   ; Updates global pointer
     MOVEM.L     (SP)+, A0-A5/D0-D7  ; Restore registers (except A6, global pointer to word to read)
@@ -744,7 +744,7 @@ CLR_MODE_001: ; Invalid: An
     JSR         EA_INVALID          ; Address register direct is invalid mode
     JMP         CLR_END
 CLR_MODE_010: ; (An)
-    JSR         EA_PRINT_AN_IND     ; Print address register indirect
+    JSR         EA_PRINT_IND         ; Print address register indirect
     JMP         CLR_END
 CLR_MODE_011: ; (An)+
     JSR         EA_PRINT_POSTINC    ; Print address register indirect with post increment
@@ -784,7 +784,7 @@ CLR_END:
 *-----------------------------------------------------------
 EA_CMP:
     MOVEM.L     A0-A5/D0-D7, -(SP)  ; Save registers (except A6, global pointer to word to read)
-    dJSR         EA_COPY_PTR         ; Copy global pointer to A5
+    JSR         EA_COPY_PTR         ; Copy global pointer to A5
 *--- Check validity based on mode value
     JSR         EA_DEFAULT_COMBO
     LEA         CMP_MODE, A0       ; Set index '0' for jump table
@@ -808,7 +808,7 @@ CMP_MODE_001: ; An
     JSR         EA_PRINT_AN         ; Address register direct is invalid mode
     JMP         CMP_MODE_END        ; End evaluation of ea mode
 CMP_MODE_010: ; (An)
-    JSR         EA_PRINT_AN_IND     ; Print address register indirect
+    JSR         EA_PRINT_IND        ; Print address register indirect
     JMP         CMP_MODE_END        ; End evaluation of ea mode
 CMP_MODE_011: ; (An)+
     JSR         EA_PRINT_POSTINC    ; Print address register indirect with post increment
@@ -877,7 +877,7 @@ DIVU_W_MODE_001: ; Invalid: An
     JSR         EA_INVALID          ; Address register direct is invalid mode
     JMP         DIVU_W_END
 DIVU_W_MODE_010: ; (An)
-    JSR         EA_PRINT_AN_IND     ; Print address register indirect
+    JSR         EA_PRINT_IND         ; Print address register indirect
     JMP         DIVU_W_DEST
 DIVU_W_MODE_011: ; (An)+
     JSR         EA_PRINT_POSTINC    ; Print address register indirect with post increment
@@ -957,7 +957,7 @@ JSR_MODE_001: ; Invalid: An
     JSR         EA_INVALID          ; Address register direct is invalid mode
     JMP         JSR_END
 JSR_MODE_010: ; (An)
-    JSR         EA_PRINT_AN_IND     ; Print address register indirect
+    JSR         EA_PRINT_IND         ; Print address register indirect
     JMP         JSR_END
 JSR_MODE_011: ; (An)+
     JSR         EA_INVALID          ; Address register indirect w/ post increment is invalid mode
@@ -1022,7 +1022,7 @@ LEA_MODE_001: ; Invalid: An
     JSR         EA_INVALID          ; Address register direct is invalid mode
     JMP         LEA_END
 LEA_MODE_010: ; (An)
-    JSR         EA_PRINT_AN_IND     ; Print address register indirect
+    JSR         EA_PRINT_IND         ; Print address register indirect
     JMP         LEA_DEST
 LEA_MODE_011: ; (An)+
     JSR         EA_INVALID          ; Address register indirect with post increment is invalid
@@ -1129,7 +1129,7 @@ LSd_MEM_MODE_001: ; Invalid: An
     JSR         EA_INVALID          ; Address register direct is invalid mode
     JMP         LSd_END
 LSd_MEM_MODE_010: ; (An)
-    JSR         EA_PRINT_AN_IND     ; Print address register indirect
+    JSR         EA_PRINT_IND         ; Print address register indirect
     JMP         LSd_END
 LSd_MEM_MODE_011: ; (An)+
     JSR         EA_PRINT_POSTINC    ; Print address register indirect with post increment
@@ -1218,7 +1218,7 @@ MOVE_SRC_MODE_001: ; Invalid: An
     JSR         EA_PRINT_AN         ; Print address register in D7
     JMP         MOVE_DESTINATION
 MOVE_SRC_MODE_010: ; (An)
-    JSR         EA_PRINT_AN_IND     ; Print address register indirect
+    JSR         EA_PRINT_IND         ; Print address register indirect
     JMP         MOVE_DESTINATION
 MOVE_SRC_MODE_011: ; (An)+
     JSR         EA_PRINT_POSTINC    ; Print address register indirect with post increment
@@ -1234,11 +1234,11 @@ MOVE_SRC_MODE_110: ; Invalid: Address Register Indirect with Index (8-Bit Displa
     JMP         MOVE_END
 MOVE_SRC_MODE_111: ; The rest (not all valid, validated by register number)
     CMP.B       #$00, D7            ; Test for absolute word address
-    BEQ         MOVE_ABS_W
+    BEQ         MOVE_SRC_ABS_W
     CMP.B       #$01, D7            ; Test for absolute long address
-    BEQ         MOVE_ABS_L
+    BEQ         MOVE_SRC_ABS_L
     CMP.B       #$04, D7            ; Test for immediate data
-    BEQ         ADD_IMM
+    BEQ         MOVE_SRC_IMM
     JSR         EA_INVALID          ; Else: invalid
     JMP         MOVE_END
 *-----------------------------------
@@ -1281,7 +1281,7 @@ MOVE_DST_MODE_001: ; Invalid: An
     JSR         EA_INVALID          ; Print address register in D7
     JMP         MOVE_END
 MOVE_DST_MODE_010: ; (An)
-    JSR         EA_PRINT_AN_IND     ; Print address register indirect
+    JSR         EA_PRINT_IND         ; Print address register indirect
     JMP         MOVE_END
 MOVE_DST_MODE_011: ; (An)+
     JSR         EA_PRINT_POSTINC    ; Print address register indirect with post increment
@@ -1297,9 +1297,9 @@ MOVE_DST_MODE_110: ; Invalid: Address Register Indirect with Index (8-Bit Displa
     JMP         MOVE_END
 MOVE_DST_MODE_111: ; The rest (not all valid, validated by register number)
     CMP.B       #$00, D7            ; Test for absolute word address
-    BEQ         MOVE_ABS_W
+    BEQ         MOVE_DST_ABS_W
     CMP.B       #$01, D7            ; Test for absolute long address
-    BEQ         MOVE_ABS_L
+    BEQ         MOVE_DST_ABS_L
     JSR         EA_INVALID          ; Else: invalid
     JMP         MOVE_END
 *-----------------------------------
@@ -1370,7 +1370,7 @@ MOVEA_SRC_MODE_001: ; Invalid: An
     JSR         EA_PRINT_AN         ; Print address register in D7
     JMP         MOVEA_DESTINATION
 MOVEA_SRC_MODE_010: ; (An)
-    JSR         EA_PRINT_AN_IND     ; Print address register indirect
+    JSR         EA_PRINT_IND         ; Print address register indirect
     JMP         MOVEA_DESTINATION
 MOVEA_SRC_MODE_011: ; (An)+
     JSR         EA_PRINT_POSTINC    ; Print address register indirect with post increment
@@ -1386,11 +1386,11 @@ MOVEA_SRC_MODE_110: ; Invalid: Address Register Indirect with Index (8-Bit Displ
     JMP         MOVEA_END
 MOVEA_SRC_MODE_111: ; The rest (not all valid, validated by register number)
     CMP.B       #$00, D7            ; Test for absolute word address
-    BEQ         MOVEA_ABS_W
+    BEQ         MOVEA_SRC_ABS_W
     CMP.B       #$01, D7            ; Test for absolute long address
-    BEQ         MOVEA_ABS_L
+    BEQ         MOVEA_SRC_ABS_L
     CMP.B       #$04, D7            ; Test for immediate data
-    BEQ         ADD_IMM
+    BEQ         MOVEA_SRC_IMM
     JSR         EA_INVALID          ; Else: invalid
     JMP         MOVEA_END
 *-----------------------------------
@@ -1485,7 +1485,7 @@ MULS_W_MODE_001: ; Invalid: An
     JSR         EA_INVALID          ; Address register direct is invalid mode
     JMP         MULS_W_END
 MULS_W_MODE_010: ; (An)
-    JSR         EA_PRINT_AN_IND     ; Print address register indirect
+    JSR         EA_PRINT_IND         ; Print address register indirect
     JMP         MULS_W_DEST
 MULS_W_MODE_011: ; (An)+
     JSR         EA_PRINT_POSTINC    ; Print address register indirect with post increment
@@ -1631,7 +1631,7 @@ OR_MODE_001: ; An (invalid if opmode 2)
     JSR         EA_PRINT_AN         ; Address register direct is invalid mode
     JMP         OR_MODE_END         ; End evaluation of ea mode
 OR_MODE_010: ; (An)
-    JSR         EA_PRINT_AN_IND     ; Print address register indirect
+    JSR         EA_PRINT_IND         ; Print address register indirect
     JMP         OR_MODE_END         ; End evaluation of ea mode
 OR_MODE_011: ; (An)+
     JSR         EA_PRINT_POSTINC    ; Print address register indirect with post increment
@@ -1742,7 +1742,7 @@ ROd_MEM_MODE_001: ; Invalid: An
     JSR         EA_INVALID          ; Address register direct is invalid mode
     JMP         ROd_END
 ROd_MEM_MODE_010: ; (An)
-    JSR         EA_PRINT_AN_IND     ; Print address register indirect
+    JSR         EA_PRINT_IND         ; Print address register indirect
     JMP         ROd_END
 ROd_MEM_MODE_011: ; (An)+
     JSR         EA_PRINT_POSTINC    ; Print address register indirect with post increment
@@ -1872,7 +1872,7 @@ SUB_MODE_001: ; An (invalid if opmode 2)
     JSR         EA_PRINT_AN         ; Address register direct is invalid mode
     JMP         SUB_MODE_END        ; End evaluation of ea mode
 SUB_MODE_010: ; (An)
-    JSR         EA_PRINT_AN_IND     ; Print address register indirect
+    JSR         EA_PRINT_IND         ; Print address register indirect
     JMP         SUB_MODE_END        ; End evaluation of ea mode
 SUB_MODE_011: ; (An)+
     JSR         EA_PRINT_POSTINC    ; Print address register indirect with post increment
@@ -1916,6 +1916,8 @@ SUB_END:
     JSR         EA_UPDATE_POINTER   ; Updates global pointer
     MOVEM.L     (SP)+, A0-A5/D0-D7  ; Restore registers (except A6, global pointer to word to read)
     RTS
+
+
 
 *~Font name~Courier New~
 *~Font size~10~
