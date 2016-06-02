@@ -1329,7 +1329,7 @@ ISRTS   MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
         LEA         MESSAGERTS, A1  *OPCODE is RTS
         MOVE.B      #14, D0
         TRAP        #15
-        ADDA.W      #$2, A6         ; increment global pointer past current opcode word
+        ADDA.L      #$00000002, A6      ; increment global pointer past current opcode word
         MOVEM.W     (SP)+,  A0-A7/D0-D7 ; Restore registers
         RTS
 
@@ -1345,7 +1345,7 @@ ISNOP   MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
         LEA         MESSAGENOP, A1  *OPCODE is NOP so display NOP message
         MOVE.B      #14, D0
         TRAP        #15
-        ADDA.W      #$2, A6         ; increment global pointer past current opcode word
+        ADDA.L      #$00000002, A6      ; increment global pointer past current opcode word
         MOVEM.W     (SP)+,  A0-A7/D0-D7 ; Restore registers
         RTS                         ; Exit subroutine
 
@@ -1412,6 +1412,7 @@ ISADDIB MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
         JSR         EA_ADDI
         MOVEM.W     (SP)+,  A0-A7/D0-D7 ; Restore registers
         RTS                         ; Exit subroutine
+
 
 
 
