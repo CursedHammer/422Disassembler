@@ -652,6 +652,7 @@ ASd_END:
 * the BCC opcode
 *-----------------------------------------------------------
 EA_BCC: *ONLY BCC, BGT, BLE
+*two's complement and stuff. for later TODO
     JSR         EA_UNIMPLEMENTED
     RTS
 *---------- CLR Effective Addresses ------------------------
