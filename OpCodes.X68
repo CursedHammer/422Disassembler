@@ -14,7 +14,7 @@ OC_PARSE:
         MOVEM.L     A0-A6/D0-D7, -(SP) ; Save registers
         LEA         initial_table,A0 ; Index into the table
         CLR.L       D0              ; Zero it
-        MOVE.W      (A2),D0         ; We'll play with it here
+        MOVE.W      (A6),D0         ; We'll play with it here
         MOVE.B      #12,D1          ; Shift 12 bits to the right
         LSR.W       D1,D0           ; Move the bits (moves highest 4 bits to lowest 4 positions,
                                     ; and the rest are zeroed out)
