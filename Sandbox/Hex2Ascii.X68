@@ -9,11 +9,7 @@
 ******************************************************************************
 *           DEFINITIONS                                                      *
 ******************************************************************************
-BEGIN       EQU   $2000
-END         EQU   $2010
-STR_LEN     EQU   $2020
-HEXFLAG     EQU   $2021
-HEXVALUE    EQU   $2030
+HEXVALUE    EQU   $ABCD1234
 
 CR          EQU   $0D
 LF          EQU   $0A 
@@ -29,7 +25,9 @@ LF          EQU   $0A
 *-----------------------------------------------------------------------------
 START
 PRINT_HEX_AS_ASCII
-    JSR         IO_WELCOME          * Print welcome message   
+    JSR         IO_WELCOME          * Print welcome message  
+ 
+    MOVE.L      #HEXVALUE,D1        * This is the key, move value to D1
     
     JSR         PRINT_HEXVALUE      * Display hex value
     
@@ -69,11 +67,10 @@ NEW_LINE
 * Prints out to display whatever is in A1
 *-----------------------------------------------------------------------------
 PRINT_HEXVALUE
-    LEA         ASCIIVAL,A1         * Load message in A1 for display
+    LEA         ASCIIPROMPT,A1      * Load message in A1 for display
     MOVE.B      #14,D0              * Moves the Task 13 into D0
     TRAP        #15                 * Displays contents of A1
     
-    MOVE.L      #$ABCD1234,D1       * This is the key, move value to D1
     MOVE.B      #16,D2              * Move base 16 to D2
     MOVE.B      #15,D0              * Moves Task 15 into D0
     TRAP        #15                 * Displays contents of D1
@@ -88,8 +85,7 @@ PRINT_HEXVALUE
 ******************************************************************************
 
 INTRO           DC.B  'WELCOME!',CR,LF,'This program will convert Hex to Ascii.',CR,LF,0
-HEXVAL          DC.B  'The HEX value is  : ',0
-ASCIIVAL        DC.B  'The ASCII value is: ',0
+ASCIIPROMPT     DC.B  'The ASCII value is: 0x',0
 ENDL            DC.B  CR,LF,0
 
 HEXSTRING       DS.B  80            * Var for hex string
