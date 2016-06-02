@@ -148,27 +148,6 @@ OR_DIVUcode111 JSR    OPCODE_INVALID              ;INVALID
 		       RTS
 *----------- END  ADD_BorADD_WorADD_L ----------------------
 
-*****************************  MULSLorDIVUL ************************************
-MULSLorDIVUL        LEA     STACK,SP            ; Load the SP
-                    LEA     tableMULSLorDIVUL, A0            ; Index into the table
-                    CLR.L   D0                  ; Zero it
-                    MOVE.W  (A6),D0         ; We'll play with it here
-                    MOVE.B  #6,D1           ; Shift 6 bits left
-                    ASL.W   D1,D0
-                    MOVE.B  #12,D1              ; Shift 12 bits to the right
-                    LSR.W   D1,D0               ; Move the bits (moves highest 4 bits to lowest 4 positions,
-                    MULU    #6,D0               ; Form offset (move 6 bytes in memory for every 'JMP' command)
-                    JSR     0(A0,D0)            ; Jump indirect with index, i.e. jump to 'table' + displacement
-
-tableMULSLorDIVUL             JMP    MULSLorDIVULcode0   ;  MULS.L
-                              JMP    MULSLorDIVULcode1   ;  DIVU.L
-
-MULSLorDIVULcode0   JSR     ISMULSL
-                    RTS
-MULSLorDIVULcode1   JSR     ISDIVUL
-                    RTS
-***************************** END  MULSLorDIVUL ************************************
-
 
 *----------- someASR ---------------------------------------
 someASR:
@@ -786,7 +765,7 @@ tableNOP_MOVEM_LEA_JSR_CLR_RTS:
         JMP         LOTScode1110
         JMP         LOTScode1111
 
-LOTScode0000 JSR    MULSLorDIVUL
+LOTScode0000 JSR    OPCODE_INVALID              ; MULS.L and DIVU.L are not supported for 68000 Disassember
              RTS
 LOTScode0001 JSR    OPCODE_INVALID              ;INVALID
              RTS
@@ -931,7 +910,6 @@ MOVEWcode111 JSR    ISMOVEW
 *----------- All 'IS' Subroutines --------------------------
 ; TODO: adjust workflow to:
 ;   1) save message address to buffer pointer
-;   2) pass pointer to necessary EA Subroutines
 OPCODE_INVALID  MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
             LEA MESSAGEOPCODE_INVALID, A1
             MOVE.B  #14, D0
@@ -960,14 +938,6 @@ ISBLE  MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
             MOVE.B  #14, D0
             TRAP    #15
             JSR     EA_BCC
-            MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
-            RTS
-
-ISDIVUL     MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
-            LEA MESSAGEDIVUL, A1
-            MOVE.B  #14, D0
-            TRAP    #15
-            JSR     EA_DIVU
             MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
             RTS
 
@@ -1144,14 +1114,6 @@ ISROLL  MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
         MOVE.B      #14, D0
         TRAP        #15
         JSR         EA_ROd
-        MOVEM.W     (SP)+,  A0-A7/D0-D7 ; Restore registers
-        RTS
-
-ISMULSL MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
-        LEA         MESSAGEMULSL, A1 *OPCODE is MULS.L
-        MOVE.B      #14, D0
-        TRAP        #15
-        *TODO may not need this opcode word, so no EA call for now
         MOVEM.W     (SP)+,  A0-A7/D0-D7 ; Restore registers
         RTS
 
