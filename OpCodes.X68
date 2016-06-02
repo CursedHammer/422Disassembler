@@ -922,14 +922,14 @@ ISBCC  MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
             LEA MESSAGEBCC, A1
             MOVE.B  #14, D0
             TRAP    #15
-            JSR     EA_BCC
+            JSR     EA_Bcc
             MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
             RTS
 ISBGT  MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
             LEA MESSAGEBGT, A1
             MOVE.B  #14, D0
             TRAP    #15
-            JSR     EA_BCC
+            JSR     EA_Bcc
             MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
             RTS
 
@@ -937,7 +937,7 @@ ISBLE  MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
             LEA MESSAGEBLE, A1
             MOVE.B  #14, D0
             TRAP    #15
-            JSR     EA_BCC
+            JSR     EA_Bcc
             MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
             RTS
 
@@ -945,7 +945,7 @@ ISDIVUW     MOVEM.W     A0-A7/D0-D7, -(SP) ; Save registers
             LEA MESSAGEDIVUW, A1
             MOVE.B  #14, D0
             TRAP    #15
-            JSR     EA_DIVU
+            JSR     EA_DIVU_W
             MOVEM.W (SP)+,  A0-A7/D0-D7         ; Restore registers
             RTS
 
