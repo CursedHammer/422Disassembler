@@ -1,0 +1,113 @@
+00001516 Starting Address
+Assembler used: EASy68K Editor/Assembler v5.15.04
+Created On: 6/2/2016 11:03:45 AM
+
+00000000                             1  ******************************************************************************
+00000000                             2  * Title      : I/O End Program
+00000000                             3  * Written by : Brandon Authier (Hblkr), Jack S. Eldridge
+00000000                             4  *              (JackScottie), Marijn Burger (marijnburger)
+00000000                             5  * Date       : 1 Jun 2016
+00000000                             6  * Description: This function asks the user if they would like to rerun the 
+00000000                             7  *              program or end it.
+00000000                             8  ******************************************************************************
+00000000                             9  
+00000000                            10  
+00000000                            11  ******************************************************************************
+00000000                            12  *           DEFINITIONS                                                      *
+00000000                            13  ******************************************************************************
+00000000                            14  
+00000000  =00000059                 15  UPYES     EQU   'Y'
+00000000  =00000079                 16  LOWYES    EQU   'y'
+00000000                            17  
+00000000                            18            *ORG   $1000
+00000000                            19  
+00000000                            20  ******************************************************************************
+00000000                            21  *           BEGIN CODE                                                       *
+00000000                            22  ******************************************************************************
+00000000                            23  
+00000000                            24  *---------- START ------------------------------------------------------------
+00000000                            25  * Begins program's logical flow. Similar to main in C/C++
+00000000                            26  *-----------------------------------------------------------------------------           
+00000000                            27  KEEP_RUNNING
+00000000  6100 000E                 28      BSR.W       RERUN               * Run welcome subroutine
+Line 29 ERROR: Undefined symbol
+00000004  0C39 0001 0054448C        29      CMPI.B      #1,(RUNAGAIN)       * Is true?
+0000000C  67F2                      30      BEQ         KEEP_RUNNING        * If yes, keep running program
+0000000E                            31  *    BRA         FINISHED            * Else, finished    
+0000000E                            32  *      
+0000000E                            33  *FINISHED
+0000000E                            34  *    *SIMHALT                         * halt simulator
+0000000E  4E75                      35      RTS                             * Return to Disassembler
+00000010                            36      
+00000010                            37  *---------- END - START ------------------------------------------------------
+00000010                            38  
+00000010                            39  
+00000010                            40  ******************************************************************************
+00000010                            41  *           SUB ROUTINES                                                     *
+00000010                            42  ******************************************************************************
+00000010                            43             
+00000010                            44  *---------- RERUN ------------------------------------------------------------
+00000010                            45  * Check to see if the user would like to rerun the program
+00000010                            46  *-----------------------------------------------------------------------------
+00000010                            47  
+00000010                            48  RERUN 
+00000010  43F9 00000048             49      LEA         ENDQUESTION,A1      * Loads message into A1
+00000016  103C 000E                 50      MOVE.B      #14,D0              * Moves the Task 14 into D0
+0000001A  4E4F                      51      TRAP        #15                 * Displays Intro Message
+0000001C                            52      
+0000001C  103C 0005                 53      MOVE.B      #5,D0               * Move task 5 to read one char
+00000020  4E4F                      54      TRAP        #15                 * Trap 15 for IO
+00000022                            55      
+00000022  0C01 0059                 56      CMPI.B      #UPYES,D1           * Is char = Y
+00000026  6700 0014                 57      BEQ         NOTDONE             * If yes, notdone
+0000002A  0C01 0079                 58      CMPI.B      #LOWYES,D1          * Is char = y   
+0000002E  6700 000C                 59      BEQ         NOTDONE             * If yes, notdone
+Line 60 ERROR: Undefined symbol
+00000032  13FC 0000 0054449C        60      MOVE.B      #0,(RUNAGAIN)       * 0 for false to end program
+0000003A  4E75                      61      RTS 
+0000003C                            62      
+0000003C                            63  NOTDONE
+Line 64 ERROR: Undefined symbol
+0000003C  13FC 0001 0054449C        64      MOVE.B      #1,(RUNAGAIN)       * 1 for true to rerun program
+Line 65 ERROR: Undefined symbol
+00000044  6000 BB48                 65      BRA.W       CLEARSCRN           * Clear screen and return from subroutine         
+00000048                            66          
+00000048                            67  *---------- END - RERUN ------------------------------------------------------
+00000048                            68  * Put program code here
+00000048                            69  
+00000048                            70  *---------- CLEARSCRN --------------------------------------------------------
+00000048                            71  * Clear all output on screen
+00000048                            72  *-----------------------------------------------------------------------------
+00000048                            73  *CLEARSCRN     
+00000048                            74  *    MOVE.B      #11,D0              * Task 11 for clearing screen
+00000048                            75  *    MOVE.W      #$FF00,D1           * FF00, Clear screen
+00000048                            76  *    TRAP        #15                 * Wait for keystroke
+00000048                            77  *    RTS                             * Return from subroutine
+00000048                            78  
+00000048                            79  *---------- END - CLEARSCRN --------------------------------------------------
+00000048                            80  
+00000048                            81  
+00000048                            82  ******************************************************************************
+00000048                            83  *           VARIABLES AND CONSTANTS                                          *
+00000048                            84  ******************************************************************************
+00000048                            85  
+00000048= 57 4F 55 4C 44 20 ...     86  ENDQUESTION     DC.B 'WOULD YOU LIKE TO RUN THE PROGRAM AGAIN (Y/N)? ',0
+00000078                            87  
+00000078                            88      *END         KEEP_RUNNING
+00000078                            89  
+00000078                            90  
+Line 91 WARNING: END directive missing, starting address not set
+
+4 errors detected
+1 warning generated
+
+
+SYMBOL TABLE INFORMATION
+Symbol-name         Value
+-------------------------
+ENDQUESTION         48
+KEEP_RUNNING        0
+LOWYES              79
+NOTDONE             3C
+RERUN               10
+UPYES               59
