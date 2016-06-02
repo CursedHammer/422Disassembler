@@ -1202,7 +1202,7 @@ MOVE_DESTINATION:
     *PRINT COMMA TODO
     MOVEM.L     A0-A5/D0-D7, -(SP)  ; Save registers (except A6, global pointer to word to read)
     JSR         EA_COPY_PTR         ; Copy global pointer to ASd
-    JSR         EA_DEFAULT_COMBO    ; mode: D6, register: D7
+    JSR         EA_OPMODE_COMBO     ; mode: D6, register: D7 (destination bits)
     LEA         MOVE_DST_MODE, A0   ; Set index '0' for jump table
     MULU        #6, D6              ; Form offset (move 6 bytes in memory for every 'JMP' command)
     JMP         0(A0, D6)           ; Jump indirect with index, i.e. jump to 'table' + displacement
@@ -1265,7 +1265,101 @@ MOVE_END:
 * the MOVEA opcode
 *-----------------------------------------------------------
 EA_MOVEA:
-    JSR         EA_UNIMPLEMENTED
+    MOVEM.L     A0-A5/D0-D7, -(SP)  ; Save registers (except A6, global pointer to word to read)
+    JSR         EA_COPY_PTR         ; Copy global pointer to ASd
+*--- Parse size bits ---------------
+    MOVE.L      (A6), D5            ; Load opcode to data register 5 (for using size bits in immediate data)
+    MOVE.B      #2, D2              ; Clear upper 10 bits of opcode word
+    LSL.W       D2, D5              ; Perform shift (zeros shifted in)
+    MOVE.B      #14, D2             ; 'Right-align' bits 12-13 to determine mode bits
+    LSR.W       D2, D5              ; Perform shift (zeros shifted in)
+    CMP.B       #$03, D5            ; if size bits are 11, correct D5
+                                    ; to 10 for use with immediate data subroutine
+    BEQ         MOVEA_ADJUST_W
+    CMP.B       #$02, D5            ; if size bits are 10, correct D5
+                                    ; to 11 for use with immediate data subroutine
+    BEQ         MOVEA_ADJUST_L
+    JMP         MOVEA_SOURCE         ; Jump to evaluating source operand
+MOVEA_ADJUST_W:
+    MOVE.B      #$02, D5            ; Correct for weird sizing in MOVE
+    JMP         MOVEA_SOURCE         ; Jump to evaluating source operand
+MOVEA_ADJUST_L:
+    MOVE.B      #$03, D5            ; Correct for weird sizing in MOVE
+    JMP         MOVEA_SOURCE         ; Jump to evaluating source operand
+*-----------------------------------
+*--- Source operand ----------------
+MOVEA_SOURCE:
+    MOVEM.L     A0-A5/D0-D7, -(SP)  ; Save registers (except A6, global pointer to word to read)
+    JSR         EA_COPY_PTR         ; Copy global pointer to ASd
+    JSR         EA_DEFAULT_COMBO    ; mode: D6, register: D7
+    LEA         MOVEA_SRC_MODE, A0   ; Set index '0' for jump table
+    MULU        #6, D6              ; Form offset (move 6 bytes in memory for every 'JMP' command)
+    JMP         0(A0, D6)           ; Jump indirect with index, i.e. jump to 'table' + displacement
+*--------------------------------------
+*--- Check validity based on mode value
+MOVEA_SRC_MODE:
+    JMP         MOVEA_SRC_MODE_000   ; Dn
+    JMP         MOVEA_SRC_MODE_001   ; An
+    JMP         MOVEA_SRC_MODE_010   ; (An)
+    JMP         MOVEA_SRC_MODE_011   ; (An)+
+    JMP         MOVEA_SRC_MODE_100   ; -(An)
+    JMP         MOVEA_SRC_MODE_101   ; Invalid: Address Register Indirect with Displacement Mode
+    JMP         MOVEA_SRC_MODE_110   ; Invalid: Address Register Indirect with Index (8-Bit Displacement)
+    JMP         MOVEA_SRC_MODE_111   ; The rest (not all valid, validated by register number)
+*-----------------------------------
+*--- Jump table options ------------
+MOVEA_SRC_MODE_000: ; Dn
+    JSR         EA_PRINT_DN         ; Print data register in D7
+    JMP         MOVEA_DESTINATION
+MOVEA_SRC_MODE_001: ; Invalid: An
+    JSR         EA_PRINT_AN         ; Print address register in D7
+    JMP         MOVEA_DESTINATION
+MOVEA_SRC_MODE_010: ; (An)
+    JSR         EA_PRINT_AN_IND     ; Print address register indirect
+    JMP         MOVEA_DESTINATION
+MOVEA_SRC_MODE_011: ; (An)+
+    JSR         EA_PRINT_POSTINC    ; Print address register indirect with post increment
+    JMP         MOVEA_DESTINATION
+MOVEA_SRC_MODE_100: ; -(An)
+    JSR         EA_PRINT_PREDEC     ; Print address register indirect with pre decrement
+    JMP         MOVEA_DESTINATION    ; Continue with parsing destination operand
+MOVEA_SRC_MODE_101: ; Invalid: Address Register Indirect with Displacement Mode
+    JSR         EA_INVALID          ; Opcode word is Invalid
+    JMP         MOVEA_END
+MOVEA_SRC_MODE_110: ; Invalid: Address Register Indirect with Index (8-Bit Displacement)
+    JSR         EA_INVALID          ; Opcode word is Invalid
+    JMP         MOVEA_END
+MOVEA_SRC_MODE_111: ; The rest (not all valid, validated by register number)
+    CMP.B       #$00, D7            ; Test for absolute word address
+    BEQ         MOVEA_ABS_W
+    CMP.B       #$01, D7            ; Test for absolute long address
+    BEQ         MOVEA_ABS_L
+    CMP.B       #$04, D7            ; Test for immediate data
+    BEQ         ADD_IMM
+    JSR         EA_INVALID          ; Else: invalid
+    JMP         MOVEA_END
+*-----------------------------------
+*--- Valid options for mode 111 ----
+MOVEA_SRC_ABS_W:
+    JSR         EA_PRINT_ABS_W      ; Print absolute word address operand
+    JMP         MOVEA_DESTINATION
+MOVEA_SRC_ABS_L:
+    JSR         EA_PRINT_ABS_L      ; Print absolute long address operand
+    JMP         MOVEA_DESTINATION
+MOVEA_SRC_IMM:
+    JSR         EA_PRINT_IMM        ; Print immediate data
+    JMP         MOVEA_DESTINATION
+*-----------------------------------
+MOVEA_DESTINATION:
+    *PRINT COMMA TODO
+    MOVEM.L     A0-A5/D0-D7, -(SP)  ; Save registers (except A6, global pointer to word to read)
+    JSR         EA_COPY_PTR         ; Copy global pointer to ASd
+    JSR         EA_OPMODE_COMBO     ; Get register bits in D7, mode bits not used
+    JSR         EA_PRINT_AN         ; Print address register, continue to end
+*-----------------------------------
+MOVEA_END:
+    JSR         EA_UPDATE_POINTER   ; Updates global pointer
+    MOVEM.L     (SP)+, A0-A5/D0-D7  ; Restore registers (except A6, global pointer to word to read)
     RTS
 *---------- MOVEM Effective Addresses ----------------------
 * Parses and prints the effective addressing information for
