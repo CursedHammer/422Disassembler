@@ -59,22 +59,9 @@ ENDADDR   EQU   $5010               * Variable to hold ending address value
 
 RUNAGAIN  EQU   $6000               * Value equivalent to 'true'
 
-          ORG   $1000               * Program begins at address 1000
+START     ORG   $1000               * Program begins at address 1000
 
 *********** END DEFINITIONS **************************************************
-
-
-******************************************************************************
-*           INCLUDES                                                         *
-******************************************************************************
-
-    INCLUDE 'IO.X68'
-    INCLUDE 'OpCodes.X68'
-    INCLUDE 'EA.X68'
-    INCLUDE 'EndProgram.X68'
-    INCLUDE 'WriteBuffer.X68'
-
-*********** END INCLUDES *****************************************************
 
 
 ******************************************************************************
@@ -84,7 +71,6 @@ RUNAGAIN  EQU   $6000               * Value equivalent to 'true'
 *---------- START ------------------------------------------------------------
 * Begins program's logical flow. Similar to main in C/C++
 *-----------------------------------------------------------------------------
-START
     LEA         STACK,SP            * SP is stored in A7
     JSR         GET_ADDRESSES       * Runs GET_ADDRESSES and IO_WELCOME
     MOVEA.L     BEGINADDR,A6        * Assign beginning address to A6 for use
@@ -138,7 +124,17 @@ END_LOOP
 *           VARIABLES AND CONSTANTS                                          *
 ******************************************************************************
 
+******************************************************************************
+*           INCLUDES                                                         *
+******************************************************************************
 
+    INCLUDE 'IO.X68'
+    INCLUDE 'OpCodes.X68'
+    INCLUDE 'EA.X68'
+    INCLUDE 'EndProgram.X68'
+    INCLUDE 'WriteBuffer.X68'
+
+*********** END INCLUDES *****************************************************
 
 *---------- Reserved Registers -----------------------------
 *   A7: stack pointer
