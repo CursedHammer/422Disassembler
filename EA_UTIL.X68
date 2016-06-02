@@ -18,7 +18,8 @@
 *-----------------------------------------------------------
 EA_UNIMPLEMENTED:
     ADDA.L      #$00000002, A6      ; Increment past current opcode word
-    *print unimplemented message
+    LEA         EA_MSG_UNIMP
+    JSR         WRITE2MEM
     RTS
 
 *---------- Invalid OpCode ---------------------------------
@@ -134,15 +135,29 @@ EA_PRINT_DN_JMP:
     JMP         DN_111 ; D7
 *print value TODO
 DN_000: ; D0
-    *MOVE.L      #DREG0, A4
-    *JSR         WRITE_LINE
-DN_001 ; D1
-DN_010 ; D2
-DN_011 ; D3
-DN_100 ; D4
-DN_101 ; D5
-DN_110 ; D6
-DN_111 ; D7
+    LEA         EA_MSG_D0
+    JSR         WRITE2MEM
+DN_001: ; D1
+    LEA         EA_MSG_D1
+    JSR         WRITE2MEM
+DN_010: ; D2
+    LEA         EA_MSG_D2
+    JSR         WRITE2MEM
+DN_011: ; D3
+    LEA         EA_MSG_D3
+    JSR         WRITE2MEM
+DN_100: ; D4
+    LEA         EA_MSG_D4
+    JSR         WRITE2MEM
+DN_101: ; D5
+    LEA         EA_MSG_D5
+    JSR         WRITE2MEM
+DN_110: ; D6
+    LEA         EA_MSG_D6
+    JSR         WRITE2MEM
+DN_111: ; D7
+    LEA         EA_MSG_D7
+    JSR         WRITE2MEM
 
 EA_PRINT_DN_END:
     RTS
@@ -165,14 +180,30 @@ AN_JMP:
     JMP         AN_110 ; A6
     JMP         AN_111 ; A7
 *print value TODO
-AN_000 ; A0
-AN_001 ; A1
-AN_010 ; A2
-AN_011 ; A3
-AN_100 ; A4
-AN_101 ; A5
-AN_110 ; A6
-AN_111 ; A7
+AN_000: ; A0
+    LEA         EA_MSG_A0
+    JSR         WRITE2MEM
+AN_001: ; A1
+    LEA         EA_MSG_A1
+    JSR         WRITE2MEM
+AN_010: ; A2
+    LEA         EA_MSG_A2
+    JSR         WRITE2MEM
+AN_011: ; A3
+    LEA         EA_MSG_A3
+    JSR         WRITE2MEM
+AN_100: ; A4
+    LEA         EA_MSG_A4
+    JSR         WRITE2MEM
+AN_101: ; A5
+    LEA         EA_MSG_A5
+    JSR         WRITE2MEM
+AN_110: ; A6
+    LEA         EA_MSG_A6
+    JSR         WRITE2MEM
+AN_111: ; A7
+    LEA         EA_MSG_A7
+    JSR         WRITE2MEM
 
 EA_PRINT_AN_END:
     RTS
@@ -194,15 +225,31 @@ IND_JMP:
     JMP         IND_110 ; (A6)
     JMP         IND_111 ; (A7)
 *print value TODO
-IND_000 ; (A0)
-IND_001 ; (A1)
-IND_010 ; (A2)
-IND_011 ; (A3)
-IND_100 ; (A4)
-IND_101 ; (A5)
-IND_110 ; (A6)
-IND_111 ; (A7)
-
+IND_000: ; (A0)
+    *TODO
+    LEA         EA_MSG_D0
+    JSR         WRITE2MEM
+IND_001: ; (A1)
+    LEA         EA_MSG_D1
+    JSR         WRITE2MEM
+IND_010: ; (A2)
+    LEA         EA_MSG_D2
+    JSR         WRITE2MEM
+IND_011: ; (A3)
+    LEA         EA_MSG_D3
+    JSR         WRITE2MEM
+IND_100: ; (A4)
+    LEA         EA_MSG_D4
+    JSR         WRITE2MEM
+IND_101: ; (A5)
+    LEA         EA_MSG_D5
+    JSR         WRITE2MEM
+IND_110: ; (A6)
+    LEA         EA_MSG_D6
+    JSR         WRITE2MEM
+IND_111: ; (A7)
+    LEA         EA_MSG_D7
+    JSR         WRITE2MEM
 EA_PRINT_IND_END:
     RTS
 *---------- Immediate Data ---------------------------------

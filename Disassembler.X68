@@ -72,6 +72,7 @@ RUNAGAIN  EQU   $6000               * Value equivalent to 'true'
     INCLUDE 'OpCodes.X68'
     INCLUDE 'EA.X68'
     INCLUDE 'EndProgram.X68'
+    INCLUDE 'WriteBuffer.X68'
 
 *********** END INCLUDES *****************************************************
 
@@ -91,12 +92,20 @@ START
 LOOP
     * OC_PARSE Command doesn't work due to issues in the Opcode include
     * many errors need to be fixed. Same with EA include
-    *JSR         OC_PARSE            * Determine if there is an initial opcode match
-    JSR         INVALID_DATA
+
+    LEA         BUFFER, A2
+    JSR         OC_PARSE            * Determine if there is an initial opcode match
+    JSR         WRITE_ENDL
+    JSR         PRINTLINE
+    LEA         BUFFER, A2
+    JSR         CLEAN_BUFF
+
     * decrement row count
     * if at 0, prompt for next page
     * else, continue
-    ADDA.L      #$00000002,A6            * Advance address to test LOOP (test only)
+
+    *JSR         INVALID_DATA
+    *ADDA.L      #$00000002,A6            * Advance address to test LOOP (test only)
 
 LOOP_CHECK
     * Changed the following code from:
