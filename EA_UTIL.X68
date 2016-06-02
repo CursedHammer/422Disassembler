@@ -226,29 +226,30 @@ IND_JMP:
     JMP         IND_111 ; (A7)
 *print value TODO
 IND_000: ; (A0)
-    *TODO
-    LEA         EA_MSG_D0
+    LEA         EA_MSG_OPENPAREN
+    JSR         WRITE2MEM
+    LEA         EA_MSG_A0
     JSR         WRITE2MEM
 IND_001: ; (A1)
-    LEA         EA_MSG_D1
+    LEA         EA_MSG_A1
     JSR         WRITE2MEM
 IND_010: ; (A2)
-    LEA         EA_MSG_D2
+    LEA         EA_MSG_A2
     JSR         WRITE2MEM
 IND_011: ; (A3)
-    LEA         EA_MSG_D3
+    LEA         EA_MSG_A3
     JSR         WRITE2MEM
 IND_100: ; (A4)
-    LEA         EA_MSG_D4
+    LEA         EA_MSG_A4
     JSR         WRITE2MEM
 IND_101: ; (A5)
-    LEA         EA_MSG_D5
+    LEA         EA_MSG_A5
     JSR         WRITE2MEM
 IND_110: ; (A6)
-    LEA         EA_MSG_D6
+    LEA         EA_MSG_A6
     JSR         WRITE2MEM
 IND_111: ; (A7)
-    LEA         EA_MSG_D7
+    LEA         EA_MSG_A7
     JSR         WRITE2MEM
 EA_PRINT_IND_END:
     RTS
