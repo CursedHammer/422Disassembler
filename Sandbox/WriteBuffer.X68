@@ -21,39 +21,39 @@ LF      EQU     $0A                 * Line feed
 
 BUFFER  EQU     $2000               * Buffer address for string
 RCOUNT  EQU     30                  * Counters
-   
-        ORG     $1000               * Program beginning address
-        
-START
-    MOVE.B      #RCOUNT,D3          * Move row counter to D3
-        
+           
 WRITE_LINE
+    MOVE.B      #RCOUNT,D3          * Move row counter to D3
     LEA         BUFFER,A2           * Load BUFFER address to A2 for use
-
+    
 *   Write Strings to Memory Creating a Line
-*   =======================================    
-    MOVE.L      #MV,A4              * Move the string 'MOVE' to A4
-    BSR.S       WRITE2MEM           * Write string to memory
-    MOVE.L      #LONG,A4            * Move the string '.L  ' to A4
-    BSR.S       WRITE2MEM           * Write string to memory
-    MOVE.L      #DREG1,A4           * Move the string 'D1' to A4
-    BSR.S       WRITE2MEM           * Write string to memory
-    MOVE.L      #COMMA,A4           * Move the string ',' to A4
-    BSR.S       WRITE2MEM           * Write string to memory
-    MOVE.L      #DREG4,A4           * Move the string 'D4' to A4
-    BSR.S       WRITE2MEM           * Write string to memory
-    BSR.S       WRITE_ENDL          * Write end of line to memory          
+*   =======================================
+    BSR.S       WRITE2MEM
+    RTS
+    
+*    MOVE.L      #MV,A4              * Move the string 'MOVE' to A4
+*    BSR.S       WRITE2MEM           * Write string to memory
+*    MOVE.L      #LONG,A4            * Move the string '.L  ' to A4
+*    BSR.S       WRITE2MEM           * Write string to memory
+*    MOVE.L      #DREG1,A4           * Move the string 'D1' to A4
+*    BSR.S       WRITE2MEM           * Write string to memory
+*    MOVE.L      #COMMA,A4           * Move the string ',' to A4
+*    BSR.S       WRITE2MEM           * Write string to memory
+*    MOVE.L      #DREG4,A4           * Move the string 'D4' to A4
+*    BSR.S       WRITE2MEM           * Write string to memory
+*    BSR.S       WRITE_ENDL          * Write end of line to memory 
+         
 *   ----------- Finished Writing the Whole Line -------------------
 
 *   Print Buffer
 *   ============ 
-    BSR.S       PRINTLN             * Subroutine to print buffer
+    *BSR.S       PRINTLN             * Subroutine to print buffer
 *   ----------- Print Buffer -----------------------------------
 
 *   Clean Buffer
 *   ============ 
-    LEA         BUFFER,A2           * Reset A2 for buffer cleaning
-    BSR.S       CLEAN_BUFF          * Subroutine to reset buffer to all F's
+    *LEA         BUFFER,A2           * Reset A2 for buffer cleaning
+    *BSR.S       CLEAN_BUFF          * Subroutine to reset buffer to all F's
 *   ----------- Buffer Cleaned --------------------------------------------
 
 *   Is New Page Needed?
@@ -170,6 +170,7 @@ TAB             DC.B '    ',0
 
 QUIT
         END     START        ; last line of source
+
 
 *~Font name~Courier New~
 *~Font size~10~
