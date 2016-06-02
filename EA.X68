@@ -148,8 +148,7 @@ ADD_IMM: ; invalid if opmode is 2
 ADD_MODE_END:
     RTS                             ; Finish evaluating EA bits
 ADD_MODE_INVALID:
-    JSR         EA_INVALID          ; Opcode word is Invalid
-    RTS                             ; Finish evaluating EA bits
+    JSR         EA_INVALID          ; Opcode word is Invalid, then end
 *-----------------------------------
 ADD_END:
     JSR         EA_UPDATE_POINTER   ; Updates global pointer
@@ -547,8 +546,7 @@ AND_IMM: ; invalid if opmode is 2
 AND_MODE_END:
     RTS                             ; Finish evaluating EA bits
 AND_MODE_INVALID:
-    JSR         EA_INVALID          ; Opcode word is Invalid
-    RTS                             ; Finish evaluating EA bits
+    JSR         EA_INVALID          ; Opcode word is Invalid, continue to end
 *-----------------------------------
 AND_END:
     JSR         EA_UPDATE_POINTER   ; Updates global pointer
@@ -1677,8 +1675,7 @@ OR_IMM: ; invalid if opmode is 2
 OR_MODE_END:
     RTS                             ; Finish evaluating EA bits
 OR_MODE_INVALID:
-    JSR         EA_INVALID          ; Opcode word is Invalid
-    RTS
+    JSR         EA_INVALID          ; Opcode word is Invalid, continue to end
 OR_END:
     JSR         EA_UPDATE_POINTER   ; Updates global pointer
     MOVEM.L     (SP)+, A0-A5/D0-D7  ; Restore registers (except A6, global pointer to word to read)
@@ -1922,8 +1919,7 @@ SUB_IMM: ; invalid if opmode is 2
 SUB_MODE_END:
     RTS                             ; Finish evaluating EA bits
 SUB_MODE_INVALID:
-    JSR         EA_INVALID          ; Opcode word is Invalid
-    RTS
+    JSR         EA_INVALID          ; Opcode word is Invalid, continue to end
 *-----------------------------------
 SUB_END:
     JSR         EA_UPDATE_POINTER   ; Updates global pointer
