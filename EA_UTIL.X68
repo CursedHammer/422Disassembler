@@ -18,7 +18,8 @@
 *-----------------------------------------------------------
 EA_UNIMPLEMENTED:
     ADDA.L      #$00000002, A6      ; Increment past current opcode word
-    *print unimplemented message
+    LEA         EA_MSG_UNIMP, A4
+    JSR         WRITE2MEM
     RTS
 
 *---------- Invalid OpCode ---------------------------------
@@ -29,6 +30,15 @@ EA_INVALID:
     ADDA.L      #$00000002, A5      ; Increment past current opcode word
     JSR         INVALID_DATA        ; Print data error message
     RTS
+
+*---------- Data Print Unimplemented -----------------------
+* Message replacing printing data, for testing
+*-----------------------------------------------------------
+EA_PRINT_DATA:
+    LEA         EA_MSG_PRINT_DATA, A4
+    JSR         WRITE2MEM
+    RTS
+
 
 *---------- Update Global Pointer --------------------------
 * Updates global pointer based on address stored in A5
@@ -132,17 +142,38 @@ EA_PRINT_DN_JMP:
     JMP         DN_101 ; D5
     JMP         DN_110 ; D6
     JMP         DN_111 ; D7
-*print value TODO
 DN_000: ; D0
-    *MOVE.L      #DREG0, A4
-    *JSR         WRITE_LINE
-DN_001 ; D1
-DN_010 ; D2
-DN_011 ; D3
-DN_100 ; D4
-DN_101 ; D5
-DN_110 ; D6
-DN_111 ; D7
+    LEA         EA_MSG_D0, A4
+    JSR         WRITE2MEM
+    JMP         EA_PRINT_DN_END
+DN_001: ; D1
+    LEA         EA_MSG_D1, A4
+    JSR         WRITE2MEM
+    JMP         EA_PRINT_DN_END
+DN_010: ; D2
+    LEA         EA_MSG_D2, A4
+    JSR         WRITE2MEM
+    JMP         EA_PRINT_DN_END
+DN_011: ; D3
+    LEA         EA_MSG_D3, A4
+    JSR         WRITE2MEM
+    JMP         EA_PRINT_DN_END
+DN_100: ; D4
+    LEA         EA_MSG_D4, A4
+    JSR         WRITE2MEM
+    JMP         EA_PRINT_DN_END
+DN_101: ; D5
+    LEA         EA_MSG_D5, A4
+    JSR         WRITE2MEM
+    JMP         EA_PRINT_DN_END
+DN_110: ; D6
+    LEA         EA_MSG_D6, A4
+    JSR         WRITE2MEM
+    JMP         EA_PRINT_DN_END
+DN_111: ; D7
+    LEA         EA_MSG_D7, A4
+    JSR         WRITE2MEM
+    JMP         EA_PRINT_DN_END
 
 EA_PRINT_DN_END:
     RTS
@@ -164,15 +195,38 @@ AN_JMP:
     JMP         AN_101 ; A5
     JMP         AN_110 ; A6
     JMP         AN_111 ; A7
-*print value TODO
-AN_000 ; A0
-AN_001 ; A1
-AN_010 ; A2
-AN_011 ; A3
-AN_100 ; A4
-AN_101 ; A5
-AN_110 ; A6
-AN_111 ; A7
+AN_000: ; A0
+    LEA         EA_MSG_A0, A4
+    JSR         WRITE2MEM
+    JMP         EA_PRINT_AN_END
+AN_001: ; A1
+    LEA         EA_MSG_A1, A4
+    JSR         WRITE2MEM
+    JMP         EA_PRINT_AN_END
+AN_010: ; A2
+    LEA         EA_MSG_A2, A4
+    JSR         WRITE2MEM
+    JMP         EA_PRINT_AN_END
+AN_011: ; A3
+    LEA         EA_MSG_A3, A4
+    JSR         WRITE2MEM
+    JMP         EA_PRINT_AN_END
+AN_100: ; A4
+    LEA         EA_MSG_A4, A4
+    JSR         WRITE2MEM
+    JMP         EA_PRINT_AN_END
+AN_101: ; A5
+    LEA         EA_MSG_A5, A4
+    JSR         WRITE2MEM
+    JMP         EA_PRINT_AN_END
+AN_110: ; A6
+    LEA         EA_MSG_A6, A4
+    JSR         WRITE2MEM
+    JMP         EA_PRINT_AN_END
+AN_111: ; A7
+    LEA         EA_MSG_A7, A4
+    JSR         WRITE2MEM
+    JMP         EA_PRINT_AN_END
 
 EA_PRINT_AN_END:
     RTS
@@ -181,6 +235,8 @@ EA_PRINT_AN_END:
 * register value in D7
 *-----------------------------------------------------------
 EA_PRINT_IND:
+    LEA         OPAREN, A4    ; Print open parentheses
+    JSR         WRITE2MEM
     LEA         IND_JMP, A0         ; Set index '0' for jump table
     MULU        #6, D7              ; Form offset (move 6 bytes in memory for every 'JMP' command)
     JMP         0(A0, D7)           ; Jump indirect with index, i.e. jump to 'table' + displacement
@@ -193,17 +249,41 @@ IND_JMP:
     JMP         IND_101 ; (A5)
     JMP         IND_110 ; (A6)
     JMP         IND_111 ; (A7)
-*print value TODO
-IND_000 ; (A0)
-IND_001 ; (A1)
-IND_010 ; (A2)
-IND_011 ; (A3)
-IND_100 ; (A4)
-IND_101 ; (A5)
-IND_110 ; (A6)
-IND_111 ; (A7)
-
+IND_000: ; (A0)
+    LEA         EA_MSG_A0, A4
+    JSR         WRITE2MEM
+    JMP         EA_PRINT_IND_END
+IND_001: ; (A1)
+    LEA         EA_MSG_A1, A4
+    JSR         WRITE2MEM
+    JMP         EA_PRINT_IND_END
+IND_010: ; (A2)
+    LEA         EA_MSG_A2, A4
+    JSR         WRITE2MEM
+    JMP         EA_PRINT_IND_END
+IND_011: ; (A3)
+    LEA         EA_MSG_A3, A4
+    JSR         WRITE2MEM
+    JMP         EA_PRINT_IND_END
+IND_100: ; (A4)
+    LEA         EA_MSG_A4, A4
+    JSR         WRITE2MEM
+    JMP         EA_PRINT_IND_END
+IND_101: ; (A5)
+    LEA         EA_MSG_A5, A4
+    JSR         WRITE2MEM
+    JMP         EA_PRINT_IND_END
+IND_110: ; (A6)
+    LEA         EA_MSG_A6, A4
+    JSR         WRITE2MEM
+    JMP         EA_PRINT_IND_END
+IND_111: ; (A7)
+    LEA         EA_MSG_A7, A4
+    JSR         WRITE2MEM
+    JMP         EA_PRINT_IND_END
 EA_PRINT_IND_END:
+    LEA         CPAREN, A4   ; Print close parentheses
+    JSR         WRITE2MEM
     RTS
 *---------- Immediate Data ---------------------------------
 * Reads immediate data from memory and prints it, based on
@@ -216,7 +296,7 @@ EA_PRINT_IMM:
     CMP         #3, D5
     BEQ         PRINT_IMM_L         ; if L, branch
     MOVE.W      (A1), D0            ; store value in a register (todo, register tbd)
-    *print value TODO
+    JSR         EA_PRINT_DATA *print value TODO
     ADDA.L      #$00000002, A1      ; move temp pointer past word that has been read
     JMP         PRINT_IMM_END
 PRINT_IMM_L:
@@ -230,6 +310,8 @@ PRINT_IMM_END:
 * Example Description
 *-----------------------------------------------------------
 EA_PRINT_POSTINC:
+    LEA         OPAREN, A4    ; Print open parentheses
+    JSR         WRITE2MEM
     LEA         POSTINC_JMP, A0     ; Set index '0' for jump table
     MULU        #6, D7              ; Form offset (move 6 bytes in memory for every 'JMP' command)
     JMP         0(A0, D7)           ; Jump indirect with index, i.e. jump to 'table' + displacement
@@ -242,22 +324,52 @@ POSTINC_JMP:
     JMP         POSTINC_101 ; (A5)+
     JMP         POSTINC_110 ; (A6)+
     JMP         POSTINC_111 ; (A7)+
-*print value TODO
-POSTINC_000 ; (A0)+
-POSTINC_001 ; (A1)+
-POSTINC_010 ; (A2)+
-POSTINC_011 ; (A3)+
-POSTINC_100 ; (A4)+
-POSTINC_101 ; (A5)+
-POSTINC_110 ; (A6)+
-POSTINC_111 ; (A7)+
-
+POSTINC_000: ; (A0)+
+    LEA         EA_MSG_A0, A4
+    JSR         WRITE2MEM
+    JMP         EA_PRINT_PI_END
+POSTINC_001: ; (A1)+
+    LEA         EA_MSG_A1, A4
+    JSR         WRITE2MEM
+    JMP         EA_PRINT_PI_END
+POSTINC_010: ; (A2)+
+    LEA         EA_MSG_A2, A4
+    JSR         WRITE2MEM
+    JMP         EA_PRINT_PI_END
+POSTINC_011: ; (A3)+
+    LEA         EA_MSG_A3, A4
+    JSR         WRITE2MEM
+    JMP         EA_PRINT_PI_END
+POSTINC_100: ; (A4)+
+    LEA         EA_MSG_A4, A4
+    JSR         WRITE2MEM
+    JMP         EA_PRINT_PI_END
+POSTINC_101: ; (A5)+
+    LEA         EA_MSG_A5, A4
+    JSR         WRITE2MEM
+    JMP         EA_PRINT_PI_END
+POSTINC_110: ; (A6)+
+    LEA         EA_MSG_A6, A4
+    JSR         WRITE2MEM
+    JMP         EA_PRINT_PI_END
+POSTINC_111: ; (A7)+
+    LEA         EA_MSG_A7, A4
+    JSR         WRITE2MEM
+    JMP         EA_PRINT_PI_END
 EA_PRINT_PI_END:
+    LEA         CPAREN, A4   ; Print close parentheses
+    JSR         WRITE2MEM
+    LEA         PLUS, A4         ; Print plus sign
+    JSR         WRITE2MEM
     RTS
 *---------- Address Register Indirect w/ Pre Decrement -----
 * Example Description
 *-----------------------------------------------------------
 EA_PRINT_PREDEC:
+    LEA         MINUS, A4               ; Print minus sign
+    JSR         WRITE2MEM
+    LEA         OPAREN, A4              ; Print open parentheses
+    JSR         WRITE2MEM
     LEA         PREDEC_JMP, A0      ; Set index '0' for jump table
     MULU        #6, D7              ; Form offset (move 6 bytes in memory for every 'JMP' command)
     JMP         0(A0, D7)           ; Jump indirect with index, i.e. jump to 'table' + displacement
@@ -270,17 +382,43 @@ PREDEC_JMP:
     JMP         PREDEC_101 ; -(A5)
     JMP         PREDEC_110 ; -(A6)
     JMP         PREDEC_111 ; -(A7)
-*print value TODO
-PREDEC_000 ; -(A0)
-PREDEC_001 ; -(A1)
-PREDEC_010 ; -(A2)
-PREDEC_011 ; -(A3)
-PREDEC_100 ; -(A4)
-PREDEC_101 ; -(A5)
-PREDEC_110 ; -(A6)
-PREDEC_111 ; -(A7)
+
+PREDEC_000: ; -(A0)
+    LEA         EA_MSG_A0, A4
+    JSR         WRITE2MEM
+    JMP         EA_PRINT_PD_END
+PREDEC_001: ; -(A1)
+    LEA         EA_MSG_A1, A4
+    JSR         WRITE2MEM
+    JMP         EA_PRINT_PD_END
+PREDEC_010: ; -(A2)
+    LEA         EA_MSG_A2, A4
+    JSR         WRITE2MEM
+    JMP         EA_PRINT_PD_END
+PREDEC_011: ; -(A3)
+    LEA         EA_MSG_A3, A4
+    JSR         WRITE2MEM
+    JMP         EA_PRINT_PD_END
+PREDEC_100: ; -(A4)
+    LEA         EA_MSG_A4, A4
+    JSR         WRITE2MEM
+    JMP         EA_PRINT_PD_END
+PREDEC_101: ; -(A5)
+    LEA         EA_MSG_A5, A4
+    JSR         WRITE2MEM
+    JMP         EA_PRINT_PD_END
+PREDEC_110: ; -(A6)
+    LEA         EA_MSG_A6, A4
+    JSR         WRITE2MEM
+    JMP         EA_PRINT_PD_END
+PREDEC_111: ; -(A7)
+    LEA         EA_MSG_A7, A4
+    JSR         WRITE2MEM
+    JMP         EA_PRINT_PD_END
 
 EA_PRINT_PD_END:
+    LEA         CPAREN, A4   ; Print close parentheses
+    JSR         WRITE2MEM
     RTS
 *---------- Absolute Long Address --------------------------
 * Reads and prints a longword address operand, and passes
@@ -290,7 +428,7 @@ EA_PRINT_ABS_L:
     MOVEA.L     A5, A1              ; copy pointer to temp
     ADDA.L      #$00000002, A1      ; Advance temp pointer to next word
     MOVE.L      (A1), D0            ; store longword address to print TODO
-    *print value TODO
+    JSR         EA_PRINT_DATA *print value TODO
     ADDA.L      #$00000004, A1      ; move temp pointer past longword that has been read
     MOVEA.L     A1, A5              ; store new pointer location to pass back
     RTS
@@ -302,7 +440,7 @@ EA_PRINT_ABS_W:
     MOVEA.L     A5, A1              ; copy pointer to temp
     ADDA.L      #$00000002, A1      ; Advance temp pointer to next word
     MOVE.L      (A1), D0            ; store word address to print in TODO
-    *print value TODO
+    JSR         EA_PRINT_DATA *print value TODO
     ADDA.L      #$00000002, A1      ; move temp pointer past word that has been read
     MOVEA.L     A1, A5              ; store new pointer location to pass back
     RTS

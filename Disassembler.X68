@@ -59,21 +59,9 @@ ENDADDR   EQU   $5010               * Variable to hold ending address value
 
 RUNAGAIN  EQU   $6000               * Value equivalent to 'true'
 
-          ORG   $1000               * Program begins at address 1000
+START     ORG   $1000               * Program begins at address 1000
 
 *********** END DEFINITIONS **************************************************
-
-
-******************************************************************************
-*           INCLUDES                                                         *
-******************************************************************************
-
-    INCLUDE 'IO.X68'
-    INCLUDE 'OpCodes.X68'
-    INCLUDE 'EA.X68'
-    INCLUDE 'EndProgram.X68'
-
-*********** END INCLUDES *****************************************************
 
 
 ******************************************************************************
@@ -83,20 +71,27 @@ RUNAGAIN  EQU   $6000               * Value equivalent to 'true'
 *---------- START ------------------------------------------------------------
 * Begins program's logical flow. Similar to main in C/C++
 *-----------------------------------------------------------------------------
-START
     LEA         STACK,SP            * SP is stored in A7
     JSR         GET_ADDRESSES       * Runs GET_ADDRESSES and IO_WELCOME
     MOVEA.L     BEGINADDR,A6        * Assign beginning address to A6 for use
-
+    LEA         BUFFER, A2
+    JSR         CLEAN_BUFF
 LOOP
     * OC_PARSE Command doesn't work due to issues in the Opcode include
     * many errors need to be fixed. Same with EA include
-    *JSR         OC_PARSE            * Determine if there is an initial opcode match
-    JSR         INVALID_DATA
+    LEA         BUFFER, A2
+    JSR         OC_PARSE            * Determine if there is an initial opcode match
+    JSR         WRITE_ENDL
+    JSR         PRINTLN
+    LEA         BUFFER, A2
+    JSR         CLEAN_BUFF
+
     * decrement row count
     * if at 0, prompt for next page
     * else, continue
-    ADDA.L      #$00000002,A6            * Advance address to test LOOP (test only)
+
+    *JSR         INVALID_DATA
+    *ADDA.L      #$00000002,A6            * Advance address to test LOOP (test only)
 
 LOOP_CHECK
     * Changed the following code from:
@@ -129,7 +124,23 @@ END_LOOP
 *           VARIABLES AND CONSTANTS                                          *
 ******************************************************************************
 
+******************************************************************************
+*           INCLUDES                                                         *
+******************************************************************************
 
+    INCLUDE 'IO.X68'
+    INCLUDE 'OpCodes.X68'
+    INCLUDE 'EA.X68'
+    INCLUDE 'EndProgram.X68'
+    INCLUDE 'WriteBuffer.X68'
+
+    INCLUDE 'IOMessages.X68'
+    INCLUDE 'OCMessages.X68'
+    INCLUDE 'EAMessages.X68'
+    INCLUDE 'EPMessages.X68'        ; EndProgram messages
+    INCLUDE 'WBMessages.X68'        ; WriteBuffer messages
+
+*********** END INCLUDES *****************************************************
 
 *---------- Reserved Registers -----------------------------
 *   A7: stack pointer

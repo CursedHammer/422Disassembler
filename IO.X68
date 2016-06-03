@@ -19,7 +19,7 @@
 *    Make sure all hex values (nearly none)
 *    Check that ending address is less than beginning address
 *    Display full screens of data and clear
-* 
+*
 ******************************************************************************
 
 
@@ -34,7 +34,7 @@ REMAINDER EQU   $5050
 MOD       EQU   2
 
 CR        EQU   $0D
-LF        EQU   $0A 
+LF        EQU   $0A
 
 ******************************************************************************
 *           BEGIN CODE                                                       *
@@ -42,62 +42,62 @@ LF        EQU   $0A
 
 *---------- START ------------------------------------------------------------
 * Begins program's logical flow. Similar to main in C/C++
-*-----------------------------------------------------------------------------           
+*-----------------------------------------------------------------------------
 GET_ADDRESSES
     JSR         CLEARSCRN
     JSR         IO_WELCOME          * Run welcome subroutine
-            
+
 GET_FIRST_ADDRESS
     LEA         PS1,A1              * Loads message into A1
     JSR         MAKE_CHECKS         * Get address and perform checks
     CMPI.B      #1,HEXFLAG          * Does HEXFLAG = 1
     BNE         GET_FIRST_ADDRESS   * If no, get hex again
-   
+
     MOVE.L      HEXVALUE,BEGINADDR  * Copy hex value to begin
-    JSR         NEW_LINE            * Space    
+    JSR         NEW_LINE            * Space
     JSR         CLEAR               * Clear values for next hex
-    
+
 GET_SECOND_ADDRESS
     LEA         PS2,A1              * Loads message into A1
     JSR         MAKE_CHECKS         * Get address and perform checks
     CMPI.B      #1,HEXFLAG          * Does HEXFLAG = 1
     BNE         GET_SECOND_ADDRESS  * If no, get hex again
-   
+
     MOVE.L      HEXVALUE,ENDADDR    * Copy hex value to begin
-    JSR         NEW_LINE            * Space    
+    JSR         NEW_LINE            * Space
     JSR         CLEAR               * Clear values for next hex
-    
+
 CHECK_BADDR_IS_LESS_THAN_EADDR
     JSR         IS_LESSTHAN         *
     CMPI.B      #1,HEXFLAG          * Does HEXFLAG = 1
     BEQ         FINISHED            * If yes, finished
     LEA         ADR_ERR_NOTLT,A1    * Else, load error message
     BSR.W       ADDRESS_ERR
-    BSR.W       START      
+    BSR.W       START
 
 
 FINISHED
     RTS                             * Return to Disassembler
-    
+
 *---------- END - START ------------------------------------------------------
-       
-           
+
+
 ******************************************************************************
 *           SUB ROUTINES                                                     *
 ******************************************************************************
-           
+
 *---------- IO_WELCOME -------------------------------------------------------
 * Prints a welcome message
 *-----------------------------------------------------------------------------
 
-IO_WELCOME: 
+IO_WELCOME:
     LEA         INTRO,A1            * Loads message into A1
     MOVE.B      #14,D0              * Moves the Task 14 into D0
-    TRAP        #15                 * Displays Intro Message 
-      
-    JSR         NEW_LINE            * Call Subroutine        
+    TRAP        #15                 * Displays Intro Message
+
+    JSR         NEW_LINE            * Call Subroutine
     RTS                             * Return from subroutine
-        
+
 *---------- END - IO_WELCOME -------------------------------------------------
 
 
@@ -106,14 +106,14 @@ IO_WELCOME:
 *-----------------------------------------------------------------------------
 CLEAR
     CLR.L       D6                   * Clear
-    MOVE.W      #$FFFF,STR_LEN       * Clear   
-    MOVE.L      #$FFFFFFFF,HEXVALUE  * Clear  
+    MOVE.W      #$FFFF,STR_LEN       * Clear
+    MOVE.L      #$FFFFFFFF,HEXVALUE  * Clear
     MOVE.L      #$FFFFFFFF,REMAINDER * Clear
     RTS                              * Return to main to get hex
 
 *---------- END - CLEAR ------------------------------------------------------
 
-        
+
 *---------- GET_HEXSTRING ----------------------------------------------------
 * Read in the ASCII string address and verify length is <= 8.
 *-----------------------------------------------------------------------------
@@ -121,43 +121,43 @@ GET_HEXSTRING
     MOVE.B      #14,D0              * Moves the Task 14 into D0
     MOVE.W      #(PS2-PS1),D1       * The prompt string length
     TRAP        #15                 * Displays contents of A1
- 
+
     LEA         HEXSTRING,A1        * Pointer to store the sentence
     MOVE.B      #2,D0               * Set up readstring function
     TRAP        #15                 * Get string from keyboard
     MOVE.B      D1,STR_LEN          * Save length of input string
-    
+
     CMPI.B      #8,(STR_LEN)        * Is length > 8?
     BGT         BAD_LENGTH          * If yes, get hex again
-       
-    LEA         HEXSTRING,A0        * Load address for verification     
-    MOVE.B      #1,(HEXFLAG)   
+
+    LEA         HEXSTRING,A0        * Load address for verification
+    MOVE.B      #1,(HEXFLAG)
     RTS                             * Return from subroutine
-    
+
 BAD_LENGTH
     MOVE.B      #0,(HEXFLAG)        * Bad length set HEXFLAG to false
     RTS                             * Return to subroutine
-        
+
 *---------- END - GET_HEXSTRING ----------------------------------------------
 
 
 *---------- ASCII_TO_HEX -----------------------------------------------------
 * Checks to see if each character is hexadecimal
 *-----------------------------------------------------------------------------
-ASCII_TO_HEX      
-    MOVE.B      (A0)+,D3            * Move first char into D3    
+ASCII_TO_HEX
+    MOVE.B      (A0)+,D3            * Move first char into D3
     CMPI.B      #'0',D3             * Is Char equal to 0?
-    BEQ         HEXZERO            
+    BEQ         HEXZERO
     CMPI.B      #'1',D3             * Is Char equal to 1?
-    BEQ         HEXONE                   
+    BEQ         HEXONE
     CMPI.B      #'2',D3             * Is Char equal to 2?
-    BEQ         HEXTWO    
+    BEQ         HEXTWO
     CMPI.B      #'3',D3             * Is Char equal to 3?
-    BEQ         HEXTHREE    
+    BEQ         HEXTHREE
     CMPI.B      #'4',D3             * Is Char equal to 4?
-    BEQ         HEXFOUR    
+    BEQ         HEXFOUR
     CMPI.B      #'5',D3             * Is Char equal to 5?
-    BEQ         HEXFIVE    
+    BEQ         HEXFIVE
     CMPI.B      #'6',D3             * Is Char equal to 6?
     BEQ         HEXSIX
     CMPI.B      #'7',D3             * Is Char equal to 7?
@@ -167,7 +167,7 @@ ASCII_TO_HEX
     CMPI.B      #'9',D3             * Is Char equal to 9?
     BEQ         HEXNINE
     CMPI.B      #'A',D3             * Is Char equal to A?
-    BEQ         HEXA                      
+    BEQ         HEXA
     CMPI.B      #'B',D3             * Is Char equal to B?
     BEQ         HEXB
     CMPI.B      #'C',D3             * Is Char equal to C?
@@ -190,16 +190,16 @@ ASCII_TO_HEX
     BEQ         HEXE
     CMPI.B      #'f',D3             * Is Char equal to f?
     BEQ         HEXF
-    
+
 *   Value is not hex. Reset values and loop back to get hex
 *   =======================================================
-    MOVE.B      #0,HEXFLAG          * Set false    
+    MOVE.B      #0,HEXFLAG          * Set false
     BRA         CLEAR               * Clear some values
-    
-FOUND  
+
+FOUND
     SUBI.B      #1,STR_LEN          * Decrease string by one
     CMPI.B      #0,STR_LEN          * Is string = 0?
-    BNE         SHIFTLEFT           * If no, shift value left 
+    BNE         SHIFTLEFT           * If no, shift value left
     MOVE.L      D6,HEXVALUE         * If yes, save hex value
     MOVE.B      #1,HEXFLAG          * Set true
     RTS                             * Then, return to main
@@ -210,7 +210,7 @@ SHIFTLEFT
 
 HEXZERO
     ADD.L       #$0,D6              * Add value
-    BRA         FOUND               * found, decrease strlen, shift value left    
+    BRA         FOUND               * found, decrease strlen, shift value left
 HEXONE
     ADD.L       #$1,D6              * Add value
     BRA         FOUND               * found, decrease strlen, shift value left
@@ -240,7 +240,7 @@ HEXNINE
     BRA         FOUND               * found, decrease strlen, shift value left
 HEXA
     ADD.L       #$A,D6              * Add value
-    BRA         FOUND               * found, decrease strlen, shift value left    
+    BRA         FOUND               * found, decrease strlen, shift value left
 HEXB
     ADD.L       #$B,D6              * Add value
     BRA         FOUND               * found, decrease strlen, shift value left
@@ -255,13 +255,13 @@ HEXE
     BRA         FOUND               * found, decrease strlen, shift value left
 HEXF
     ADD.L       #$F,D6              * Add value
-    BRA         FOUND               * found, decrease strlen, shift value left 
-   
+    BRA         FOUND               * found, decrease strlen, shift value left
+
 *---------- END - ASCII_TO_HEX -----------------------------------------------
 
 
 *---------- IS_LESSTHAN ------------------------------------------------------
-* Check to see if the starting hex address is less than the ending hex 
+* Check to see if the starting hex address is less than the ending hex
 * address.
 *-----------------------------------------------------------------------------
 IS_LESSTHAN
@@ -282,17 +282,17 @@ LT
 *---------- IS_HEX_EVEN ------------------------------------------------------
 * Check to see if the hex value given is even.
 *-----------------------------------------------------------------------------
-IS_HEX_EVEN      
+IS_HEX_EVEN
     MOVE.W      D6,D3               * Move value to be modded into D3
     MOVE.W      #MOD,D5             * Move mod value into D5
     DIVU        D5,D3               * Divide D3 by D5
-    MOVE.B      #3,D1               * Set counter to shift value into word 
-                                    * position    
-REPEAT 
+    MOVE.B      #3,D1               * Set counter to shift value into word
+                                    * position
+REPEAT
     LSR.L       #4,D3               * Shift remainder to lower word
     DBEQ        D1,REPEAT           * UNTIL [D0] = - 1
     CLR         D1                  * Clear
-    
+
     CMP.L       #0,D3               * Is hex even?
     BNE         NOTEVEN             * No, clear and go back to get_hex
     MOVE.W      D3,REMAINDER        * Save remainder
@@ -313,18 +313,18 @@ MAKE_CHECKS
     JSR         GET_HEXSTRING       * Get string from user
     CMPI.B      #1,HEXFLAG          * Does HEXFLAG = 1
     BNE         BAD_CHECK           * If no, get hex again
-   
+
     JSR         ASCII_TO_HEX        * Convert ascii to hex
     CMPI.B      #1,HEXFLAG          * Does HEXFLAG = 1
     BNE         BAD_CHECK           * If no, get hex again
-    
+
     JSR         IS_HEX_EVEN         * Check that hex value is even
     CMPI.B      #1,HEXFLAG          * Does HEXFLAG = 1
     BNE         BAD_CHECK           * If no, get hex again
 
     RTS                             * Return from subroutine
 
-BAD_CHECK    
+BAD_CHECK
     RTS                             * Return from subroutine
 
 *---------- END - MAKE_CHECKS ------------------------------------------------
@@ -335,12 +335,12 @@ BAD_CHECK
 *-----------------------------------------------------------------------------
 PRINT_HEXVALUE
     MOVE.B      #14,D0              * Moves the Task 14 into D0
-    TRAP        #15                 * Displays contents of A1    
-    
+    TRAP        #15                 * Displays contents of A1
+
     MOVE.B      #3,D0               * Moves the Task 3 into D0
     TRAP        #15                 * Displays contents of D1
-    
-    RTS                             * Return from subroutine                                  
+
+    RTS                             * Return from subroutine
 
 *---------- END - PRINT_HEXVALUE ---------------------------------------------
 
@@ -358,7 +358,7 @@ NEW_LINE
 *---------- CLEARSCRN --------------------------------------------------------
 * Clear all output on screen
 *-----------------------------------------------------------------------------
-CLEARSCRN     
+CLEARSCRN
     MOVE.B      #11,D0              * Task 11 for clearing screen
     MOVE.W      #$FF00,D1           * FF00, Clear screen
     TRAP        #15                 * Wait for keystroke
@@ -378,7 +378,7 @@ ADDRESS_ERR
     BSR.W       CLEARSCRN           * Clear output before displaying error
     MOVE.B      #13,D0              * Moves the Task 13 into D0
     TRAP        #15                 * Displays contents of A1
-    MOVE.B      #5,D0               * Read single character from 
+    MOVE.B      #5,D0               * Read single character from
     TRAP        #15                 * The keyboard into D1.B
     RTS                             * Return from subroutine
 
@@ -393,55 +393,35 @@ INVALID_DATA
     MOVE.B      #16,D2              * Move base 16 to D2
     MOVE.B      #15,D0              * Moves Task 15 into D0
     TRAP        #15                 * Displays contents of D1
-    
+
     LEA         TAB,A1              * Load TAB to A1
     MOVE.B      #14,D0              * Moves the Task 14 into D0
     TRAP        #15                 * Displays a tab of A1
-    
+
     LEA         DATA,A1             * Load address location to A1
     MOVE.B      #14,D0              * Moves the Task 14 into D0
     TRAP        #15                 * Displays location of A1
-    
+
     LEA         TAB,A1              * Load TAB to A1
     MOVE.B      #14,D0              * Moves the Task 14 into D0
     TRAP        #15                 * Displays a tab of A1
-    
+
     LEA         DOLLAR,A1           * Load TAB to A1
     MOVE.B      #14,D0              * Moves the Task 14 into D0
     TRAP        #15                 * Displays a tab of A1
-    
+
     MOVE.W      (A6),D1             * Move the address value to D1
     MOVE.B      #16,D2              * Move base 16 to D2
     MOVE.B      #15,D0              * Moves Task 15 into D0
     TRAP        #15                 * Displays value of D1
-    
+
     LEA         ENDL,A1             * Load TAB to A1
     MOVE.B      #14,D0              * Moves the Task 14 into D0
     TRAP        #15                 * Displays a tab of A1
-    
+
     RTS                             * Return from subroutine
 
 *---------- END - INVALID_DATA -----------------------------------------------
-
-
-******************************************************************************
-*           VARIABLES AND CONSTANTS                                          *
-******************************************************************************
-
-INTRO           DC.B 'WELCOME!',CR,LF,'THIS IS A 68K DISASSEMBLER.',CR,LF,0
-PS1             DC.B 'PLEASE ENTER THE STARTING HEX ADDRESS',CR,LF,'(MAX 8 DIGITS AND MUST BE EVEN): $',0
-PS2             DC.B 'PLEASE ENTER THE ENDING HEX ADDRESS',CR,LF,'(MAX 8 DIGITS AND MUST BE EVEN): $',0
-BMESSAGE        DC.B CR,LF,'BEGINNING ADDRESS GIVEN IS: ',0
-EMESSAGE        DC.B CR,LF,'ENDING ADDRESS GIVEN IS   : ',0
-ENDL            DC.B CR,LF,0
-TAB             DC.B '    ',0
-DOLLAR          DC.B '$',0
-
-ADR_ERR_NOTLT   DC.B 'THE BEGINNING ADDRESS MUST BE LESS THAN THE ENDING ADDRESS.',CR,LF,'PRESS ANY KEY TO TRY AGAIN...',0
-
-HEXSTRING       DS.B 80             * Var for hex string
-
-DATA            DC.B 'DATA',0
 
 
 
