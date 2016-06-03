@@ -16,7 +16,7 @@
 * the ADD opcode
 *-----------------------------------------------------------
 EA_ADD:
-    MOVEM.L     A0-A5/D0-D7, -(SP)  ; Save registers (except A6, global pointer to word to read)
+    MOVEM.L     A0-A1/A3-A5/D0-D7, -(SP)  ; Save registers (except A6, global pointer to word to read)
     JSR         EA_COPY_PTR         ; Copy global pointer to A5
     JSR         EA_OPMODE_COMBO     ; opmode: D6, register: D7
     LEA         ADD_OPMODE, A0      ; Set index '0' for jump table
@@ -152,7 +152,7 @@ ADD_MODE_INVALID:
 *-----------------------------------
 ADD_END:
     JSR         EA_UPDATE_POINTER   ; Updates global pointer
-    MOVEM.L     (SP)+, A0-A5/D0-D7  ; Restore registers (except A6, global pointer to word to read)
+    MOVEM.L     (SP)+, A0-A1/A3-A5/D0-D7  ; Restore registers (except A6, global pointer to word to read)
     RTS
 
 *---------- ADDA Effective Addresses -----------------------
@@ -160,7 +160,7 @@ ADD_END:
 * the ADDA opcode
 *-----------------------------------------------------------
 EA_ADDA:
-    MOVEM.L     A0-A5/D0-D7, -(SP)  ; Save registers (except A6, global pointer to word to read)
+    MOVEM.L     A0-A1/A3-A5/D0-D7, -(SP)  ; Save registers (except A6, global pointer to word to read)
     JSR         EA_COPY_PTR         ; Copy global pointer to A5
     JSR         EA_DEFAULT_COMBO    ; Mode: D6, register: D7
     LEA         ADDA_MODE, A0       ; Set index '0' for jump table
@@ -228,7 +228,7 @@ ADDA_MODE_END:
     JSR         EA_PRINT_AN         ; Print address register
 ADDA_END:
     JSR         EA_UPDATE_POINTER   ; Update global pointer
-    MOVEM.L     (SP)+, A0-A5/D0-D7  ; Restore registers (except A6, global pointer to word to read)
+    MOVEM.L     (SP)+, A0-A1/A3-A5/D0-D7  ; Restore registers (except A6, global pointer to word to read)
     RTS
 
 *---------- ADDI Effective Addresses -----------------------
@@ -236,7 +236,7 @@ ADDA_END:
 * the ADDI opcode
 *-----------------------------------------------------------
 EA_ADDI:
-    MOVEM.L     A0-A5/D0-D7, -(SP)  ; Save registers (except A6, global pointer to word to read)
+    MOVEM.L     A0-A1/A3-A5/D0-D7, -(SP)  ; Save registers (except A6, global pointer to word to read)
     JSR         EA_COPY_PTR         ; Copy global pointer to A5
     JSR         EA_SIZE_BITS        ; get size bits in D7
 *--- Branch based on size ----------
@@ -329,14 +329,14 @@ ADDI_ABS_L:
 *-----------------------------------
 ADDI_END:
     JSR         EA_UPDATE_POINTER   ; Update global pointer
-    MOVEM.L     (SP)+, A0-A5/D0-D7  ; Restore registers (except A6, global pointer to word to read)
+    MOVEM.L     (SP)+, A0-A1/A3-A5/D0-D7  ; Restore registers (except A6, global pointer to word to read)
     RTS
 *---------- ADDQ Effective Addresses -----------------------
 * Parses and prints the effective addressing information for
 * the ADDQ opcode
 *-----------------------------------------------------------
 EA_ADDQ:
-    MOVEM.L     A0-A5/D0-D7, -(SP)  ; Save registers (except A6, global pointer to word to read)
+    MOVEM.L     A0-A1/A3-A5/D0-D7, -(SP)  ; Save registers (except A6, global pointer to word to read)
     JSR         EA_COPY_PTR         ; Copy global pointer to A5
 *--- Parse data --------------------
     MOVE.W      (A6), D1            ; Load opcode to data register 1
@@ -410,14 +410,14 @@ ADDQ_ABS_L:
 *-----------------------------------
 ADDQ_END:
     JSR         EA_UPDATE_POINTER   ; Update global pointer
-    MOVEM.L     (SP)+, A0-A5/D0-D7  ; Restore registers (except A6, global pointer to word to read)
+    MOVEM.L     (SP)+, A0-A1/A3-A5/D0-D7  ; Restore registers (except A6, global pointer to word to read)
     RTS
 *---------- AND Effective Addresses -------------------------
 * Parses and prints the effective addressing information for
 * the AND opcode
 *-----------------------------------------------------------
 EA_AND:
-    MOVEM.L     A0-A5/D0-D7, -(SP)  ; Save registers (except A6, global pointer to word to read)
+    MOVEM.L     A0-A1/A3-A5/D0-D7, -(SP)  ; Save registers (except A6, global pointer to word to read)
     JSR         EA_COPY_PTR         ; Copy global pointer to A5
     JSR         EA_OPMODE_COMBO     ; opmode: D6, register: D7
     LEA         ADD_OPMODE, A0      ; Set index '0' for jump table
@@ -550,14 +550,14 @@ AND_MODE_INVALID:
 *-----------------------------------
 AND_END:
     JSR         EA_UPDATE_POINTER   ; Updates global pointer
-    MOVEM.L     (SP)+, A0-A5/D0-D7  ; Restore registers (except A6, global pointer to word to read)
+    MOVEM.L     (SP)+, A0-A1/A3-A5/D0-D7  ; Restore registers (except A6, global pointer to word to read)
     RTS
 *---------- ASd Effective Addresses -------------------------
 * Parses and prints the effective addressing information for
 * the ASd opcode
 *-----------------------------------------------------------
 EA_ASd:
-    MOVEM.L     A0-A5/D0-D7, -(SP)  ; Save registers (except A6, global pointer to word to read)
+    MOVEM.L     A0-A1/A3-A5/D0-D7, -(SP)  ; Save registers (except A6, global pointer to word to read)
     JSR         EA_COPY_PTR         ; Copy global pointer to A5
     JSR         EA_SIZE_BITS        ; get size bits in D7
 *--- Branch based on size bits -----
@@ -654,14 +654,14 @@ ASd_MEM_ABS_L:
 *-----------------------------------
 ASd_END:
     JSR         EA_UPDATE_POINTER   ; Updates global pointer
-    MOVEM.L     (SP)+, A0-A5/D0-D7  ; Restore registers (except A6, global pointer to word to read)
+    MOVEM.L     (SP)+, A0-A1/A3-A5/D0-D7  ; Restore registers (except A6, global pointer to word to read)
     RTS
 *---------- Bcc Effective Addresses ------------------------
 * Parses and prints the effective addressing information for
 * the BCC opcode
 *-----------------------------------------------------------
 EA_Bcc:
-    MOVEM.L     A0-A5/D0-D7, -(SP)  ; Save registers (except A6, global pointer to word to read)
+    MOVEM.L     A0-A1/A3-A5/D0-D7, -(SP)  ; Save registers (except A6, global pointer to word to read)
     JSR         EA_COPY_PTR         ; Copy global pointer to A5
 *--- Parse 8-bit displacement bits ----------
     MOVE.W      (A6), D1            ; Load opcode to data register 1
@@ -716,14 +716,14 @@ BCC_DISPLAY:
     ADDA.L      D1, A4              ; add displacement to current addressing
     *print address in A4
     JSR         EA_UPDATE_POINTER   ; Updates global pointer
-    MOVEM.L     (SP)+, A0-A5/D0-D7  ; Restore registers (except A6, global pointer to word to read)
+    MOVEM.L     (SP)+, A0-A1/A3-A5/D0-D7  ; Restore registers (except A6, global pointer to word to read)
     RTS
 *---------- CLR Effective Addresses ------------------------
 * Parses and prints the effective addressing information for
 * the CLR opcode
 *-----------------------------------------------------------
 EA_CLR:
-    MOVEM.L     A0-A5/D0-D7, -(SP)  ; Save registers (except A6, global pointer to word to read)
+    MOVEM.L     A0-A1/A3-A5/D0-D7, -(SP)  ; Save registers (except A6, global pointer to word to read)
     JSR         EA_COPY_PTR         ; Copy global pointer to ASd
     JSR         EA_DEFAULT_COMBO    ; mode: D6, register: D7
     LEA         CLR_MODE, A0        ; Set index '0' for jump table
@@ -781,14 +781,14 @@ CLR_ABS_L:
 *-----------------------------------
 CLR_END:
     JSR         EA_UPDATE_POINTER   ; Updates global pointer
-    MOVEM.L     (SP)+, A0-A5/D0-D7  ; Restore registers (except A6, global pointer to word to read)
+    MOVEM.L     (SP)+, A0-A1/A3-A5/D0-D7  ; Restore registers (except A6, global pointer to word to read)
     RTS
 *---------- CMP Effective Addresses ------------------------
 * Parses and prints the effective addressing information for
 * the CMP opcode
 *-----------------------------------------------------------
 EA_CMP:
-    MOVEM.L     A0-A5/D0-D7, -(SP)  ; Save registers (except A6, global pointer to word to read)
+    MOVEM.L     A0-A1/A3-A5/D0-D7, -(SP)  ; Save registers (except A6, global pointer to word to read)
     JSR         EA_COPY_PTR         ; Copy global pointer to A5
 *--- Check validity based on mode value
     JSR         EA_DEFAULT_COMBO
@@ -851,14 +851,14 @@ CMP_MODE_END:
     JSR         EA_PRINT_DN         ; print register
 CMP_END:
     JSR         EA_UPDATE_POINTER   ; Update global pointer
-    MOVEM.L     (SP)+, A0-A5/D0-D7  ; Restore registers (except A6, global pointer to word to read)
+    MOVEM.L     (SP)+, A0-A1/A3-A5/D0-D7  ; Restore registers (except A6, global pointer to word to read)
     RTS
 *---------- DIVU.W Effective Addresses -----------------------
 * Parses and prints the effective addressing information for
 * the DIVU.W opcode
 *-----------------------------------------------------------
 EA_DIVU_W:
-    MOVEM.L     A0-A5/D0-D7, -(SP)  ; Save registers (except A6, global pointer to word to read)
+    MOVEM.L     A0-A1/A3-A5/D0-D7, -(SP)  ; Save registers (except A6, global pointer to word to read)
     JSR         EA_COPY_PTR         ; Copy global pointer to A5
     JSR         EA_DEFAULT_COMBO    ; mode: D6, register: D7
     LEA         DIVU_W_MODE, A0       ; Set index '0' for jump table
@@ -930,14 +930,14 @@ DIVU_W_DEST:
     JSR         EA_PRINT_DN         ; Print data register direct operand
 DIVU_W_END:
     JSR         EA_UPDATE_POINTER   ; Update global pointer
-    MOVEM.L     (SP)+, A0-A5/D0-D7  ; Restore registers (except A6, global pointer to word to read)
+    MOVEM.L     (SP)+, A0-A1/A3-A5/D0-D7  ; Restore registers (except A6, global pointer to word to read)
     RTS
 *---------- JSR Effective Addresses ------------------------
 * Parses and prints the effective addressing information for
 * the JSR opcode
 *-----------------------------------------------------------
 EA_JSR:
-    MOVEM.L     A0-A5/D0-D7, -(SP)  ; Save registers (except A6, global pointer to word to read)
+    MOVEM.L     A0-A1/A3-A5/D0-D7, -(SP)  ; Save registers (except A6, global pointer to word to read)
     JSR         EA_COPY_PTR         ; Copy global pointer to ASd
     JSR         EA_DEFAULT_COMBO    ; mode: D6, register: D7
     LEA         JSR_MODE, A0        ; Set index '0' for jump table
@@ -995,14 +995,14 @@ JSR_ABS_L:
 *-----------------------------------
 JSR_END:
     JSR         EA_UPDATE_POINTER   ; Updates global pointer
-    MOVEM.L     (SP)+, A0-A5/D0-D7  ; Restore registers (except A6, global pointer to word to read)
+    MOVEM.L     (SP)+, A0-A1/A3-A5/D0-D7  ; Restore registers (except A6, global pointer to word to read)
     RTS
 *---------- LEA Effective Addresses ------------------------
 * Parses and prints the effective addressing information for
 * the LEA opcode
 *-----------------------------------------------------------
 EA_LEA:
-    MOVEM.L     A0-A5/D0-D7, -(SP)  ; Save registers (except A6, global pointer to word to read)
+    MOVEM.L     A0-A1/A3-A5/D0-D7, -(SP)  ; Save registers (except A6, global pointer to word to read)
     JSR         EA_COPY_PTR         ; Copy global pointer to ASd
     JSR         EA_DEFAULT_COMBO    ; mode: D6, register: D7
     LEA         LEA_MODE, A0        ; Set index '0' for jump table
@@ -1066,14 +1066,14 @@ LEA_DEST:
     JSR         EA_PRINT_AN         ; Print address register
 LEA_END:
     JSR         EA_UPDATE_POINTER   ; Updates global pointer
-    MOVEM.L     (SP)+, A0-A5/D0-D7  ; Restore registers (except A6, global pointer to word to read)
+    MOVEM.L     (SP)+, A0-A1/A3-A5/D0-D7  ; Restore registers (except A6, global pointer to word to read)
     RTS
 *---------- LSd Effective Addresses ------------------------
 * Parses and prints the effective addressing information for
 * the LSd opcode
 *-----------------------------------------------------------
 EA_LSd:
-    MOVEM.L     A0-A5/D0-D7, -(SP)  ; Save registers (except A6, global pointer to word to read)
+    MOVEM.L     A0-A1/A3-A5/D0-D7, -(SP)  ; Save registers (except A6, global pointer to word to read)
     JSR         EA_COPY_PTR         ; Copy global pointer to A5
     JSR         EA_SIZE_BITS        ; get size bits in D7
 *--- Branch based on size bits -----
@@ -1170,14 +1170,14 @@ LSd_MEM_ABS_L:
 *-----------------------------------
 LSd_END:
     JSR         EA_UPDATE_POINTER   ; Updates global pointer
-    MOVEM.L     (SP)+, A0-A5/D0-D7  ; Restore registers (except A6, global pointer to word to read)
+    MOVEM.L     (SP)+, A0-A1/A3-A5/D0-D7  ; Restore registers (except A6, global pointer to word to read)
     RTS
 *---------- MOVE Effective Addresses -----------------------
 * Parses and prints the effective addressing information for
 * the MOVE opcode
 *-----------------------------------------------------------
 EA_MOVE:
-    MOVEM.L     A0-A5/D0-D7, -(SP)  ; Save registers (except A6, global pointer to word to read)
+    MOVEM.L     A0-A1/A3-A5/D0-D7, -(SP)  ; Save registers (except A6, global pointer to word to read)
     JSR         EA_COPY_PTR         ; Copy global pointer to ASd
 *--- Parse size bits ---------------
     MOVE.W      (A6), D5            ; Load opcode to data register 5 (for using size bits in immediate data)
@@ -1319,14 +1319,14 @@ MOVE_DST_ABS_L:
 *-----------------------------------
 MOVE_END:
     JSR         EA_UPDATE_POINTER   ; Updates global pointer
-    MOVEM.L     (SP)+, A0-A5/D0-D7  ; Restore registers (except A6, global pointer to word to read)
+    MOVEM.L     (SP)+, A0-A1/A3-A5/D0-D7  ; Restore registers (except A6, global pointer to word to read)
     RTS
 *---------- MOVEA Effective Addresses ----------------------
 * Parses and prints the effective addressing information for
 * the MOVEA opcode
 *-----------------------------------------------------------
 EA_MOVEA:
-    MOVEM.L     A0-A5/D0-D7, -(SP)  ; Save registers (except A6, global pointer to word to read)
+    MOVEM.L     A0-A1/A3-A5/D0-D7, -(SP)  ; Save registers (except A6, global pointer to word to read)
     JSR         EA_COPY_PTR         ; Copy global pointer to ASd
 *--- Parse size bits ---------------
     MOVE.W      (A6), D5            ; Load opcode to data register 5 (for using size bits in immediate data)
@@ -1417,7 +1417,7 @@ MOVEA_DESTINATION:
 *-----------------------------------
 MOVEA_END:
     JSR         EA_UPDATE_POINTER   ; Updates global pointer
-    MOVEM.L     (SP)+, A0-A5/D0-D7  ; Restore registers (except A6, global pointer to word to read)
+    MOVEM.L     (SP)+, A0-A1/A3-A5/D0-D7  ; Restore registers (except A6, global pointer to word to read)
     RTS
 *---------- MOVEM Effective Addresses ----------------------
 * Parses and prints the effective addressing information for
@@ -1432,7 +1432,7 @@ EA_MOVEM:
 * the MOVEQ opcode
 *-----------------------------------------------------------
 EA_MOVEQ:
-    MOVEM.L     A0-A5/D0-D7, -(SP)  ; Save registers (except A6, global pointer to word to read)
+    MOVEM.L     A0-A1/A3-A5/D0-D7, -(SP)  ; Save registers (except A6, global pointer to word to read)
     JSR         EA_COPY_PTR         ; Copy global pointer to A5
 *isolate data
     MOVE.W      (A6), D1            ; Load opcode to data register 1
@@ -1458,14 +1458,14 @@ MOVEQ_PRINT_DATA:
     JSR         EA_OPMODE_COMBO     ; Get register bits in D7, mode bits not used
     JSR         EA_PRINT_DN         ; Print data register
     JSR         EA_UPDATE_POINTER   ; Updates global pointer
-    MOVEM.L     (SP)+, A0-A5/D0-D7  ; Restore registers (except A6, global pointer to word to read)
+    MOVEM.L     (SP)+, A0-A1/A3-A5/D0-D7  ; Restore registers (except A6, global pointer to word to read)
     RTS
 *---------- MULS.W Effective Addresses ---------------------
 * Parses and prints the effective addressing information for
 * the MULS.W opcode
 *-----------------------------------------------------------
 EA_MULS_W:
-    MOVEM.L     A0-A5/D0-D7, -(SP)  ; Save registers (except A6, global pointer to word to read)
+    MOVEM.L     A0-A1/A3-A5/D0-D7, -(SP)  ; Save registers (except A6, global pointer to word to read)
     JSR         EA_COPY_PTR         ; Copy global pointer to A5
     JSR         EA_DEFAULT_COMBO    ; mode: D6, register: D7
     LEA         MULS_W_MODE, A0     ; Set index '0' for jump table
@@ -1537,7 +1537,7 @@ MULS_W_DEST:
     JSR         EA_PRINT_DN         ; Print data register direct operand
 MULS_W_END:
     JSR         EA_UPDATE_POINTER   ; Update global pointer
-    MOVEM.L     (SP)+, A0-A5/D0-D7  ; Restore registers (except A6, global pointer to word to read)
+    MOVEM.L     (SP)+, A0-A1/A3-A5/D0-D7  ; Restore registers (except A6, global pointer to word to read)
     RTS
 
 *---------- OR Effective Addresses -------------------------
@@ -1545,7 +1545,7 @@ MULS_W_END:
 * the OR opcode
 *-----------------------------------------------------------
 EA_OR:
-    MOVEM.L     A0-A5/D0-D7, -(SP)  ; Save registers (except A6, global pointer to word to read)
+    MOVEM.L     A0-A1/A3-A5/D0-D7, -(SP)  ; Save registers (except A6, global pointer to word to read)
     JSR         EA_COPY_PTR         ; Copy global pointer to A5
     JSR         EA_OPMODE_COMBO     ; opmode: D6, register: D7
     LEA         OR_OPMODE, A0       ; Set index '0' for jump table
@@ -1678,14 +1678,14 @@ OR_MODE_INVALID:
     JSR         EA_INVALID          ; Opcode word is Invalid, continue to end
 OR_END:
     JSR         EA_UPDATE_POINTER   ; Updates global pointer
-    MOVEM.L     (SP)+, A0-A5/D0-D7  ; Restore registers (except A6, global pointer to word to read)
+    MOVEM.L     (SP)+, A0-A1/A3-A5/D0-D7  ; Restore registers (except A6, global pointer to word to read)
     RTS
 *---------- ROd Effective Addresses ------------------------
 * Parses and prints the effective addressing information for
 * the ROd opcode
 *-----------------------------------------------------------
 EA_ROd:
-    MOVEM.L     A0-A5/D0-D7, -(SP)  ; Save registers (except A6, global pointer to word to read)
+    MOVEM.L     A0-A1/A3-A5/D0-D7, -(SP)  ; Save registers (except A6, global pointer to word to read)
     JSR         EA_COPY_PTR         ; Copy global pointer to A5
     JSR         EA_SIZE_BITS        ; get size bits in D7
 *--- Branch based on size bits -----
@@ -1782,7 +1782,7 @@ ROd_MEM_ABS_L:
 *-----------------------------------
 ROd_END:
     JSR         EA_UPDATE_POINTER   ; Updates global pointer
-    MOVEM.L     (SP)+, A0-A5/D0-D7  ; Restore registers (except A6, global pointer to word to read)
+    MOVEM.L     (SP)+, A0-A1/A3-A5/D0-D7  ; Restore registers (except A6, global pointer to word to read)
     RTS
 *---------- SUB Effective Addresses ------------------------
 * Parses and prints the effective addressing information for
@@ -1923,7 +1923,7 @@ SUB_MODE_INVALID:
 *-----------------------------------
 SUB_END:
     JSR         EA_UPDATE_POINTER   ; Updates global pointer
-    MOVEM.L     (SP)+, A0-A5/D0-D7  ; Restore registers (except A6, global pointer to word to read)
+    MOVEM.L     (SP)+, A0-A1/A3-A5/D0-D7  ; Restore registers (except A6, global pointer to word to read)
     RTS
 
 
