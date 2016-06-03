@@ -70,7 +70,7 @@ EA_DEFAULT_COMBO:
     CLR.L       D6                  ; Clear space for mode bits
     CLR.L       D7                  ; Clear space for register bits
 * Get Mode
-    MOVE.L      (A6), D1            ; Load opcode to data register 1
+    MOVE.W      (A6), D1            ; Load opcode to data register 1
     MOVE.B      #10, D2             ; Clear upper 10 bits of opcode word
     LSL.W       D2, D1              ; Perform shift (zeros shifted in)
     MOVE.B      #13, D2             ; 'Right-align' bits 3-5 to determine mode bits
@@ -94,7 +94,7 @@ EA_OPMODE_COMBO:
     CLR.L       D6                  ; Clear space for mode bits
     CLR.L       D7                  ; Clear space for register bits
 * Get Opmode
-    MOVE.L      (A6), D1            ; Load opcode to data register 1
+    MOVE.W      (A6), D1            ; Load opcode to data register 1
     MOVE.B      #7, D2              ; Clear upper 7 bits of opcode word
     LSL.W       D2, D1              ; Perform shift (zeros shifted in)
     MOVE.B      #13, D2             ; 'Right-align' bits 6-8 to determine opmode bits
@@ -114,7 +114,7 @@ EA_OPMODE_COMBO:
 *-----------------------------------------------------------
 EA_SIZE_BITS:
     CLR.L       D7
-    MOVE.L      (A6), D7            ; Load opcode to data register 1
+    MOVE.W      (A6), D7            ; Load opcode to data register 1
     MOVE.B      #8, D2              ; Clear upper 8 bits of opcode word
     LSL.W       D2, D7              ; Perform shift (zeros shifted in)
     MOVE.B      #14, D2             ; 'Right-align' bits 6-7 to determine size bits
