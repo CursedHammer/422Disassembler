@@ -77,7 +77,7 @@ EA_DEFAULT_COMBO:
     LSR.W       D2, D1              ; Perform shift (zeros shifted in)
     MOVE.B      D1, D6              ; Save mode bits to D6
 * Get Register
-    MOVE.L      (A6), D1            ; Reload opcode to data register 1
+    MOVE.W      (A6), D1            ; Reload opcode to data register 1
     MOVE.B      #13, D2             ; Clear upper 13 bits of opcode word
     LSL.W       D2, D1              ; Perform shift (zeros shifted in)
     MOVE.B      #13, D2             ; 'Right-align' bits 0-2 to determine register bits
@@ -101,7 +101,7 @@ EA_OPMODE_COMBO:
     LSR.W       D2, D1              ; Perform shift (zeros shifted in)
     MOVE.B      D1, D6              ; Save opmode bits to D6
 * Get Register
-    MOVE.L      (A6), D1            ; Reload opcode to data register 1
+    MOVE.W      (A6), D1            ; Reload opcode to data register 1
     MOVE.B      #4, D2              ; Clear upper 4 bits of opcode word
     LSL.W       D2, D1              ; Perform shift (zeros shifted in)
     MOVE.B      #13, D2             ; 'Right-align' bits 9-11 to determine register bits
