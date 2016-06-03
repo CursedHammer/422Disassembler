@@ -1181,7 +1181,7 @@ EA_MOVE:
     JSR         EA_COPY_PTR         ; Copy global pointer to ASd
 *--- Parse size bits ---------------
     MOVE.W      (A6), D5            ; Load opcode to data register 5 (for using size bits in immediate data)
-    MOVE.B      #2, D2              ; Clear upper 10 bits of opcode word
+    MOVE.B      #2, D2              ; Clear upper 2 bits of opcode word
     LSL.W       D2, D5              ; Perform shift (zeros shifted in)
     MOVE.B      #14, D2             ; 'Right-align' bits 12-13 to determine mode bits
     LSR.W       D2, D5              ; Perform shift (zeros shifted in)

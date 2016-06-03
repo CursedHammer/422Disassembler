@@ -56,7 +56,7 @@
 
 START:                  ; first instruction of program
 
-    MOVE.B D4, D1 ; = 0001 1010 0000 0100
+    *MOVE.B D4, D1 ; = 0001 1010 0000 0100
     NOP ;   = 0100 1110 0111 0001
     MOVEA.L D4, A5 ;  = 0010 1010 0100 0100
     MOVE.L D4, D5 ;  = 0010 1010 0000 0100

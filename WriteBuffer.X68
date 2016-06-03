@@ -19,7 +19,7 @@
 CR      EQU     $0D                 * Carriage return
 LF      EQU     $0A                 * Line feed
 
-BUFFER  EQU     $2000               * Buffer address for string
+BUFFER  EQU     $5070               * Buffer address for string
 RCOUNT  EQU     30                  * Counters
 
 WRITE_LINE

@@ -74,11 +74,11 @@ START     ORG   $1000               * Program begins at address 1000
     LEA         STACK,SP            * SP is stored in A7
     JSR         GET_ADDRESSES       * Runs GET_ADDRESSES and IO_WELCOME
     MOVEA.L     BEGINADDR,A6        * Assign beginning address to A6 for use
-
+    LEA         BUFFER, A2
+    JSR         CLEAN_BUFF
 LOOP
     * OC_PARSE Command doesn't work due to issues in the Opcode include
     * many errors need to be fixed. Same with EA include
-
     LEA         BUFFER, A2
     JSR         OC_PARSE            * Determine if there is an initial opcode match
     JSR         WRITE_ENDL
