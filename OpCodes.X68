@@ -11,7 +11,7 @@
 
 *----------- OC_PARSE --------------------------------------
 OC_PARSE:
-        MOVEM.L     A0-A1/A3-A6/D0-D7, -(SP) ; Save registers
+        MOVEM.L     A0-A1/A3-A5/D0-D7, -(SP) ; Save registers
         LEA         initial_table,A0 ; Index into the table
         CLR.L       D0              ; Zero it
         MOVE.W      (A6),D0         ; We'll play with it here
@@ -69,7 +69,7 @@ code1110 JSR        ROd_LSd_ASd
 code1111 JSR    OPCODE_INVALID              ;INVALID
 		 JMP        DONE
 *----------- Done ------------------------------------------
-DONE    MOVEM.L     (SP)+,  A0-A1/A3-A6/D0-D7 ; Restore registers
+DONE    MOVEM.L     (SP)+,  A0-A1/A3-A5/D0-D7 ; Restore registers
         RTS
 
 *****************************  BCCorBGTorBLE ************************************

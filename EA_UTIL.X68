@@ -145,27 +145,35 @@ EA_PRINT_DN_JMP:
 DN_000: ; D0
     LEA         EA_MSG_D0, A4
     JSR         WRITE2MEM
+    JMP         EA_PRINT_DN_END
 DN_001: ; D1
     LEA         EA_MSG_D1, A4
     JSR         WRITE2MEM
+    JMP         EA_PRINT_DN_END
 DN_010: ; D2
     LEA         EA_MSG_D2, A4
     JSR         WRITE2MEM
+    JMP         EA_PRINT_DN_END
 DN_011: ; D3
     LEA         EA_MSG_D3, A4
     JSR         WRITE2MEM
+    JMP         EA_PRINT_DN_END
 DN_100: ; D4
     LEA         EA_MSG_D4, A4
     JSR         WRITE2MEM
+    JMP         EA_PRINT_DN_END
 DN_101: ; D5
     LEA         EA_MSG_D5, A4
     JSR         WRITE2MEM
+    JMP         EA_PRINT_DN_END
 DN_110: ; D6
     LEA         EA_MSG_D6, A4
     JSR         WRITE2MEM
+    JMP         EA_PRINT_DN_END
 DN_111: ; D7
     LEA         EA_MSG_D7, A4
     JSR         WRITE2MEM
+    JMP         EA_PRINT_DN_END
 
 EA_PRINT_DN_END:
     RTS
@@ -190,27 +198,35 @@ AN_JMP:
 AN_000: ; A0
     LEA         EA_MSG_A0, A4
     JSR         WRITE2MEM
+    JMP         EA_PRINT_AN_END
 AN_001: ; A1
     LEA         EA_MSG_A1, A4
     JSR         WRITE2MEM
+    JMP         EA_PRINT_AN_END
 AN_010: ; A2
     LEA         EA_MSG_A2, A4
     JSR         WRITE2MEM
+    JMP         EA_PRINT_AN_END
 AN_011: ; A3
     LEA         EA_MSG_A3, A4
     JSR         WRITE2MEM
+    JMP         EA_PRINT_AN_END
 AN_100: ; A4
     LEA         EA_MSG_A4, A4
     JSR         WRITE2MEM
+    JMP         EA_PRINT_AN_END
 AN_101: ; A5
     LEA         EA_MSG_A5, A4
     JSR         WRITE2MEM
+    JMP         EA_PRINT_AN_END
 AN_110: ; A6
     LEA         EA_MSG_A6, A4
     JSR         WRITE2MEM
+    JMP         EA_PRINT_AN_END
 AN_111: ; A7
     LEA         EA_MSG_A7, A4
     JSR         WRITE2MEM
+    JMP         EA_PRINT_AN_END
 
 EA_PRINT_AN_END:
     RTS
@@ -236,27 +252,35 @@ IND_JMP:
 IND_000: ; (A0)
     LEA         EA_MSG_A0, A4
     JSR         WRITE2MEM
+    JMP         EA_PRINT_IND_END
 IND_001: ; (A1)
     LEA         EA_MSG_A1, A4
     JSR         WRITE2MEM
+    JMP         EA_PRINT_IND_END
 IND_010: ; (A2)
     LEA         EA_MSG_A2, A4
     JSR         WRITE2MEM
+    JMP         EA_PRINT_IND_END
 IND_011: ; (A3)
     LEA         EA_MSG_A3, A4
     JSR         WRITE2MEM
+    JMP         EA_PRINT_IND_END
 IND_100: ; (A4)
     LEA         EA_MSG_A4, A4
     JSR         WRITE2MEM
+    JMP         EA_PRINT_IND_END
 IND_101: ; (A5)
     LEA         EA_MSG_A5, A4
     JSR         WRITE2MEM
+    JMP         EA_PRINT_IND_END
 IND_110: ; (A6)
     LEA         EA_MSG_A6, A4
     JSR         WRITE2MEM
+    JMP         EA_PRINT_IND_END
 IND_111: ; (A7)
     LEA         EA_MSG_A7, A4
     JSR         WRITE2MEM
+    JMP         EA_PRINT_IND_END
 EA_PRINT_IND_END:
     LEA         CPAREN, A4   ; Print close parentheses
     JSR         WRITE2MEM
@@ -303,27 +327,35 @@ POSTINC_JMP:
 POSTINC_000: ; (A0)+
     LEA         EA_MSG_A0, A4
     JSR         WRITE2MEM
+    JMP         EA_PRINT_PI_END
 POSTINC_001: ; (A1)+
     LEA         EA_MSG_A1, A4
     JSR         WRITE2MEM
+    JMP         EA_PRINT_PI_END
 POSTINC_010: ; (A2)+
     LEA         EA_MSG_A2, A4
     JSR         WRITE2MEM
+    JMP         EA_PRINT_PI_END
 POSTINC_011: ; (A3)+
     LEA         EA_MSG_A3, A4
     JSR         WRITE2MEM
+    JMP         EA_PRINT_PI_END
 POSTINC_100: ; (A4)+
     LEA         EA_MSG_A4, A4
     JSR         WRITE2MEM
+    JMP         EA_PRINT_PI_END
 POSTINC_101: ; (A5)+
     LEA         EA_MSG_A5, A4
     JSR         WRITE2MEM
+    JMP         EA_PRINT_PI_END
 POSTINC_110: ; (A6)+
     LEA         EA_MSG_A6, A4
     JSR         WRITE2MEM
+    JMP         EA_PRINT_PI_END
 POSTINC_111: ; (A7)+
     LEA         EA_MSG_A7, A4
     JSR         WRITE2MEM
+    JMP         EA_PRINT_PI_END
 EA_PRINT_PI_END:
     LEA         CPAREN, A4   ; Print close parentheses
     JSR         WRITE2MEM
@@ -354,27 +386,35 @@ PREDEC_JMP:
 PREDEC_000: ; -(A0)
     LEA         EA_MSG_A0, A4
     JSR         WRITE2MEM
+    JMP         EA_PRINT_PD_END
 PREDEC_001: ; -(A1)
     LEA         EA_MSG_A1, A4
     JSR         WRITE2MEM
+    JMP         EA_PRINT_PD_END
 PREDEC_010: ; -(A2)
     LEA         EA_MSG_A2, A4
     JSR         WRITE2MEM
+    JMP         EA_PRINT_PD_END
 PREDEC_011: ; -(A3)
     LEA         EA_MSG_A3, A4
     JSR         WRITE2MEM
+    JMP         EA_PRINT_PD_END
 PREDEC_100: ; -(A4)
     LEA         EA_MSG_A4, A4
     JSR         WRITE2MEM
+    JMP         EA_PRINT_PD_END
 PREDEC_101: ; -(A5)
     LEA         EA_MSG_A5, A4
     JSR         WRITE2MEM
+    JMP         EA_PRINT_PD_END
 PREDEC_110: ; -(A6)
     LEA         EA_MSG_A6, A4
     JSR         WRITE2MEM
+    JMP         EA_PRINT_PD_END
 PREDEC_111: ; -(A7)
     LEA         EA_MSG_A7, A4
     JSR         WRITE2MEM
+    JMP         EA_PRINT_PD_END
 
 EA_PRINT_PD_END:
     LEA         CPAREN, A4   ; Print close parentheses
