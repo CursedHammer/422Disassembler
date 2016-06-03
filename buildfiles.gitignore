@@ -1,0 +1,4 @@
+# Ignore all .L68 and .S68, except TestCode.S68
+*.L68
+*.S68
+!TestCode.S68
