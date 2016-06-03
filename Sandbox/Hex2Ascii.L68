@@ -1,6 +1,6 @@
 00001000 Starting Address
 Assembler used: EASy68K Editor/Assembler v5.15.04
-Created On: 6/1/2016 10:12:42 PM
+Created On: 6/2/2016 6:02:12 PM
 
 00000000                             1  ******************************************************************************
 00000000                             2  * Title      : Ascii to Hex
@@ -13,88 +13,198 @@ Created On: 6/1/2016 10:12:42 PM
 00000000                             9  ******************************************************************************
 00000000                            10  *           DEFINITIONS                                                      *
 00000000                            11  ******************************************************************************
-00000000  =ABCD1234                 12  HEXVALUE    EQU   $ABCD1234
-00000000                            13  
-00000000  =0000000D                 14  CR          EQU   $0D
-00000000  =0000000A                 15  LF          EQU   $0A 
-00000000                            16  
-00001000                            17              ORG    $1000
-00001000                            18              
-00001000                            19  ******************************************************************************
-00001000                            20  *           BEGIN CODE                                                       *
-00001000                            21  ******************************************************************************
-00001000                            22  
-00001000                            23  *---------- START ------------------------------------------------------------
-00001000                            24  * Begins program's logical flow. Similar to main in C/C++
-00001000                            25  *-----------------------------------------------------------------------------
-00001000                            26  START
-00001000                            27  PRINT_HEX_AS_ASCII
-00001000  4EB9 00001016             28      JSR         IO_WELCOME          * Print welcome message  
-00001006                            29   
-00001006  223C ABCD1234             30      MOVE.L      #HEXVALUE,D1        * This is the key, move value to D1
-0000100C                            31      
-0000100C  4EB9 00001038             32      JSR         PRINT_HEXVALUE      * Display hex value
-00001012                            33      
-00001012  FFFF FFFF                 34      SIMHALT                         * Halt simulator
-00001016                            35      
-00001016                            36  *---------- END - START ------------------------------------------------------
-00001016                            37  
-00001016                            38  
-00001016                            39  *---------- IO_WELCOME -------------------------------------------------------
-00001016                            40  * Prints a welcome message
-00001016                            41  *-----------------------------------------------------------------------------
-00001016                            42  
-00001016                            43  IO_WELCOME 
-00001016  43F9 00001050             44      LEA         INTRO,A1            * Loads message into A1
-0000101C  103C 000E                 45      MOVE.B      #14,D0              * Moves the Task 14 into D0
-00001020  4E4F                      46      TRAP        #15                 * Displays Intro Message 
-00001022                            47        
-00001022  4EB9 0000102A             48      JSR         NEW_LINE            * Call Subroutine        
-00001028  4E75                      49      RTS                             * Return from subroutine
-0000102A                            50          
-0000102A                            51  *---------- END - IO_WELCOME -------------------------------------------------
-0000102A                            52  
-0000102A                            53  
-0000102A                            54  *---------- NEW_LINE ---------------------------------------------------------
-0000102A                            55  * Prints a new line
-0000102A                            56  *-----------------------------------------------------------------------------
-0000102A                            57  NEW_LINE
-0000102A  43F9 0000109B             58      LEA         ENDL,A1             * Loads message into A1
-00001030  103C 000E                 59      MOVE.B      #14,D0              * Moves the TRACK 14 into D0
-00001034  4E4F                      60      TRAP        #15                 * Displays New line
-00001036  4E75                      61      RTS                             * Return from subroutine
-00001038                            62  
-00001038                            63  *---------- END - NEW_LINE ---------------------------------------------------
-00001038                            64  
-00001038                            65  
-00001038                            66  *---------- PRINT_HEXVALUE ---------------------------------------------------
-00001038                            67  * Prints out to display whatever is in A1
-00001038                            68  *-----------------------------------------------------------------------------
-00001038                            69  PRINT_HEXVALUE
-00001038  43F9 00001084             70      LEA         ASCIIPROMPT,A1      * Load message in A1 for display
-0000103E  103C 000E                 71      MOVE.B      #14,D0              * Moves the Task 13 into D0
-00001042  4E4F                      72      TRAP        #15                 * Displays contents of A1
-00001044                            73      
-00001044  143C 0010                 74      MOVE.B      #16,D2              * Move base 16 to D2
-00001048  103C 000F                 75      MOVE.B      #15,D0              * Moves Task 15 into D0
-0000104C  4E4F                      76      TRAP        #15                 * Displays contents of D1
-0000104E                            77      
-0000104E  4E75                      78      RTS                             * Return from subroutine                                  
-00001050                            79  
-00001050                            80  *---------- END - PRINT_HEXVALUE ---------------------------------------------
-00001050                            81  
-00001050                            82  
-00001050                            83  ******************************************************************************
-00001050                            84  *           VARIABLES AND CONSTANTS                                          *
-00001050                            85  ******************************************************************************
-00001050                            86  
-00001050= 57 45 4C 43 4F 4D ...     87  INTRO           DC.B  'WELCOME!',CR,LF,'This program will convert Hex to Ascii.',CR,LF,0
-00001084= 54 68 65 20 41 53 ...     88  ASCIIPROMPT     DC.B  'The ASCII value is: 0x',0
-0000109B= 0D 0A 00                  89  ENDL            DC.B  CR,LF,0
-0000109E                            90  
-0000109E                            91  HEXSTRING       DS.B  80            * Var for hex string
-000010EE                            92  
-000010EE                            93                  END   START         * Last line of source
+00000000  =00005060                 12  ASCIIVALUE  EQU   $5060
+00000000  =00005070                 13  BUFFER      EQU   $5070             * Buffer address for string
+00000000                            14  
+00000000  =F0000000                 15  MASK8       EQU   %11110000000000000000000000000000
+00000000  =0F000000                 16  MASK7       EQU   %00001111000000000000000000000000
+00000000  =00F00000                 17  MASK6       EQU   %00000000111100000000000000000000
+00000000  =000F0000                 18  MASK5       EQU   %00000000000011110000000000000000
+00000000  =0000F000                 19  MASK4       EQU   %00000000000000001111000000000000
+00000000  =00000F00                 20  MASK3       EQU   %00000000000000000000111100000000
+00000000  =000000F0                 21  MASK2       EQU   %00000000000000000000000011110000
+00000000  =0000000F                 22  MASK1       EQU   %00000000000000000000000000001111
+00000000                            23  
+00001000                            24              ORG   $1000
+00001000                            25              
+00001000                            26  ******************************************************************************
+00001000                            27  *           BEGIN CODE                                                       *
+00001000                            28  ******************************************************************************
+00001000                            29  
+00001000                            30  *---------- START ------------------------------------------------------------
+00001000                            31  * Begins program's logical flow. Similar to main in C/C++
+00001000                            32  *-----------------------------------------------------------------------------
+00001000                            33  START
+00001000  2C3C 000000AB             34      MOVE.L      #$AB,D6             * Move parameter in for parsing        
+00001006  7E02                      35      MOVE.L      #2,D7               * Move in length
+00001008                            36      
+00001008                            37  CONVERT_TO_ASCII
+00001008  2606                      38      MOVE.L      D6,D3
+0000100A  0C07 0008                 39      CMPI.B      #8,D7
+0000100E  6700 0102                 40      BEQ         LONG_MASK
+00001012  0C07 0004                 41      CMPI.B      #4,D7
+00001016  6700 0100                 42      BEQ         WORD_MASK
+0000101A  0C07 0002                 43      CMPI.B      #2,D7
+0000101E  6700 00FE                 44      BEQ         BYTE_MASK
+00001022                            45      
+00001022                            46  *    MOVE.L      D6,D3               * Copy value for bit manipulation
+00001022                            47  *    LSR.B       #$4,D3              * Shift 4 bits
+00001022                            48  *    LEA         ASCIIVALUE,A0       * Move parameter in for parsing    
+00001022                            49  *    BSR.W       HEX_TO_ASCII        * Change Hex to Ascii
+00001022                            50  
+00001022  4EB9 00001124             51      JSR         PRINT_ASCIIVALUE    * Display hex value
+00001028                            52      
+00001028  FFFF FFFF                 53      SIMHALT                         * Halt simulator
+0000102C                            54      
+0000102C                            55  *---------- END - START ------------------------------------------------------
+0000102C                            56  
+0000102C                            57  
+0000102C                            58  *---------- HEX_TO_ASCII -----------------------------------------------------
+0000102C                            59  * Checks to see if each character is hexadecimal
+0000102C                            60  *-----------------------------------------------------------------------------
+0000102C                            61  HEX_TO_ASCII         
+0000102C  0C03 0000                 62      CMPI.B      #$0,D3              * Is Char equal to 0?
+00001030  6700 0080                 63      BEQ         ASCIIZERO            
+00001034  0C03 0001                 64      CMPI.B      #$1,D3              * Is Hex equal to 1?
+00001038  6700 007E                 65      BEQ         ASCIIONE                   
+0000103C  0C03 0002                 66      CMPI.B      #$2,D3              * Is Hex equal to 2?
+00001040  6700 007C                 67      BEQ         ASCIITWO    
+00001044  0C03 0003                 68      CMPI.B      #$3,D3              * Is Hex equal to 3?
+00001048  6700 007A                 69      BEQ         ASCIITHREE    
+0000104C  0C03 0004                 70      CMPI.B      #$4,D3              * Is Hex equal to 4?
+00001050  6700 0078                 71      BEQ         ASCIIFOUR    
+00001054  0C03 0005                 72      CMPI.B      #$5,D3              * Is Hex equal to 5?
+00001058  6700 0076                 73      BEQ         ASCIIFIVE    
+0000105C  0C03 0006                 74      CMPI.B      #$6,D3              * Is Hex equal to 6?
+00001060  6700 0074                 75      BEQ         ASCIISIX
+00001064  0C03 0007                 76      CMPI.B      #$7,D3              * Is Hex equal to 7?
+00001068  6700 0072                 77      BEQ         ASCIISEVEN
+0000106C  0C03 0008                 78      CMPI.B      #$8,D3              * Is Hex equal to 8?
+00001070  6700 0070                 79      BEQ         ASCIIEIGHT
+00001074  0C03 0009                 80      CMPI.B      #$9,D3              * Is Hex equal to 9?
+00001078  6700 006E                 81      BEQ         ASCIININE
+0000107C  0C03 000A                 82      CMPI.B      #$A,D3              * Is Hex equal to A?
+00001080  6700 006C                 83      BEQ         ASCIIA                      
+00001084  0C03 000B                 84      CMPI.B      #$B,D3              * Is Hex equal to B?
+00001088  6700 006A                 85      BEQ         ASCIIB
+0000108C  0C03 000C                 86      CMPI.B      #$C,D3              * Is Hex equal to C?
+00001090  6700 0068                 87      BEQ         ASCIIC
+00001094  0C03 000D                 88      CMPI.B      #$D,D3              * Is Hex equal to D?
+00001098  6700 0066                 89      BEQ         ASCIID
+0000109C  0C03 000E                 90      CMPI.B      #$E,D3              * Is Hex equal to E?
+000010A0  6700 0064                 91      BEQ         ASCIIE
+000010A4  0C03 000F                 92      CMPI.B      #$F,D3              * Is Hex equal to F?
+000010A8  6700 0062                 93      BEQ         ASCIIF
+000010AC                            94      
+000010AC  4E75                      95      RTS
+000010AE                            96      
+000010AE                            97  FOUND_ASCII  
+000010AE  5307                      98      SUBI.B      #1,D7               * Decrease string by one
+000010B0  4E75                      99      RTS                             * Then, return to main
+000010B2                           100  
+000010B2                           101  ASCIIZERO
+000010B2  10FC 0030                102      MOVE.B       #'0',(A0)+          * Add value
+000010B6  60F6                     103      BRA         FOUND_ASCII         * Mark hexflag true and proceed    
+000010B8                           104  ASCIIONE
+000010B8  10FC 0031                105      MOVE.B       #'1',(A0)+          * Add value
+000010BC  60F0                     106      BRA         FOUND_ASCII   * Mark hexflag true and proceed
+000010BE                           107  ASCIITWO
+000010BE  10FC 0032                108      MOVE.B       #'2',(A0)+          * Add value
+000010C2  60EA                     109      BRA         FOUND_ASCII   * Mark hexflag true and proceed
+000010C4                           110  ASCIITHREE
+000010C4  10FC 0033                111      MOVE.B      #'3',(A0)+          * Add value
+000010C8  60E4                     112      BRA         FOUND_ASCII   * Mark hexflag true and proceed
+000010CA                           113  ASCIIFOUR
+000010CA  10FC 0034                114      MOVE.B       #'4',(A0)+          * Add value
+000010CE  60DE                     115      BRA         FOUND_ASCII   * Mark hexflag true and proceed
+000010D0                           116  ASCIIFIVE
+000010D0  10FC 0035                117      MOVE.B      #'5',(A0)+          * Add value
+000010D4  60D8                     118      BRA         FOUND_ASCII   * Mark hexflag true and proceed
+000010D6                           119  ASCIISIX
+000010D6  10FC 0036                120      MOVE.B       #'6',(A0)+          * Add value
+000010DA  60D2                     121      BRA         FOUND_ASCII   * Mark hexflag true and proceed
+000010DC                           122  ASCIISEVEN
+000010DC  10FC 0037                123      MOVE.B      #'7',(A0)+          * Add value
+000010E0  60CC                     124      BRA         FOUND_ASCII   * Mark hexflag true and proceed
+000010E2                           125  ASCIIEIGHT
+000010E2  10FC 0038                126      MOVE.B      #'8',(A0)+          * Add value
+000010E6  60C6                     127      BRA         FOUND_ASCII   * Mark hexflag true and proceed
+000010E8                           128  ASCIININE
+000010E8  10FC 0039                129      MOVE.B      #'9',(A0)+          * Add value
+000010EC  60C0                     130      BRA         FOUND_ASCII   * Mark hexflag true and proceed
+000010EE                           131  ASCIIA
+000010EE  10FC 0041                132      MOVE.B      #'A',(A0)+          * Add value
+000010F2  60BA                     133      BRA         FOUND_ASCII   * Mark hexflag true and proceed    
+000010F4                           134  ASCIIB
+000010F4  10FC 0042                135      MOVE.B      #'B',(A0)+          * Add value
+000010F8  60B4                     136      BRA         FOUND_ASCII   * Mark hexflag true and proceed
+000010FA                           137  ASCIIC
+000010FA  10FC 0043                138      MOVE.B      #'C',(A0)+          * Add value
+000010FE  60AE                     139      BRA         FOUND_ASCII   * Mark hexflag true and proceed
+00001100                           140  ASCIID
+00001100  10FC 0044                141      MOVE.B      #'D',(A0)+          * Add value
+00001104  60A8                     142      BRA         FOUND_ASCII   * Mark hexflag true and proceed
+00001106                           143  ASCIIE
+00001106  10FC 0045                144      MOVE.B      #'E',(A0)+          * Add value
+0000110A  60A2                     145      BRA         FOUND_ASCII   * Mark hexflag true and proceed
+0000110C                           146  ASCIIF
+0000110C  10FC 0046                147      MOVE.B      #'F',(A0)+          * Add value
+00001110  609C                     148      BRA         FOUND_ASCII   * Mark hexflag true and proceed
+00001112                           149          
+00001112                           150  *---------- END - HEX_TO_ASCII -----------------------------------------------
+00001112                           151  
+00001112                           152  
+00001112                           153  *---------- LONG_MASK --------------------------------------------------------
+00001112                           154  * Perform the long mask and proceed
+00001112                           155  *-----------------------------------------------------------------------------
+00001112                           156  LONG_MASK
+00001112  0283 F0000000            157      ANDI.L  #MASK8,D3
+00001118                           158      
+00001118                           159  *---------- END - LONG_MASK --------------------------------------------------
+00001118                           160  
+00001118                           161  
+00001118                           162  *---------- WORD_MASK --------------------------------------------------------
+00001118                           163  * Perform the word mask and proceed
+00001118                           164  *-----------------------------------------------------------------------------
+00001118                           165  WORD_MASK
+00001118  0283 0000F000            166      ANDI.L  #MASK4,D3
+0000111E                           167      
+0000111E                           168  *---------- END - WORD_MASK --------------------------------------------------
+0000111E                           169  
+0000111E                           170  
+0000111E                           171  *---------- BYTE_MASK --------------------------------------------------------
+0000111E                           172  * Perform the byte mask and proceed
+0000111E                           173  *-----------------------------------------------------------------------------
+0000111E                           174  BYTE_MASK
+0000111E  0283 000000F0            175      ANDI.L  #MASK2,D3
+00001124                           176      
+00001124                           177  *---------- END - BYTE_MASK --------------------------------------------------
+00001124                           178  
+00001124                           179  
+00001124                           180  *---------- PRINT_ASCIIVALUE -------------------------------------------------
+00001124                           181  * Prints out to display whatever is in A1
+00001124                           182  *-----------------------------------------------------------------------------
+00001124                           183  PRINT_ASCIIVALUE
+00001124  43F9 0000113C            184      LEA         ASCIIPROMPT,A1      * Load message in A1 for display
+0000112A  103C 000E                185      MOVE.B      #14,D0              * Moves the Task 14 into D0
+0000112E  4E4F                     186      TRAP        #15                 * Displays contents of A1
+00001130                           187      
+00001130  43F8 5060                188      LEA         ASCIIVALUE,A1       * Load message in A1 for display
+00001134  103C 000E                189      MOVE.B      #14,D0              * Moves the Task 14 into D0
+00001138  4E4F                     190      TRAP        #15                 * Displays contents of A1
+0000113A                           191      
+0000113A  4E75                     192      RTS                             * Return from subroutine                                  
+0000113C                           193  
+0000113C                           194  *---------- END - PRINT_ASCIIVALUE -------------------------------------------
+0000113C                           195  
+0000113C                           196  
+0000113C                           197  ******************************************************************************
+0000113C                           198  *           VARIABLES AND CONSTANTS                                          *
+0000113C                           199  ******************************************************************************
+0000113C                           200  
+0000113C= 54 68 65 20 41 53 ...    201  ASCIIPROMPT     DC.B  'The ASCII value is: 0x',0
+00001153                           202  
+00001153                           203                  END   START         * Last line of source
 
 No errors detected
 No warnings generated
@@ -103,15 +213,38 @@ No warnings generated
 SYMBOL TABLE INFORMATION
 Symbol-name         Value
 -------------------------
-ASCIIPROMPT         1084
-CR                  D
-ENDL                109B
-HEXSTRING           109E
-HEXVALUE            ABCD1234
-INTRO               1050
-IO_WELCOME          1016
-LF                  A
-NEW_LINE            102A
-PRINT_HEXVALUE      1038
-PRINT_HEX_AS_ASCII  1000
+ASCIIA              10EE
+ASCIIB              10F4
+ASCIIC              10FA
+ASCIID              1100
+ASCIIE              1106
+ASCIIEIGHT          10E2
+ASCIIF              110C
+ASCIIFIVE           10D0
+ASCIIFOUR           10CA
+ASCIININE           10E8
+ASCIIONE            10B8
+ASCIIPROMPT         113C
+ASCIISEVEN          10DC
+ASCIISIX            10D6
+ASCIITHREE          10C4
+ASCIITWO            10BE
+ASCIIVALUE          5060
+ASCIIZERO           10B2
+BUFFER              5070
+BYTE_MASK           111E
+CONVERT_TO_ASCII    1008
+FOUND_ASCII         10AE
+HEX_TO_ASCII        102C
+LONG_MASK           1112
+MASK1               F
+MASK2               F0
+MASK3               F00
+MASK4               F000
+MASK5               F0000
+MASK6               F00000
+MASK7               F000000
+MASK8               F0000000
+PRINT_ASCIIVALUE    1124
 START               1000
+WORD_MASK           1118

@@ -9,12 +9,19 @@
 ******************************************************************************
 *           DEFINITIONS                                                      *
 ******************************************************************************
-HEXVALUE    EQU   $ABCD1234
+ASCIIVALUE  EQU   $5060
+BUFFER      EQU   $5070             * Buffer address for string
 
-CR          EQU   $0D
-LF          EQU   $0A 
+MASK8       EQU   %11110000000000000000000000000000
+MASK7       EQU   %00001111000000000000000000000000
+MASK6       EQU   %00000000111100000000000000000000
+MASK5       EQU   %00000000000011110000000000000000
+MASK4       EQU   %00000000000000001111000000000000
+MASK3       EQU   %00000000000000000000111100000000
+MASK2       EQU   %00000000000000000000000011110000
+MASK1       EQU   %00000000000000000000000000001111
 
-            ORG    $1000
+            ORG   $1000
             
 ******************************************************************************
 *           BEGIN CODE                                                       *
@@ -24,73 +31,178 @@ LF          EQU   $0A
 * Begins program's logical flow. Similar to main in C/C++
 *-----------------------------------------------------------------------------
 START
-PRINT_HEX_AS_ASCII
-    JSR         IO_WELCOME          * Print welcome message  
- 
-    MOVE.L      #HEXVALUE,D1        * This is the key, move value to D1
+    MOVE.L      #$AB,D6             * Move parameter in for parsing        
+    MOVE.L      #2,D7               * Move in length
     
-    JSR         PRINT_HEXVALUE      * Display hex value
+CONVERT_TO_ASCII
+    MOVE.L      D6,D3
+    CMPI.B      #8,D7
+    BEQ         LONG_MASK
+    CMPI.B      #4,D7
+    BEQ         WORD_MASK
+    CMPI.B      #2,D7
+    BEQ         BYTE_MASK
+    
+*    MOVE.L      D6,D3               * Copy value for bit manipulation
+*    LSR.B       #$4,D3              * Shift 4 bits
+*    LEA         ASCIIVALUE,A0       * Move parameter in for parsing    
+*    BSR.W       HEX_TO_ASCII        * Change Hex to Ascii
+
+    JSR         PRINT_ASCIIVALUE    * Display hex value
     
     SIMHALT                         * Halt simulator
     
 *---------- END - START ------------------------------------------------------
 
 
-*---------- IO_WELCOME -------------------------------------------------------
-* Prints a welcome message
+*---------- HEX_TO_ASCII -----------------------------------------------------
+* Checks to see if each character is hexadecimal
 *-----------------------------------------------------------------------------
+HEX_TO_ASCII         
+    CMPI.B      #$0,D3              * Is Char equal to 0?
+    BEQ         ASCIIZERO            
+    CMPI.B      #$1,D3              * Is Hex equal to 1?
+    BEQ         ASCIIONE                   
+    CMPI.B      #$2,D3              * Is Hex equal to 2?
+    BEQ         ASCIITWO    
+    CMPI.B      #$3,D3              * Is Hex equal to 3?
+    BEQ         ASCIITHREE    
+    CMPI.B      #$4,D3              * Is Hex equal to 4?
+    BEQ         ASCIIFOUR    
+    CMPI.B      #$5,D3              * Is Hex equal to 5?
+    BEQ         ASCIIFIVE    
+    CMPI.B      #$6,D3              * Is Hex equal to 6?
+    BEQ         ASCIISIX
+    CMPI.B      #$7,D3              * Is Hex equal to 7?
+    BEQ         ASCIISEVEN
+    CMPI.B      #$8,D3              * Is Hex equal to 8?
+    BEQ         ASCIIEIGHT
+    CMPI.B      #$9,D3              * Is Hex equal to 9?
+    BEQ         ASCIININE
+    CMPI.B      #$A,D3              * Is Hex equal to A?
+    BEQ         ASCIIA                      
+    CMPI.B      #$B,D3              * Is Hex equal to B?
+    BEQ         ASCIIB
+    CMPI.B      #$C,D3              * Is Hex equal to C?
+    BEQ         ASCIIC
+    CMPI.B      #$D,D3              * Is Hex equal to D?
+    BEQ         ASCIID
+    CMPI.B      #$E,D3              * Is Hex equal to E?
+    BEQ         ASCIIE
+    CMPI.B      #$F,D3              * Is Hex equal to F?
+    BEQ         ASCIIF
+    
+    RTS
+    
+FOUND_ASCII  
+    SUBI.B      #1,D7               * Decrease string by one
+    RTS                             * Then, return to main
 
-IO_WELCOME 
-    LEA         INTRO,A1            * Loads message into A1
-    MOVE.B      #14,D0              * Moves the Task 14 into D0
-    TRAP        #15                 * Displays Intro Message 
-      
-    JSR         NEW_LINE            * Call Subroutine        
-    RTS                             * Return from subroutine
+ASCIIZERO
+    MOVE.B       #'0',(A0)+          * Add value
+    BRA         FOUND_ASCII         * Mark hexflag true and proceed    
+ASCIIONE
+    MOVE.B       #'1',(A0)+          * Add value
+    BRA         FOUND_ASCII   * Mark hexflag true and proceed
+ASCIITWO
+    MOVE.B       #'2',(A0)+          * Add value
+    BRA         FOUND_ASCII   * Mark hexflag true and proceed
+ASCIITHREE
+    MOVE.B      #'3',(A0)+          * Add value
+    BRA         FOUND_ASCII   * Mark hexflag true and proceed
+ASCIIFOUR
+    MOVE.B       #'4',(A0)+          * Add value
+    BRA         FOUND_ASCII   * Mark hexflag true and proceed
+ASCIIFIVE
+    MOVE.B      #'5',(A0)+          * Add value
+    BRA         FOUND_ASCII   * Mark hexflag true and proceed
+ASCIISIX
+    MOVE.B       #'6',(A0)+          * Add value
+    BRA         FOUND_ASCII   * Mark hexflag true and proceed
+ASCIISEVEN
+    MOVE.B      #'7',(A0)+          * Add value
+    BRA         FOUND_ASCII   * Mark hexflag true and proceed
+ASCIIEIGHT
+    MOVE.B      #'8',(A0)+          * Add value
+    BRA         FOUND_ASCII   * Mark hexflag true and proceed
+ASCIININE
+    MOVE.B      #'9',(A0)+          * Add value
+    BRA         FOUND_ASCII   * Mark hexflag true and proceed
+ASCIIA
+    MOVE.B      #'A',(A0)+          * Add value
+    BRA         FOUND_ASCII   * Mark hexflag true and proceed    
+ASCIIB
+    MOVE.B      #'B',(A0)+          * Add value
+    BRA         FOUND_ASCII   * Mark hexflag true and proceed
+ASCIIC
+    MOVE.B      #'C',(A0)+          * Add value
+    BRA         FOUND_ASCII   * Mark hexflag true and proceed
+ASCIID
+    MOVE.B      #'D',(A0)+          * Add value
+    BRA         FOUND_ASCII   * Mark hexflag true and proceed
+ASCIIE
+    MOVE.B      #'E',(A0)+          * Add value
+    BRA         FOUND_ASCII   * Mark hexflag true and proceed
+ASCIIF
+    MOVE.B      #'F',(A0)+          * Add value
+    BRA         FOUND_ASCII   * Mark hexflag true and proceed
         
-*---------- END - IO_WELCOME -------------------------------------------------
+*---------- END - HEX_TO_ASCII -----------------------------------------------
 
 
-*---------- NEW_LINE ---------------------------------------------------------
-* Prints a new line
+*---------- LONG_MASK --------------------------------------------------------
+* Perform the long mask and proceed
 *-----------------------------------------------------------------------------
-NEW_LINE
-    LEA         ENDL,A1             * Loads message into A1
-    MOVE.B      #14,D0              * Moves the TRACK 14 into D0
-    TRAP        #15                 * Displays New line
-    RTS                             * Return from subroutine
-
-*---------- END - NEW_LINE ---------------------------------------------------
+LONG_MASK
+    ANDI.L      #MASK8,D3
+    
+*---------- END - LONG_MASK --------------------------------------------------
 
 
-*---------- PRINT_HEXVALUE ---------------------------------------------------
+*---------- WORD_MASK --------------------------------------------------------
+* Perform the word mask and proceed
+*-----------------------------------------------------------------------------
+WORD_MASK
+    ANDI.L      #MASK4,D3
+    
+*---------- END - WORD_MASK --------------------------------------------------
+
+
+*---------- BYTE_MASK --------------------------------------------------------
+* Perform the byte mask and proceed
+*-----------------------------------------------------------------------------
+BYTE_MASK
+    ANDI.L      #MASK2,D3           * Mask everything but the value wanted
+    LSR.B       #$4,D3              * Shift 4 bits
+    
+*---------- END - BYTE_MASK --------------------------------------------------
+
+
+*---------- PRINT_ASCIIVALUE -------------------------------------------------
 * Prints out to display whatever is in A1
 *-----------------------------------------------------------------------------
-PRINT_HEXVALUE
+PRINT_ASCIIVALUE
     LEA         ASCIIPROMPT,A1      * Load message in A1 for display
-    MOVE.B      #14,D0              * Moves the Task 13 into D0
+    MOVE.B      #14,D0              * Moves the Task 14 into D0
     TRAP        #15                 * Displays contents of A1
     
-    MOVE.B      #16,D2              * Move base 16 to D2
-    MOVE.B      #15,D0              * Moves Task 15 into D0
-    TRAP        #15                 * Displays contents of D1
+    LEA         ASCIIVALUE,A1       * Load message in A1 for display
+    MOVE.B      #14,D0              * Moves the Task 14 into D0
+    TRAP        #15                 * Displays contents of A1
     
     RTS                             * Return from subroutine                                  
 
-*---------- END - PRINT_HEXVALUE ---------------------------------------------
+*---------- END - PRINT_ASCIIVALUE -------------------------------------------
 
 
 ******************************************************************************
 *           VARIABLES AND CONSTANTS                                          *
 ******************************************************************************
 
-INTRO           DC.B  'WELCOME!',CR,LF,'This program will convert Hex to Ascii.',CR,LF,0
 ASCIIPROMPT     DC.B  'The ASCII value is: 0x',0
-ENDL            DC.B  CR,LF,0
-
-HEXSTRING       DS.B  80            * Var for hex string
 
                 END   START         * Last line of source
+
 
 
 *~Font name~Courier New~
