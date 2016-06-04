@@ -82,23 +82,29 @@ SKIP_WRITE
     RTS                             * Return to main
 
 WRITE_ENDL
+    CMP.L       #BUFFER, A2         * Check if buffer has been reset, a.k.a.
+                                    * invalid opcode error message was printed
+    BEQ         SKIP_ENDL
     MOVE.B      #CR,(A2)+           * Move carriage return into memory
     MOVE.B      #LF,(A2)+           * Move line feed into memory
     MOVE.B      #$00,(A2)+          * Move string terminator into memory
+SKIP_ENDL:
     RTS
 
 PRINTLN
-    LEA         BUFFER,A2           * Reset A2 to BUFFER address beginning
-    LEA         (A2),A1             * Load BUFFER address into A1
+    LEA         BUFFER,A1               * Load BUFFER address into A1
     MOVE.B      #14,D0              * Task 14, no CR or LF
     TRAP        #15                 * Display string held in BUFFER
+    JSR         CLEAN_BUFF          * Clean buffer after printing line
     RTS                             * Return to main
 
 CLEAN_BUFF
+    LEA         BUFFER, A2          * Reset buffer pointer
+CLEAN_BUFF_LOOP:
     CMPI.L      #$FFFFFFFF,(A2)     *
     BEQ         BUFFDONE            * Buffer has been cleaned
     MOVE.L      #$FFFFFFFF,(A2)+    * Fill with F's
-    BRA         CLEAN_BUFF          * Continue cleaning buffer
+    BRA         CLEAN_BUFF_LOOP     * Continue cleaning buffer
 BUFFDONE
     RTS                             * Return to main
 

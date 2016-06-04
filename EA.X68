@@ -66,10 +66,13 @@ ADD_MODE_1:
     MOVE.W      D7, D1              ; Save register value for printing dest. operand
     JSR         EA_DEFAULT_COMBO    ; Stores mode bits in D6, register bits in D7
     JSR         ADD_EVAL_EA         ; Evaluate the results of subroutine call
-    LEA         COMMA, A4        ; Print comma
+    CMP.B       #$01, D4            ; Check if EA bits were invalid
+    BEQ         ADD_MODE_1_END      ; If invalid, skip printing destination
+    LEA         COMMA, A4           ; Else, print comma
     JSR         WRITE2MEM
     MOVE.W      D1, D7              ; Return register value to D7 for use by subroutine
     JSR         EA_PRINT_DN         ; Print data register
+ADD_MODE_1_END:
     JMP         ADD_END
 *-----------------------------------
 *--- Mode 2 ------------------------
@@ -148,7 +151,9 @@ ADD_IMM: ; invalid if opmode is 2
 ADD_MODE_END:
     RTS                             ; Finish evaluating EA bits
 ADD_MODE_INVALID:
-    JSR         EA_INVALID          ; Opcode word is Invalid, then end
+    JSR         EA_INVALID          ; Opcode word is Invalid
+    MOVE.B      #$01, D4            ; Store flag to indicate invalidity, for mode 1
+    JMP         ADD_MODE_END
 *-----------------------------------
 ADD_END:
     JSR         EA_UPDATE_POINTER   ; Updates global pointer
@@ -273,7 +278,8 @@ ADDI_L:
     ADDA.L      #$00000004, A5      ; Increment A5 past operand longword
 *--- Get destination operand -------
 ADDI_GET_DEST:
-    *PRINT COMMA
+    LEA         COMMA, A4        ; Print comma
+    JSR         WRITE2MEM
     JSR         EA_DEFAULT_COMBO    ; get mode bits in D6, register bits in D7
     LEA         ADDI_MODE, A0       ; Set index '0' for jump table
     MULU        #6, D6              ; Form offset (move 6 bytes in memory for every 'JMP' command)
@@ -920,7 +926,8 @@ DIVU_W_IMM:
     JMP         DIVU_W_DEST         ; Continue with parsing destination operand
 *-----------------------------------
 DIVU_W_DEST:
-    *print COMMA
+    LEA         COMMA, A4        ; Print comma
+    JSR         WRITE2MEM
     *Get destination register
     MOVE.W      (A6), D7            ; Load word at current pointer to D1
     MOVE.B      #4, D2              ; Clear upper 4 bits of opcode word
@@ -1527,7 +1534,8 @@ MULS_W_IMM:
     JMP         MULS_W_DEST         ; Continue with parsing destination operand
 *-----------------------------------
 MULS_W_DEST:
-    *print COMMA
+    LEA         COMMA, A4        ; Print comma
+    JSR         WRITE2MEM
     *Get destination register
     MOVE.W      (A6), D7            ; Load word at current pointer to D1
     MOVE.B      #4, D2              ; Clear upper 4 bits of opcode word
@@ -1595,10 +1603,13 @@ OR_MODE_1:
     MOVE.W      D7, D1              ; Save register value for printing dest. operand
     JSR         EA_DEFAULT_COMBO    ; Stores mode bits in D6, register bits in D7
     JSR         OR_EVAL_EA          ; Evaluate the results of subroutine call
-    LEA         COMMA, A4        ; Print comma
+    CMP.B       #$01, D4            ; Check if EA bits were invalid
+    BEQ         OR_MODE_1_END       ; If invalid, skip printing destination
+    LEA         COMMA, A4           ; Else, Print comma
     JSR         WRITE2MEM
     MOVE.W      D1, D7              ; Return register value to D7 for use by subroutine
     JSR         EA_PRINT_DN         ; Print data register
+OR_MODE_1_END:
     JMP         OR_END
 *-----------------------------------
 *--- Mode 2 ------------------------
@@ -1630,8 +1641,7 @@ OR_MODE:
 *-----------------------------------
 *--- EA mode jump table options ----
 OR_MODE_000: ; Invalid: Dn
-    JSR         EA_INVALID          ; Invalid for both opmodes
-    JMP         OR_MODE_END         ; End evaluation of ea mode
+    JMP         OR_MODE_INVALID
 OR_MODE_001: ; An (invalid if opmode 2)
     CMP         #2, D0
     BEQ         OR_MODE_INVALID     ; If opmode 2, An is invalid addressing mode
@@ -1675,7 +1685,10 @@ OR_IMM: ; invalid if opmode is 2
 OR_MODE_END:
     RTS                             ; Finish evaluating EA bits
 OR_MODE_INVALID:
-    JSR         EA_INVALID          ; Opcode word is Invalid, continue to end
+    JSR         EA_INVALID          ; Opcode word is Invalid
+    MOVE.B      #$01, D4            ; Store flag to indicate invalidity, for mode 1
+    JMP         OR_MODE_END
+*-----------------------------------
 OR_END:
     JSR         EA_UPDATE_POINTER   ; Updates global pointer
     MOVEM.L     (SP)+, A0-A1/A3-A5/D0-D7  ; Restore registers (except A6, global pointer to word to read)
@@ -1789,6 +1802,8 @@ ROd_END:
 * the SUB opcode
 *-----------------------------------------------------------
 EA_SUB:
+    MOVEM.L     A0-A1/A3-A5/D0-D7, -(SP)  ; Save registers (except A6, global pointer to word to read)
+    JSR         EA_COPY_PTR
     JSR         EA_OPMODE_COMBO     ; opmode: D6, register: D7
     LEA         SUB_OPMODE, A0      ; Set index '0' for jump table
     MULU        #6, D6              ; Form offset (move 6 bytes in memory for every 'JMP' command)
@@ -1837,10 +1852,13 @@ SUB_MODE_1:
     MOVE.W      D7, D1              ; Save register value for printing dest. operand
     JSR         EA_DEFAULT_COMBO    ; Stores mode bits in D6, register bits in D7
     JSR         SUB_EVAL_EA         ; Evaluate the results of subroutine call
+    CMP.B       #$01, D4            ; Check if EA bits were invalid
+    BEQ         SUB_MODE_1_END
     LEA         COMMA, A4        ; Print comma
     JSR         WRITE2MEM
     MOVE.W      D1, D7              ; Return register value to D7 for use by subroutine
     JSR         EA_PRINT_DN         ; Print data register
+SUB_MODE_1_END:
     JMP         SUB_END
 *-----------------------------------
 *--- Mode 2 ------------------------
@@ -1919,7 +1937,9 @@ SUB_IMM: ; invalid if opmode is 2
 SUB_MODE_END:
     RTS                             ; Finish evaluating EA bits
 SUB_MODE_INVALID:
-    JSR         EA_INVALID          ; Opcode word is Invalid, continue to end
+    JSR         EA_INVALID          ; Opcode word is Invalid
+    MOVE.B      #$01, D4            ; Store flag to indicate invalidity, for mode 1
+    JMP         SUB_MODE_END
 *-----------------------------------
 SUB_END:
     JSR         EA_UPDATE_POINTER   ; Updates global pointer

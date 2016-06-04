@@ -40,10 +40,13 @@ initial_table:
         JMP         code1111
 
 code0000 JSR        ADDI_BorADDI_WorADDI_L
+         JMP        DONE
 code0001 JSR        ISMOVEB
          JMP        DONE
 code0010 JSR        MOVEA_LorMOVE_L
+         JMP        DONE
 code0011 JSR        MOVEA_WorMOVE_W
+         JMP        DONE
 code0100 JSR        NOP_MOVEM_LEA_JSR_CLR_RTS
          JMP        DONE
 code0101 JSR        ADDQ_BorADDQ_WorADDQ_L
@@ -56,7 +59,7 @@ code1000 JSR        OR_BorOR_WorOR_LorDIVU
          JMP        DONE
 code1001 JSR        SUB_BorSUB_WorSUB_L
          JMP        DONE
-code1010 JSR    OPCODE_INVALID              ;INVALID
+code1010 JSR        OPCODE_INVALID              ;INVALID
 		 JMP        DONE
 code1011 JSR        CMP_BorCMP_WorCMP_L
          JMP        DONE
@@ -66,7 +69,7 @@ code1101 JSR        ADD_BorADD_WorADD_L
          JMP        DONE
 code1110 JSR        ROd_LSd_ASd
          JMP        DONE
-code1111 JSR    OPCODE_INVALID              ;INVALID
+code1111 JSR        OPCODE_INVALID              ;INVALID
 		 JMP        DONE
 *----------- Done ------------------------------------------
 DONE    MOVEM.L     (SP)+,  A0-A1/A3-A5/D0-D7 ; Restore registers
@@ -1118,6 +1121,7 @@ ISMULSW:
         RTS
 
 ISANDB:
+        LEA    MESSAGEANDB, A4
         JSR    WRITE2MEM
         LEA    MESSAGESPACE, A4
         JSR    WRITE2MEM
@@ -1264,7 +1268,7 @@ ISCLRB:
         JSR    WRITE2MEM
         LEA    MESSAGESPACE, A4
         JSR    WRITE2MEM
-        JSR         EA_MOVEQ
+        JSR         EA_CLR
         RTS
 
 ISCLRW:
@@ -1317,7 +1321,6 @@ ISJSR:
 
 ISRTS:
         LEA         MESSAGERTS, A4
-        JSR    WRITE2MEM
         JSR    WRITE2MEM
         ADDA.L      #$00000002, A6      ; increment global pointer past current opcode word
         RTS

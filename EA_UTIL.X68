@@ -67,22 +67,24 @@ EA_COPY_PTR:
 * POST: mode bits in D6, register bits in D7
 *-----------------------------------------------------------
 EA_DEFAULT_COMBO:
+    MOVEM.L     A0-A6/D0-D5, -(SP)  ; Save registers (except D6/D7, to pass back data)
     CLR.L       D6                  ; Clear space for mode bits
     CLR.L       D7                  ; Clear space for register bits
 * Get Mode
-    MOVE.L      (A6), D1            ; Load opcode to data register 1
+    MOVE.W      (A6), D1            ; Load opcode to data register 1
     MOVE.B      #10, D2             ; Clear upper 10 bits of opcode word
     LSL.W       D2, D1              ; Perform shift (zeros shifted in)
     MOVE.B      #13, D2             ; 'Right-align' bits 3-5 to determine mode bits
     LSR.W       D2, D1              ; Perform shift (zeros shifted in)
     MOVE.B      D1, D6              ; Save mode bits to D6
 * Get Register
-    MOVE.L      (A6), D1            ; Reload opcode to data register 1
+    MOVE.W      (A6), D1            ; Reload opcode to data register 1
     MOVE.B      #13, D2             ; Clear upper 13 bits of opcode word
     LSL.W       D2, D1              ; Perform shift (zeros shifted in)
     MOVE.B      #13, D2             ; 'Right-align' bits 0-2 to determine register bits
     LSR.W       D2, D1              ; Perform shift (zeros shifted in)
     MOVE.B      D1, D7              ; Save register bits to D7
+    MOVEM.L     (SP)+, A0-A6/D0-D5  ; Restore registers (except D6/D7, to pass back data)
     RTS                             ; Return from subroutine
 
 *---------- Parse Opmode Combo ----------------------------
@@ -91,34 +93,38 @@ EA_DEFAULT_COMBO:
 * POST: opmode bits in D6, register bits in D7
 *-----------------------------------------------------------
 EA_OPMODE_COMBO:
+    MOVEM.L     A0-A6/D0-D5, -(SP)  ; Save registers (except D6/D7, to pass back data)
     CLR.L       D6                  ; Clear space for mode bits
     CLR.L       D7                  ; Clear space for register bits
 * Get Opmode
-    MOVE.L      (A6), D1            ; Load opcode to data register 1
+    MOVE.W      (A6), D1            ; Load opcode to data register 1
     MOVE.B      #7, D2              ; Clear upper 7 bits of opcode word
     LSL.W       D2, D1              ; Perform shift (zeros shifted in)
     MOVE.B      #13, D2             ; 'Right-align' bits 6-8 to determine opmode bits
     LSR.W       D2, D1              ; Perform shift (zeros shifted in)
     MOVE.B      D1, D6              ; Save opmode bits to D6
 * Get Register
-    MOVE.L      (A6), D1            ; Reload opcode to data register 1
+    MOVE.W      (A6), D1            ; Reload opcode to data register 1
     MOVE.B      #4, D2              ; Clear upper 4 bits of opcode word
     LSL.W       D2, D1              ; Perform shift (zeros shifted in)
     MOVE.B      #13, D2             ; 'Right-align' bits 9-11 to determine register bits
     LSR.W       D2, D1              ; Perform shift (zeros shifted in)
     MOVE.B      D1, D7              ; Save register bits to D7
+    MOVEM.L     (SP)+, A0-A6/D0-D5  ; Restore registers (except D6/D7, to pass back data)
     RTS                             ; Return from subroutine
 
 *---------- Parse Size bits --------------------------------
 * Stores the size bits 6-7 of opcode word in D7
 *-----------------------------------------------------------
 EA_SIZE_BITS:
+    MOVEM.L     A0-A6/D0-D6, -(SP)  ; Save registers (except D7, to pass back data)
     CLR.L       D7
-    MOVE.L      (A6), D7            ; Load opcode to data register 1
+    MOVE.W      (A6), D7            ; Load opcode to data register 1
     MOVE.B      #8, D2              ; Clear upper 8 bits of opcode word
     LSL.W       D2, D7              ; Perform shift (zeros shifted in)
     MOVE.B      #14, D2             ; 'Right-align' bits 6-7 to determine size bits
     LSR.W       D2, D7              ; Perform shift (zeros shifted in)
+    MOVEM.L     (SP)+, A0-A6/D0-D6  ; Restore registers (except D7, to pass back data)
     RTS
 
 *-----------------------------------------------------------

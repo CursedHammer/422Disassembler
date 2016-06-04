@@ -389,6 +389,7 @@ ADDRESS_ERR
 * Invalid data to print out to the user
 *-----------------------------------------------------------------------------
 INVALID_DATA
+    JSR         CLEAN_BUFF          * Clean the buffer
     MOVE.L      A6,D1               * Move the address location to D1
     MOVE.B      #16,D2              * Move base 16 to D2
     MOVE.B      #15,D0              * Moves Task 15 into D0
