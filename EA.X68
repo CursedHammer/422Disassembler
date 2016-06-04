@@ -1641,8 +1641,7 @@ OR_MODE:
 *-----------------------------------
 *--- EA mode jump table options ----
 OR_MODE_000: ; Invalid: Dn
-    JSR         EA_INVALID          ; Invalid for both opmodes
-    JMP         OR_MODE_END         ; End evaluation of ea mode
+    JMP         OR_MODE_INVALID
 OR_MODE_001: ; An (invalid if opmode 2)
     CMP         #2, D0
     BEQ         OR_MODE_INVALID     ; If opmode 2, An is invalid addressing mode
