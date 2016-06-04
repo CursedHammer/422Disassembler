@@ -83,7 +83,6 @@ LOOP
     JSR         OC_PARSE            * Determine if there is an initial opcode match
     JSR         WRITE_ENDL
     JSR         PRINTLN
-    LEA         BUFFER, A2
     JSR         CLEAN_BUFF
 
     * decrement row count
@@ -131,14 +130,10 @@ END_LOOP
     INCLUDE 'IO.X68'
     INCLUDE 'OpCodes.X68'
     INCLUDE 'EA.X68'
-    INCLUDE 'EndProgram.X68'
-    INCLUDE 'WriteBuffer.X68'
 
     INCLUDE 'IOMessages.X68'
     INCLUDE 'OCMessages.X68'
     INCLUDE 'EAMessages.X68'
-    INCLUDE 'EPMessages.X68'        ; EndProgram messages
-    INCLUDE 'WBMessages.X68'        ; WriteBuffer messages
 
 *********** END INCLUDES *****************************************************
 
