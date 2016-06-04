@@ -77,8 +77,6 @@ START     ORG   $1000               * Program begins at address 1000
     LEA         BUFFER, A2
     JSR         CLEAN_BUFF
 LOOP
-    * OC_PARSE Command doesn't work due to issues in the Opcode include
-    * many errors need to be fixed. Same with EA include
     LEA         BUFFER, A2
     JSR         OC_PARSE            * Determine if there is an initial opcode match
     JSR         WRITE_ENDL
@@ -93,11 +91,6 @@ LOOP
     *ADDA.L      #$00000002,A6            * Advance address to test LOOP (test only)
 
 LOOP_CHECK
-    * Changed the following code from:
-    * CMPA        A6, ENDADDR
-    * to:
-    * CMPA      (ENDADDR),A6
-    * When using the CMPA, destination must be an address so A6
     CMPA.L      ENDADDR,A6          * Is pointer at end of address range?
 
     BGT         END_LOOP            * If yes, END_LOOP
