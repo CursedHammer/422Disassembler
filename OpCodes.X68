@@ -1267,7 +1267,7 @@ ISCLRB:
         JSR    WRITE2MEM
         LEA    MESSAGESPACE, A4
         JSR    WRITE2MEM
-        JSR         EA_MOVEQ
+        JSR         EA_CLR
         RTS
 
 ISCLRW:
@@ -1320,7 +1320,6 @@ ISJSR:
 
 ISRTS:
         LEA         MESSAGERTS, A4
-        JSR    WRITE2MEM
         JSR    WRITE2MEM
         ADDA.L      #$00000002, A6      ; increment global pointer past current opcode word
         RTS
