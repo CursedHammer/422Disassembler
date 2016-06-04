@@ -16,7 +16,7 @@
 *    Write end function to ask user if they are done
 *    Make sure addresses are even
 *    ASCII to Hex
-*    Make sure all hex values (nearly none)
+*    Make sure all hex values
 *    Check that ending address is less than beginning address
 *    Display full screens of data and clear
 *
@@ -85,14 +85,12 @@ GET_SECOND_ADDRESS
     JSR         CLEAR               * Clear values for next hex
 
 CHECK_BADDR_IS_LESS_THAN_EADDR
-    JSR         IS_LESSTHAN         *
+    JSR         IS_LESSTHAN         * Subroutine to verigy baddr < eaddr
     CMPI.B      #1,HEXFLAG          * Does HEXFLAG = 1
     BEQ         FINISHED            * If yes, finished
     LEA         ADR_ERR_NOTLT,A1    * Else, load error message
-    BSR.W       ADDRESS_ERR
-    BSR.W       START
-
-
+    BSR.W       ADDRESS_ERR         * Subroutine if address error
+    
 FINISHED
     RTS                             * Return to Disassembler
 
@@ -324,7 +322,7 @@ NOTEVEN
 
 
 *---------- MAKE_CHECKS ------------------------------------------------------
-* Prints a new line
+* Checks that the given Ascii string is hex and is even
 *-----------------------------------------------------------------------------
 MAKE_CHECKS
     JSR         GET_HEXSTRING       * Get string from user
@@ -346,20 +344,6 @@ BAD_CHECK
 
 *---------- END - MAKE_CHECKS ------------------------------------------------
 
-
-*---------- PRINT_HEXVALUE ---------------------------------------------------
-* Prints out to display whatever is in A1
-*-----------------------------------------------------------------------------
-PRINT_HEXVALUE
-    MOVE.B      #14,D0              * Moves the Task 14 into D0
-    TRAP        #15                 * Displays contents of A1
-
-    MOVE.B      #3,D0               * Moves the Task 3 into D0
-    TRAP        #15                 * Displays contents of D1
-
-    RTS                             * Return from subroutine
-
-*---------- END - PRINT_HEXVALUE ---------------------------------------------
 
 *---------- NEW_LINE ---------------------------------------------------------
 * Prints a new line
@@ -389,7 +373,7 @@ CLEARSCRN
 ******************************************************************************
 
 *---------- ADDRESS_ERR ------------------------------------------------------
-* Clear all output on screen
+* Clear all output on screen and displays the error message
 *-----------------------------------------------------------------------------
 ADDRESS_ERR
     BSR.W       CLEARSCRN           * Clear output before displaying error
@@ -568,53 +552,53 @@ FOUND_ASCII
     RTS                             * Then, return to main
 
 ASCIIZERO
-    MOVE.B       #'0',D3          * Add value
-    BRA         FOUND_ASCII         * Mark hexflag true and proceed
+    MOVE.B       #'0',D3            * Copy value to D3
+    BRA         FOUND_ASCII         * Found ascii proceed and return
 ASCIIONE
-    MOVE.B       #'1',D3          * Add value
-    BRA         FOUND_ASCII   * Mark hexflag true and proceed
+    MOVE.B       #'1',D3            * Copy value to D3
+    BRA         FOUND_ASCII         * Found ascii proceed and return
 ASCIITWO
-    MOVE.B       #'2',D3          * Add value
-    BRA         FOUND_ASCII   * Mark hexflag true and proceed
+    MOVE.B       #'2',D3            * Copy value to D3Add value
+    BRA         FOUND_ASCII         * Found ascii proceed and return
 ASCIITHREE
-    MOVE.B      #'3',D3          * Add value
-    BRA         FOUND_ASCII   * Mark hexflag true and proceed
+    MOVE.B      #'3',D3             * Copy value to D3
+    BRA         FOUND_ASCII         * Found ascii proceed and return
 ASCIIFOUR
-    MOVE.B       #'4',D3          * Add value
-    BRA         FOUND_ASCII   * Mark hexflag true and proceed
+    MOVE.B       #'4',D3            * Copy value to D3
+    BRA         FOUND_ASCII         * Found ascii proceed and return
 ASCIIFIVE
-    MOVE.B      #'5',D3          * Add value
-    BRA         FOUND_ASCII   * Mark hexflag true and proceed
+    MOVE.B      #'5',D3             * Copy value to D3
+    BRA         FOUND_ASCII         * Found ascii proceed and return
 ASCIISIX
-    MOVE.B       #'6',D3          * Add value
-    BRA         FOUND_ASCII   * Mark hexflag true and proceed
+    MOVE.B       #'6',D3            * Copy value to D3
+    BRA         FOUND_ASCII         * Found ascii proceed and return
 ASCIISEVEN
-    MOVE.B      #'7',D3          * Add value
-    BRA         FOUND_ASCII   * Mark hexflag true and proceed
+    MOVE.B      #'7',D3             * Copy value to D3
+    BRA         FOUND_ASCII         * Found ascii proceed and return
 ASCIIEIGHT
-    MOVE.B      #'8',D3          * Add value
-    BRA         FOUND_ASCII   * Mark hexflag true and proceed
+    MOVE.B      #'8',D3             * Copy value to D3
+    BRA         FOUND_ASCII         * Found ascii proceed and return
 ASCIININE
-    MOVE.B      #'9',D3        * Add value
-    BRA         FOUND_ASCII   * Mark hexflag true and proceed
+    MOVE.B      #'9',D3             * Copy value to D3
+    BRA         FOUND_ASCII         * Found ascii proceed and return
 ASCIIA
-    MOVE.B      #'A',D3
-    BRA         FOUND_ASCII   * Mark hexflag true and proceed
+    MOVE.B      #'A',D3             * Copy value to D3
+    BRA         FOUND_ASCII         * Found ascii proceed and return
 ASCIIB
-    MOVE.B      #'B',D3          * Add value
-    BRA         FOUND_ASCII   * Mark hexflag true and proceed
+    MOVE.B      #'B',D3             * Copy value to D3
+    BRA         FOUND_ASCII         * Found ascii proceed and return
 ASCIIC
-    MOVE.B      #'C',D3          * Add value
-    BRA         FOUND_ASCII   * Mark hexflag true and proceed
+    MOVE.B      #'C',D3             * Copy value to D3
+    BRA         FOUND_ASCII         * Found ascii proceed and return
 ASCIID
-    MOVE.B      #'D',D3          * Add value
-    BRA         FOUND_ASCII   * Mark hexflag true and proceed
+    MOVE.B      #'D',D3             * Copy value to D3
+    BRA         FOUND_ASCII         * Found ascii proceed and return
 ASCIIE
-    MOVE.B      #'E',D3          * Add value
-    BRA         FOUND_ASCII   * Mark hexflag true and proceed
+    MOVE.B      #'E',D3             * Copy value to D3
+    BRA         FOUND_ASCII         * Found ascii proceed and return
 ASCIIF
-    MOVE.B      #'F',D3          * Add value
-    BRA         FOUND_ASCII   * Mark hexflag true and proceed
+    MOVE.B      #'F',D3             * Copy value to D3
+    BRA         FOUND_ASCII         * Found ascii proceed and return
 
 *---------- END - HEX_TO_ASCII -----------------------------------------------
 
@@ -623,8 +607,8 @@ ASCIIF
 * Perform the long mask and proceed
 *-----------------------------------------------------------------------------
 LONG_MASK
-    CMPI.B      #8,D7
-    BLT         SKIP_LONG
+    CMPI.B      #8,D7               * Is D7 < 8
+    BLT         SKIP_LONG           * If yes, skip LONG_MASK
 
     MOVE.L      D6,D3               * Reset D3 for next 4 bits
     ANDI.L      #MASK8,D3           * Mask everything but the 4 bits wanted
@@ -633,7 +617,7 @@ LONG_MASK
     LSR.L       #$8,D3              * Shift 8 bits
     LSR.L       #$4,D3              * Shift 4 bits
     BSR.W       HEX_TO_ASCII        * Store hex as ascii value in A0
-    MOVE.B      D3,(A2)+            *
+    MOVE.B      D3,(A2)+            * Move value to A2 pointer
 
     MOVE.L      D6,D3               * Reset D3 for next 4 bits
     ANDI.L      #MASK7,D3           * Mask everything but the 4 bits wanted
@@ -641,7 +625,7 @@ LONG_MASK
     LSR.L       #$8,D3              * Shift 8 bits
     LSR.L       #$8,D3              * Shift 8 bits
     BSR.W       HEX_TO_ASCII        * Store hex as ascii value in A0
-    MOVE.B      D3,(A2)+            *
+    MOVE.B      D3,(A2)+            * Move value to A2 pointer
 
     MOVE.L      D6,D3               * Reset D3 for next 4 bits
     ANDI.L      #MASK6,D3           * Mask everything but the 4 bits wanted
@@ -649,19 +633,19 @@ LONG_MASK
     LSR.L       #$8,D3              * Shift 8 bits
     LSR.L       #$4,D3              * Shift 4 bits
     BSR.W       HEX_TO_ASCII        * Store hex as ascii value in A0
-    MOVE.B      D3,(A2)+            *
+    MOVE.B      D3,(A2)+            * Move value to A2 pointer
 
     MOVE.L      D6,D3               * Reset D3 for next 4 bits
     ANDI.L      #MASK5,D3           * Mask everything but the 4 bits wanted
     LSR.L       #$8,D3              * Shift 8 bits
     LSR.L       #$8,D3              * Shift 8 bits
     BSR.W       HEX_TO_ASCII        * Store hex as ascii value in A0
-    MOVE.B      D3,(A2)+            *
+    MOVE.B      D3,(A2)+            * Move value to A2 pointer
 
-    RTS
+    RTS                             * Return program control
 
 SKIP_LONG
-    RTS
+    RTS                             * Return program control
 
 *---------- END - LONG_MASK --------------------------------------------------
 
@@ -670,26 +654,26 @@ SKIP_LONG
 * Perform the word mask and proceed
 *-----------------------------------------------------------------------------
 WORD_MASK
-    CMPI.B      #4,D7
-    BLT         SKIP_WORD
+    CMPI.B      #4,D7               * Is D7 < 4
+    BLT         SKIP_WORD           * If yes, skip WORD_MASK
 
     MOVE.L      D6,D3               * Reset D3 for next 4 bits
     ANDI.L      #MASK4,D3           * Mask everything but the 4 bits wanted
     LSR.W       #$8,D3              * Shift 4 bits
     LSR.W       #$4,D3              * Shift 4 bits
     BSR.W       HEX_TO_ASCII        * Store hex as ascii value in A0
-    MOVE.B      D3,(A2)+            *
+    MOVE.B      D3,(A2)+            * Move value to A2 pointer
 
     MOVE.L      D6,D3               * Reset D3 for next 4 bits
     ANDI.L      #MASK3,D3           * Mask everything but the 4 bits wanted
     LSR.W       #$8,D3              * Shift 8 bits
     BSR.W       HEX_TO_ASCII        * Store hex as ascii value in A0
-    MOVE.B      D3,(A2)+            *
+    MOVE.B      D3,(A2)+            * Move value to A2 pointer
 
-    RTS
+    RTS                             * Return program control
 
 SKIP_WORD
-    RTS
+    RTS                             * Return program control
 
 *---------- END - WORD_MASK --------------------------------------------------
 
@@ -702,17 +686,19 @@ BYTE_MASK
     ANDI.L      #MASK2,D3           * Mask everything but the 4 bits wanted
     LSR.B       #$4,D3              * Shift 4 bits
     BSR.W       HEX_TO_ASCII        * Store hex as ascii value in A0
-    MOVE.B      D3,(A2)+            *
+    MOVE.B      D3,(A2)+            * Move value to A2 pointer
 
     MOVE.L      D6,D3               * Reset D3 for next 4 bits
     ANDI.L      #MASK1,D3           * Mask everything but the 4 bits wanted
     BSR.W       HEX_TO_ASCII        * Store hex as ascii value in A0
-    MOVE.B      D3,(A2)+            *
-    RTS
+    MOVE.B      D3,(A2)+            * Move value to A2 pointer
+    
+    RTS                             * Return program control
 
 *---------- END - BYTE_MASK --------------------------------------------------
 
 *********** END - END PROGRAM SUBROUTINES ************************************
+
 
 
 
