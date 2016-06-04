@@ -273,7 +273,8 @@ ADDI_L:
     ADDA.L      #$00000004, A5      ; Increment A5 past operand longword
 *--- Get destination operand -------
 ADDI_GET_DEST:
-    *PRINT COMMA
+    LEA         COMMA, A4        ; Print comma
+    JSR         WRITE2MEM
     JSR         EA_DEFAULT_COMBO    ; get mode bits in D6, register bits in D7
     LEA         ADDI_MODE, A0       ; Set index '0' for jump table
     MULU        #6, D6              ; Form offset (move 6 bytes in memory for every 'JMP' command)
@@ -920,7 +921,8 @@ DIVU_W_IMM:
     JMP         DIVU_W_DEST         ; Continue with parsing destination operand
 *-----------------------------------
 DIVU_W_DEST:
-    *print COMMA
+    LEA         COMMA, A4        ; Print comma
+    JSR         WRITE2MEM
     *Get destination register
     MOVE.W      (A6), D7            ; Load word at current pointer to D1
     MOVE.B      #4, D2              ; Clear upper 4 bits of opcode word
@@ -1527,7 +1529,8 @@ MULS_W_IMM:
     JMP         MULS_W_DEST         ; Continue with parsing destination operand
 *-----------------------------------
 MULS_W_DEST:
-    *print COMMA
+    LEA         COMMA, A4        ; Print comma
+    JSR         WRITE2MEM
     *Get destination register
     MOVE.W      (A6), D7            ; Load word at current pointer to D1
     MOVE.B      #4, D2              ; Clear upper 4 bits of opcode word
