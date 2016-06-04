@@ -1789,6 +1789,8 @@ ROd_END:
 * the SUB opcode
 *-----------------------------------------------------------
 EA_SUB:
+    MOVEM.L     A0-A1/A3-A5/D0-D7, -(SP)  ; Save registers (except A6, global pointer to word to read)
+    JSR         EA_COPY_PTR
     JSR         EA_OPMODE_COMBO     ; opmode: D6, register: D7
     LEA         SUB_OPMODE, A0      ; Set index '0' for jump table
     MULU        #6, D6              ; Form offset (move 6 bytes in memory for every 'JMP' command)
