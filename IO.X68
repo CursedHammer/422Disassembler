@@ -36,6 +36,13 @@ MOD       EQU   2
 CR        EQU   $0D
 LF        EQU   $0A
 
+* For buffer code
+BUFFER  EQU     $5070               * Buffer address for string
+
+* For End Program code
+UPYES     EQU   'Y'
+LOWYES    EQU   'y'
+
 ******************************************************************************
 *           BEGIN CODE                                                       *
 ******************************************************************************
@@ -389,7 +396,6 @@ ADDRESS_ERR
 * Invalid data to print out to the user
 *-----------------------------------------------------------------------------
 INVALID_DATA
-    JSR         CLEAN_BUFF          * Clean the buffer
     MOVE.L      A6,D1               * Move the address location to D1
     MOVE.B      #16,D2              * Move base 16 to D2
     MOVE.B      #15,D0              * Moves Task 15 into D0
@@ -424,9 +430,82 @@ INVALID_DATA
 
 *---------- END - INVALID_DATA -----------------------------------------------
 
+******************************************************************************
+*           BUFFER SUBROUTINES                                               *
+******************************************************************************
 
+WRITE2MEM
+    CMP.B       #$00,(A4)           * Check if byte is string terminator
+    BEQ         SKIP_WRITE          * If yes, skip write and return
+    MOVE.B      (A4)+,(A2)+         * If no, write byte to memory
+    BRA         WRITE2MEM           * Keep writing, not end of string
+SKIP_WRITE
+    MOVEA.L     #$00000000,A4       * Clean up A4
+    RTS                             * Return to main
 
+WRITE_ENDL
+    MOVE.B      #CR,(A2)+           * Move carriage return into memory
+    MOVE.B      #LF,(A2)+           * Move line feed into memory
+    MOVE.B      #$00,(A2)+          * Move string terminator into memory
+    RTS
 
+PRINTLN
+    LEA         BUFFER,A1               * Load BUFFER address into A1
+    MOVE.B      #14,D0              * Task 14, no CR or LF
+    TRAP        #15                 * Display string held in BUFFER
+    RTS                             * Return to main
+
+CLEAN_BUFF
+    LEA         BUFFER, A2          * Reset buffer pointer
+CLEAN_BUFF_LOOP:
+    CMPI.L      #$FFFFFFFF,(A2)     *
+    BEQ         BUFFDONE            * Buffer has been cleaned
+    MOVE.L      #$FFFFFFFF,(A2)+    * Fill with F's
+    BRA         CLEAN_BUFF_LOOP     * Continue cleaning buffer
+BUFFDONE
+    RTS                             * Return to main
+
+NEW_PAGE
+    CLR.L       D3                  * Clear counter
+    LEA         ENTER,A1            * Load enter message into A1
+    MOVE.B      #14,D0              * Moves the Task 14 into D0
+    TRAP        #15                 * Displays contents of A1
+    MOVE.B      #5,D0               * Read single character from
+    TRAP        #15                 * The keyboard into D1.B
+    BRA.W       CLEARSCRN           * Clear the screen.
+
+*********** END - BUFFER SUBROUTINES *****************************************
+
+******************************************************************************
+*           END PROGRAM SUBROUTINES                                          *
+******************************************************************************
+
+*---------- RERUN ------------------------------------------------------------
+* Check to see if the user would like to rerun the program
+*-----------------------------------------------------------------------------
+
+RERUN
+    LEA         ENDQUESTION,A1      * Loads message into A1
+    MOVE.B      #14,D0              * Moves the Task 14 into D0
+    TRAP        #15                 * Displays Intro Message
+
+    MOVE.B      #5,D0               * Move task 5 to read one char
+    TRAP        #15                 * Trap 15 for IO
+
+    CMPI.B      #UPYES,D1           * Is char = Y
+    BEQ         NOTDONE             * If yes, notdone
+    CMPI.B      #LOWYES,D1          * Is char = y
+    BEQ         NOTDONE             * If yes, notdone
+    MOVE.B      #0,(RUNAGAIN)       * 0 for false to end program
+    RTS
+
+NOTDONE
+    MOVE.B      #1,(RUNAGAIN)       * 1 for true to rerun program
+    BSR.W       CLEAR               * Clear all values
+    BSR.W       CLEARSCRN           * Clear screen and return from subroutine
+    RTS
+
+*********** END - END PROGRAM SUBROUTINES ************************************
 
 
 
