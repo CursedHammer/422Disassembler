@@ -433,9 +433,9 @@ EA_PRINT_PD_END:
 EA_PRINT_ABS_L:
     MOVEA.L     A5, A1              ; copy pointer to temp
     ADDA.L      #$00000002, A1      ; Advance temp pointer to next word
-    MOVE.L      (A1), D0            ; store longword address to print TODO
-    JSR         EA_PRINT_DATA *print value TODO
-    ADDA.L      #$00000004, A1      ; move temp pointer past longword that has been read
+    MOVE.L      (A1), D6            ; store word address to print in TODO
+    MOVE.L      #8, D7              ; Set size to L
+    JSR         WRITEDATA2MEM
     MOVEA.L     A1, A5              ; store new pointer location to pass back
     RTS
 *---------- Absolute Word Address --------------------------
@@ -445,8 +445,9 @@ EA_PRINT_ABS_L:
 EA_PRINT_ABS_W:
     MOVEA.L     A5, A1              ; copy pointer to temp
     ADDA.L      #$00000002, A1      ; Advance temp pointer to next word
-    MOVE.L      (A1), D0            ; store word address to print in TODO
-    JSR         EA_PRINT_DATA *print value TODO
+    MOVE.L      (A1), D6            ; store word address to print in TODO
+    MOVE.L      #4, D7              ; Set size to W
+    JSR         WRITEDATA2MEM
     ADDA.L      #$00000002, A1      ; move temp pointer past word that has been read
     MOVEA.L     A1, A5              ; store new pointer location to pass back
     RTS
