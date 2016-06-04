@@ -92,8 +92,7 @@ SKIP_ENDL:
     RTS
 
 PRINTLN
-    LEA         BUFFER,A2           * Reset A2 to BUFFER address beginning
-    LEA         (A2),A1             * Load BUFFER address into A1
+    LEA         BUFFER,A1               * Load BUFFER address into A1
     MOVE.B      #14,D0              * Task 14, no CR or LF
     TRAP        #15                 * Display string held in BUFFER
     JSR         CLEAN_BUFF          * Clean buffer after printing line
