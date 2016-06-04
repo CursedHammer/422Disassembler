@@ -96,6 +96,7 @@ PRINTLN
     RTS                             * Return to main
 
 CLEAN_BUFF
+    LEA         BUFFER, A2          * Reset buffer pointer
     CMPI.L      #$FFFFFFFF,(A2)     *
     BEQ         BUFFDONE            * Buffer has been cleaned
     MOVE.L      #$FFFFFFFF,(A2)+    * Fill with F's
