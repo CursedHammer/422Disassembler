@@ -43,6 +43,16 @@ BUFFER  EQU     $5070               * Buffer address for string
 UPYES     EQU   'Y'
 LOWYES    EQU   'y'
 
+* For Hex to ASCII code
+MASK8       EQU   %11110000000000000000000000000000
+MASK7       EQU   %00001111000000000000000000000000
+MASK6       EQU   %00000000111100000000000000000000
+MASK5       EQU   %00000000000011110000000000000000
+MASK4       EQU   %00000000000000001111000000000000
+MASK3       EQU   %00000000000000000000111100000000
+MASK2       EQU   %00000000000000000000000011110000
+MASK1       EQU   %00000000000000000000000000001111
+
 ******************************************************************************
 *           BEGIN CODE                                                       *
 ******************************************************************************
@@ -396,35 +406,28 @@ ADDRESS_ERR
 * Invalid data to print out to the user
 *-----------------------------------------------------------------------------
 INVALID_DATA
-    MOVE.L      A6,D1               * Move the address location to D1
-    MOVE.B      #16,D2              * Move base 16 to D2
-    MOVE.B      #15,D0              * Moves Task 15 into D0
-    TRAP        #15                 * Displays contents of D1
+    JSR         CLEAN_BUFF          * Clean buffer
+    LEA         BUFFER, A2          * Reset buffer pointer
+    MOVE.L      A6,D6               * Move the address location to D6
+    MOVE.L      #8,D7               * Set size to L
+    JSR         WRITEDATA2MEM       * Write address to buffer
 
-    LEA         TAB,A1              * Load TAB to A1
-    MOVE.B      #14,D0              * Moves the Task 14 into D0
-    TRAP        #15                 * Displays a tab of A1
+    LEA         TAB,A4              * Load TAB to A4
+    JSR         WRITE2MEM           * Write tab to buffer
 
-    LEA         DATA,A1             * Load address location to A1
-    MOVE.B      #14,D0              * Moves the Task 14 into D0
-    TRAP        #15                 * Displays location of A1
+    LEA         DATA,A4             * Load DATA to A4
+    JSR         WRITE2MEM           * Write 'DATA' to buffer
 
-    LEA         TAB,A1              * Load TAB to A1
-    MOVE.B      #14,D0              * Moves the Task 14 into D0
-    TRAP        #15                 * Displays a tab of A1
+    LEA         TAB,A4              * Load TAB to A4
+    JSR         WRITE2MEM           * Write tab to buffer
 
-    LEA         DOLLAR,A1           * Load TAB to A1
-    MOVE.B      #14,D0              * Moves the Task 14 into D0
-    TRAP        #15                 * Displays a tab of A1
+    LEA         DOLLAR,A4           * Load DOLLAR to A4
+    JSR         WRITE2MEM           * Write '$' to buffer
 
-    MOVE.W      (A6),D1             * Move the address value to D1
-    MOVE.B      #16,D2              * Move base 16 to D2
-    MOVE.B      #15,D0              * Moves Task 15 into D0
-    TRAP        #15                 * Displays value of D1
-
-    LEA         ENDL,A1             * Load TAB to A1
-    MOVE.B      #14,D0              * Moves the Task 14 into D0
-    TRAP        #15                 * Displays a tab of A1
+    CLR.L       D6
+    MOVE.W      (A6),D6             * Move the address value to D6
+    MOVE.L      #4,D7               * Set size to W
+    JSR         WRITEDATA2MEM       * Write address to buffer
 
     RTS                             * Return from subroutine
 
@@ -507,6 +510,209 @@ NOTDONE
 
 *********** END - END PROGRAM SUBROUTINES ************************************
 
+******************************************************************************
+*           DATA PRINTING SUBROUTINES                                        *
+******************************************************************************
+
+*---------- WRITEDATA2MEM ----------------------------------------------------
+* Like WRITE2MEM, writes hex value to buffer after converting it to ASCII
+* PRE: Value to print in D6, size in D7 (B: 2, W: 4, L: 8)
+*-----------------------------------------------------------------------------
+WRITEDATA2MEM
+    BSR.W       LONG_MASK
+    BSR.W       WORD_MASK
+    BSR.L       BYTE_MASK
+    RTS
+
+*---------- HEX_TO_ASCII -----------------------------------------------------
+* Checks to see if each character is hexadecimal
+*-----------------------------------------------------------------------------
+HEX_TO_ASCII
+    CMPI.B      #$0,D3              * Is Char equal to 0?
+    BEQ         ASCIIZERO
+    CMPI.B      #$1,D3              * Is Hex equal to 1?
+    BEQ         ASCIIONE
+    CMPI.B      #$2,D3              * Is Hex equal to 2?
+    BEQ         ASCIITWO
+    CMPI.B      #$3,D3              * Is Hex equal to 3?
+    BEQ         ASCIITHREE
+    CMPI.B      #$4,D3              * Is Hex equal to 4?
+    BEQ         ASCIIFOUR
+    CMPI.B      #$5,D3              * Is Hex equal to 5?
+    BEQ         ASCIIFIVE
+    CMPI.B      #$6,D3              * Is Hex equal to 6?
+    BEQ         ASCIISIX
+    CMPI.B      #$7,D3              * Is Hex equal to 7?
+    BEQ         ASCIISEVEN
+    CMPI.B      #$8,D3              * Is Hex equal to 8?
+    BEQ         ASCIIEIGHT
+    CMPI.B      #$9,D3              * Is Hex equal to 9?
+    BEQ         ASCIININE
+    CMPI.B      #$A,D3              * Is Hex equal to A?
+    BEQ         ASCIIA
+    CMPI.B      #$B,D3              * Is Hex equal to B?
+    BEQ         ASCIIB
+    CMPI.B      #$C,D3              * Is Hex equal to C?
+    BEQ         ASCIIC
+    CMPI.B      #$D,D3              * Is Hex equal to D?
+    BEQ         ASCIID
+    CMPI.B      #$E,D3              * Is Hex equal to E?
+    BEQ         ASCIIE
+    CMPI.B      #$F,D3              * Is Hex equal to F?
+    BEQ         ASCIIF
+
+    RTS
+
+FOUND_ASCII
+    SUBI.B      #1,D7               * Decrease string by one
+    RTS                             * Then, return to main
+
+ASCIIZERO
+    MOVE.B       #'0',D3          * Add value
+    BRA         FOUND_ASCII         * Mark hexflag true and proceed
+ASCIIONE
+    MOVE.B       #'1',D3          * Add value
+    BRA         FOUND_ASCII   * Mark hexflag true and proceed
+ASCIITWO
+    MOVE.B       #'2',D3          * Add value
+    BRA         FOUND_ASCII   * Mark hexflag true and proceed
+ASCIITHREE
+    MOVE.B      #'3',D3          * Add value
+    BRA         FOUND_ASCII   * Mark hexflag true and proceed
+ASCIIFOUR
+    MOVE.B       #'4',D3          * Add value
+    BRA         FOUND_ASCII   * Mark hexflag true and proceed
+ASCIIFIVE
+    MOVE.B      #'5',D3          * Add value
+    BRA         FOUND_ASCII   * Mark hexflag true and proceed
+ASCIISIX
+    MOVE.B       #'6',D3          * Add value
+    BRA         FOUND_ASCII   * Mark hexflag true and proceed
+ASCIISEVEN
+    MOVE.B      #'7',D3          * Add value
+    BRA         FOUND_ASCII   * Mark hexflag true and proceed
+ASCIIEIGHT
+    MOVE.B      #'8',D3          * Add value
+    BRA         FOUND_ASCII   * Mark hexflag true and proceed
+ASCIININE
+    MOVE.B      #'9',D3        * Add value
+    BRA         FOUND_ASCII   * Mark hexflag true and proceed
+ASCIIA
+    MOVE.B      #'A',D3
+    BRA         FOUND_ASCII   * Mark hexflag true and proceed
+ASCIIB
+    MOVE.B      #'B',D3          * Add value
+    BRA         FOUND_ASCII   * Mark hexflag true and proceed
+ASCIIC
+    MOVE.B      #'C',D3          * Add value
+    BRA         FOUND_ASCII   * Mark hexflag true and proceed
+ASCIID
+    MOVE.B      #'D',D3          * Add value
+    BRA         FOUND_ASCII   * Mark hexflag true and proceed
+ASCIIE
+    MOVE.B      #'E',D3          * Add value
+    BRA         FOUND_ASCII   * Mark hexflag true and proceed
+ASCIIF
+    MOVE.B      #'F',D3          * Add value
+    BRA         FOUND_ASCII   * Mark hexflag true and proceed
+
+*---------- END - HEX_TO_ASCII -----------------------------------------------
+
+
+*---------- LONG_MASK --------------------------------------------------------
+* Perform the long mask and proceed
+*-----------------------------------------------------------------------------
+LONG_MASK
+    CMPI.B      #8,D7
+    BLT         SKIP_LONG
+
+    MOVE.L      D6,D3               * Reset D3 for next 4 bits
+    ANDI.L      #MASK8,D3           * Mask everything but the 4 bits wanted
+    LSR.L       #$8,D3              * Shift 8 bits
+    LSR.L       #$8,D3              * Shift 8 bits
+    LSR.L       #$8,D3              * Shift 8 bits
+    LSR.L       #$4,D3              * Shift 4 bits
+    BSR.W       HEX_TO_ASCII        * Store hex as ascii value in A0
+    MOVE.B      D3,(A2)+            *
+
+    MOVE.L      D6,D3               * Reset D3 for next 4 bits
+    ANDI.L      #MASK7,D3           * Mask everything but the 4 bits wanted
+    LSR.L       #$8,D3              * Shift 8 bits
+    LSR.L       #$8,D3              * Shift 8 bits
+    LSR.L       #$8,D3              * Shift 8 bits
+    BSR.W       HEX_TO_ASCII        * Store hex as ascii value in A0
+    MOVE.B      D3,(A2)+            *
+
+    MOVE.L      D6,D3               * Reset D3 for next 4 bits
+    ANDI.L      #MASK6,D3           * Mask everything but the 4 bits wanted
+    LSR.L       #$8,D3              * Shift 8 bits
+    LSR.L       #$8,D3              * Shift 8 bits
+    LSR.L       #$4,D3              * Shift 4 bits
+    BSR.W       HEX_TO_ASCII        * Store hex as ascii value in A0
+    MOVE.B      D3,(A2)+            *
+
+    MOVE.L      D6,D3               * Reset D3 for next 4 bits
+    ANDI.L      #MASK5,D3           * Mask everything but the 4 bits wanted
+    LSR.L       #$8,D3              * Shift 8 bits
+    LSR.L       #$8,D3              * Shift 8 bits
+    BSR.W       HEX_TO_ASCII        * Store hex as ascii value in A0
+    MOVE.B      D3,(A2)+            *
+
+    RTS
+
+SKIP_LONG
+    RTS
+
+*---------- END - LONG_MASK --------------------------------------------------
+
+
+*---------- WORD_MASK --------------------------------------------------------
+* Perform the word mask and proceed
+*-----------------------------------------------------------------------------
+WORD_MASK
+    CMPI.B      #4,D7
+    BLT         SKIP_WORD
+
+    MOVE.L      D6,D3               * Reset D3 for next 4 bits
+    ANDI.L      #MASK4,D3           * Mask everything but the 4 bits wanted
+    LSR.W       #$8,D3              * Shift 4 bits
+    LSR.W       #$4,D3              * Shift 4 bits
+    BSR.W       HEX_TO_ASCII        * Store hex as ascii value in A0
+    MOVE.B      D3,(A2)+            *
+
+    MOVE.L      D6,D3               * Reset D3 for next 4 bits
+    ANDI.L      #MASK3,D3           * Mask everything but the 4 bits wanted
+    LSR.W       #$8,D3              * Shift 8 bits
+    BSR.W       HEX_TO_ASCII        * Store hex as ascii value in A0
+    MOVE.B      D3,(A2)+            *
+
+    RTS
+
+SKIP_WORD
+    RTS
+
+*---------- END - WORD_MASK --------------------------------------------------
+
+
+*---------- BYTE_MASK --------------------------------------------------------
+* Perform the byte mask and proceed
+*-----------------------------------------------------------------------------
+BYTE_MASK
+    MOVE.L      D6,D3               * Reset D3 for next 4 bits
+    ANDI.L      #MASK2,D3           * Mask everything but the 4 bits wanted
+    LSR.B       #$4,D3              * Shift 4 bits
+    BSR.W       HEX_TO_ASCII        * Store hex as ascii value in A0
+    MOVE.B      D3,(A2)+            *
+
+    MOVE.L      D6,D3               * Reset D3 for next 4 bits
+    ANDI.L      #MASK1,D3           * Mask everything but the 4 bits wanted
+    BSR.W       HEX_TO_ASCII        * Store hex as ascii value in A0
+    MOVE.B      D3,(A2)+            *
+    RTS
+
+*---------- END - BYTE_MASK --------------------------------------------------
+
+*********** END - END PROGRAM SUBROUTINES ************************************
 
 
 
