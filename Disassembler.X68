@@ -57,7 +57,7 @@ STACK     EQU   $7000               * Beginning address for stack pointer
 BEGINADDR EQU   $5000               * Variable to hold beginning address value
 ENDADDR   EQU   $5010               * Variable to hold ending address value
 
-RUNAGAIN  EQU   $6000               * Value equivalent to 'true'
+RUNAGAIN  EQU   $6000               * Run program again variable
 
 RCOUNT    EQU   30                  * Row counter
 
@@ -132,6 +132,7 @@ END_LOOP                            * Else, end loop
 
 *---------- End --------------------------------------------
                END  START          * Last line of source
+
 
 
 
