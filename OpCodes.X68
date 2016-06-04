@@ -1121,6 +1121,7 @@ ISMULSW:
         RTS
 
 ISANDB:
+        LEA    MESSAGEANDB, A4
         JSR    WRITE2MEM
         LEA    MESSAGESPACE, A4
         JSR    WRITE2MEM
