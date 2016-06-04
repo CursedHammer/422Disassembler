@@ -916,14 +916,14 @@ OPCODE_INVALID JSR     INVALID_DATA
 ISBCC:
             LEA    MESSAGEBCC, A4
             JSR    WRITE2MEM
-            LEA    MESSAGESPACE, A4
+            LEA    TAB, A4
             JSR    WRITE2MEM
             JSR     EA_Bcc
             RTS
 ISBGT:
             LEA MESSAGEBGT, A4
             JSR    WRITE2MEM
-            LEA    MESSAGESPACE, A4
+            LEA    TAB, A4
             JSR    WRITE2MEM
             JSR     EA_Bcc
             RTS
@@ -931,7 +931,7 @@ ISBGT:
 ISBLE:
             LEA MESSAGEBLE, A4
             JSR    WRITE2MEM
-            LEA    MESSAGESPACE, A4
+            LEA    TAB, A4
             JSR    WRITE2MEM
             JSR     EA_Bcc
             RTS
@@ -939,7 +939,7 @@ ISBLE:
 ISDIVUW:
             LEA MESSAGEDIVUW, A4
             JSR    WRITE2MEM
-            LEA    MESSAGESPACE, A4
+            LEA    TAB, A4
             JSR    WRITE2MEM
             JSR     EA_DIVU_W
             RTS
@@ -947,7 +947,7 @@ ISDIVUW:
 ISORB:
         LEA         MESSAGEORB, A4
         JSR    WRITE2MEM
-        LEA    MESSAGESPACE, A4
+        LEA    TAB, A4
         JSR    WRITE2MEM
         JSR         EA_OR
         RTS
@@ -955,7 +955,7 @@ ISORB:
 ISORW:
         LEA         MESSAGEORW, A4
         JSR    WRITE2MEM
-        LEA    MESSAGESPACE, A4
+        LEA    TAB, A4
         JSR    WRITE2MEM
         JSR         EA_OR
         RTS
@@ -963,7 +963,7 @@ ISORW:
 ISORL:
         LEA         MESSAGEORL, A4
         JSR    WRITE2MEM
-        LEA    MESSAGESPACE, A4
+        LEA    TAB, A4
         JSR    WRITE2MEM
         JSR         EA_OR
         RTS
@@ -971,7 +971,7 @@ ISORL:
 ISASRB:
         LEA         MESSAGEASRB, A4
         JSR    WRITE2MEM
-        LEA    MESSAGESPACE, A4
+        LEA    TAB, A4
         JSR    WRITE2MEM
         JSR         EA_ASd
         RTS
@@ -979,7 +979,7 @@ ISASRB:
 ISASRW:
         LEA         MESSAGEASRW, A4
         JSR    WRITE2MEM
-        LEA    MESSAGESPACE, A4
+        LEA    TAB, A4
         JSR    WRITE2MEM
         JSR         EA_ASd
         RTS
@@ -987,7 +987,7 @@ ISASRW:
 ISASRL:
         LEA         MESSAGEASRL, A4
         JSR    WRITE2MEM
-        LEA    MESSAGESPACE, A4
+        LEA    TAB, A4
         JSR    WRITE2MEM
         JSR         EA_ASd
         RTS
@@ -995,7 +995,7 @@ ISASRL:
 ISASLB:
         LEA         MESSAGEASLB, A4
         JSR    WRITE2MEM
-        LEA    MESSAGESPACE, A4
+        LEA    TAB, A4
         JSR    WRITE2MEM
         JSR         EA_ASd
         RTS
@@ -1003,7 +1003,7 @@ ISASLB:
 ISASLW:
         LEA         MESSAGEASLW, A4
         JSR    WRITE2MEM
-        LEA    MESSAGESPACE, A4
+        LEA    TAB, A4
         JSR    WRITE2MEM
         JSR         EA_ASd
         RTS
@@ -1011,7 +1011,7 @@ ISASLW:
 ISASLL:
         LEA         MESSAGEASLL, A4
         JSR    WRITE2MEM
-        LEA    MESSAGESPACE, A4
+        LEA    TAB, A4
         JSR    WRITE2MEM
         JSR         EA_ASd
         RTS
@@ -1019,7 +1019,7 @@ ISASLL:
 ISLSRB:
         LEA         MESSAGELSRB, A4
         JSR    WRITE2MEM
-        LEA    MESSAGESPACE, A4
+        LEA    TAB, A4
         JSR    WRITE2MEM
         JSR         EA_LSd
         RTS
@@ -1027,7 +1027,7 @@ ISLSRB:
 ISLSRW:
         LEA         MESSAGELSRW, A4
         JSR    WRITE2MEM
-        LEA    MESSAGESPACE, A4
+        LEA    TAB, A4
         JSR    WRITE2MEM
         JSR         EA_LSd
         RTS
@@ -1035,7 +1035,7 @@ ISLSRW:
 ISLSRL:
         LEA         MESSAGELSRL, A4
         JSR    WRITE2MEM
-        LEA    MESSAGESPACE, A4
+        LEA    TAB, A4
         JSR    WRITE2MEM
         JSR         EA_LSd
         RTS
@@ -1043,7 +1043,7 @@ ISLSRL:
 ISLSLB:
         LEA         MESSAGELSLB, A4
         JSR    WRITE2MEM
-        LEA    MESSAGESPACE, A4
+        LEA    TAB, A4
         JSR    WRITE2MEM
         JSR         EA_LSd
         RTS
@@ -1051,7 +1051,7 @@ ISLSLB:
 ISLSLW:
         LEA         MESSAGELSLW, A4
         JSR    WRITE2MEM
-        LEA    MESSAGESPACE, A4
+        LEA    TAB, A4
         JSR    WRITE2MEM
         JSR         EA_LSd
         RTS
@@ -1059,7 +1059,7 @@ ISLSLW:
 ISLSLL:
         LEA         MESSAGELSLL, A4
         JSR    WRITE2MEM
-        LEA    MESSAGESPACE, A4
+        LEA    TAB, A4
         JSR    WRITE2MEM
         JSR         EA_LSd
         RTS
@@ -1067,7 +1067,7 @@ ISLSLL:
 ISRORB:
         LEA         MESSAGERORB, A4
         JSR    WRITE2MEM
-        LEA    MESSAGESPACE, A4
+        LEA    TAB, A4
         JSR    WRITE2MEM
         JSR         EA_ROd
         RTS
@@ -1075,7 +1075,7 @@ ISRORB:
 ISRORW:
         LEA         MESSAGERORW, A4
         JSR    WRITE2MEM
-        LEA    MESSAGESPACE, A4
+        LEA    TAB, A4
         JSR    WRITE2MEM
         JSR         EA_ROd
         RTS
@@ -1083,7 +1083,7 @@ ISRORW:
 ISRORL:
         LEA         MESSAGERORL, A4
         JSR    WRITE2MEM
-        LEA    MESSAGESPACE, A4
+        LEA    TAB, A4
         JSR    WRITE2MEM
         JSR         EA_ROd
         RTS
@@ -1091,7 +1091,7 @@ ISRORL:
 ISROLB:
         LEA         MESSAGEROLB, A4
         JSR    WRITE2MEM
-        LEA    MESSAGESPACE, A4
+        LEA    TAB, A4
         JSR    WRITE2MEM
         JSR         EA_ROd
         RTS
@@ -1099,7 +1099,7 @@ ISROLB:
 ISROLW:
         LEA         MESSAGEROLW, A4
         JSR    WRITE2MEM
-        LEA    MESSAGESPACE, A4
+        LEA    TAB, A4
         JSR    WRITE2MEM
         JSR         EA_ROd
         RTS
@@ -1107,7 +1107,7 @@ ISROLW:
 ISROLL:
         LEA         MESSAGEROLL, A4
         JSR    WRITE2MEM
-        LEA    MESSAGESPACE, A4
+        LEA    TAB, A4
         JSR    WRITE2MEM
         JSR         EA_ROd
         RTS
@@ -1115,7 +1115,7 @@ ISROLL:
 ISMULSW:
         LEA         MESSAGEMULSW, A4
         JSR    WRITE2MEM
-        LEA    MESSAGESPACE, A4
+        LEA    TAB, A4
         JSR    WRITE2MEM
         JSR         EA_MULS_W
         RTS
@@ -1123,7 +1123,7 @@ ISMULSW:
 ISANDB:
         LEA    MESSAGEANDB, A4
         JSR    WRITE2MEM
-        LEA    MESSAGESPACE, A4
+        LEA    TAB, A4
         JSR    WRITE2MEM
         JSR         EA_AND
         RTS
@@ -1131,7 +1131,7 @@ ISANDB:
 ISANDW:
         LEA         MESSAGEANDW, A4
         JSR    WRITE2MEM
-        LEA    MESSAGESPACE, A4
+        LEA    TAB, A4
         JSR    WRITE2MEM
         JSR         EA_AND
         RTS
@@ -1139,7 +1139,7 @@ ISANDW:
 ISANDL:
         LEA         MESSAGEANDL, A4
         JSR    WRITE2MEM
-        LEA    MESSAGESPACE, A4
+        LEA    TAB, A4
         JSR    WRITE2MEM
         JSR         EA_AND
         RTS
@@ -1147,7 +1147,7 @@ ISANDL:
 ISADDAW:
         LEA         MESSAGEADDAW, A4
         JSR    WRITE2MEM
-        LEA    MESSAGESPACE, A4
+        LEA    TAB, A4
         JSR    WRITE2MEM
         JSR         EA_ADDA
         RTS
@@ -1155,7 +1155,7 @@ ISADDAW:
 ISADDAL:
         LEA         MESSAGEADDAL, A4
         JSR    WRITE2MEM
-        LEA    MESSAGESPACE, A4
+        LEA    TAB, A4
         JSR    WRITE2MEM
         JSR         EA_ADDA
         RTS
@@ -1163,7 +1163,7 @@ ISADDAL:
 ISADDB:
         LEA         MESSAGEADDB, A4
         JSR    WRITE2MEM
-        LEA    MESSAGESPACE, A4
+        LEA    TAB, A4
         JSR    WRITE2MEM
         JSR         EA_ADD
         RTS
@@ -1171,7 +1171,7 @@ ISADDB:
 ISADDW:
         LEA         MESSAGEADDW, A4
         JSR    WRITE2MEM
-        LEA    MESSAGESPACE, A4
+        LEA    TAB, A4
         JSR    WRITE2MEM
         JSR         EA_ADD
         RTS
@@ -1179,7 +1179,7 @@ ISADDW:
 ISADDL:
         LEA         MESSAGEADDL, A4
         JSR    WRITE2MEM
-        LEA    MESSAGESPACE, A4
+        LEA    TAB, A4
         JSR    WRITE2MEM
         JSR         EA_ADD
         RTS
@@ -1187,7 +1187,7 @@ ISADDL:
 ISSUBB:
         LEA         MESSAGESUBB, A4
         JSR    WRITE2MEM
-        LEA    MESSAGESPACE, A4
+        LEA    TAB, A4
         JSR    WRITE2MEM
         JSR         EA_SUB
         RTS
@@ -1195,7 +1195,7 @@ ISSUBB:
 ISSUBW:
         LEA         MESSAGESUBW, A4
         JSR    WRITE2MEM
-        LEA    MESSAGESPACE, A4
+        LEA    TAB, A4
         JSR    WRITE2MEM
         JSR         EA_SUB
         RTS
@@ -1203,7 +1203,7 @@ ISSUBW:
 ISSUBL:
         LEA         MESSAGESUBL, A4
         JSR    WRITE2MEM
-        LEA    MESSAGESPACE, A4
+        LEA    TAB, A4
         JSR    WRITE2MEM
         JSR         EA_SUB
         RTS
@@ -1211,7 +1211,7 @@ ISSUBL:
 ISCMPB:
         LEA         MESSAGECMPB, A4
         JSR    WRITE2MEM
-        LEA    MESSAGESPACE, A4
+        LEA    TAB, A4
         JSR    WRITE2MEM
         JSR         EA_CMP
         RTS
@@ -1219,7 +1219,7 @@ ISCMPB:
 ISCMPW:
         LEA         MESSAGECMPW, A4
         JSR    WRITE2MEM
-        LEA    MESSAGESPACE, A4
+        LEA    TAB, A4
         JSR    WRITE2MEM
         JSR         EA_CMP
         RTS
@@ -1227,7 +1227,7 @@ ISCMPW:
 ISCMPL:
         LEA         MESSAGECMPL, A4
         JSR    WRITE2MEM
-        LEA    MESSAGESPACE, A4
+        LEA    TAB, A4
         JSR    WRITE2MEM
         JSR         EA_CMP
         RTS
@@ -1235,7 +1235,7 @@ ISCMPL:
 ISADDQB:
     LEA         MESSAGEADDQB, A4
         JSR    WRITE2MEM
-        LEA    MESSAGESPACE, A4
+        LEA    TAB, A4
         JSR    WRITE2MEM
         JSR         EA_ADDQ
         RTS
@@ -1243,22 +1243,23 @@ ISADDQB:
 ISADDQW:
     LEA         MESSAGEADDQW, A4
         JSR    WRITE2MEM
-        LEA    MESSAGESPACE, A4
+        LEA    TAB, A4
         JSR    WRITE2MEM
         JSR         EA_ADDQ
         RTS
 
 ISADDQL:
-    LEA         MESSAGEADDQL, A1 *OPCODE is ADDQ.L
-        MOVE.B      #14, D0
-        TRAP        #15
+    LEA         MESSAGEADDQL, A4
+    JSR         WRITE2MEM
+    LEA         TAB, A4
+    JSR         WRITE2MEM
         JSR         EA_ADDQ
         RTS
 
 ISMOVEQL:
     LEA         MESSAGEMOVEQL, A4
         JSR    WRITE2MEM
-        LEA    MESSAGESPACE, A4
+        LEA    TAB, A4
         JSR    WRITE2MEM
         JSR         EA_MOVEQ
         RTS
@@ -1266,7 +1267,7 @@ ISMOVEQL:
 ISCLRB:
         LEA         MESSAGECLRB, A4
         JSR    WRITE2MEM
-        LEA    MESSAGESPACE, A4
+        LEA    TAB, A4
         JSR    WRITE2MEM
         JSR         EA_CLR
         RTS
@@ -1274,7 +1275,7 @@ ISCLRB:
 ISCLRW:
         LEA         MESSAGECLRW, A4
         JSR    WRITE2MEM
-        LEA    MESSAGESPACE, A4
+        LEA    TAB, A4
         JSR    WRITE2MEM
         JSR         EA_CLR
         RTS
@@ -1282,7 +1283,7 @@ ISCLRW:
 ISCLRL:
         LEA         MESSAGECLRL, A4
         JSR    WRITE2MEM
-        LEA    MESSAGESPACE, A4
+        LEA    TAB, A4
         JSR    WRITE2MEM
         JSR         EA_CLR
         RTS
@@ -1290,7 +1291,7 @@ ISCLRL:
 ISMOVEML:
     LEA         MESSAGEMOVEML, A4
         JSR    WRITE2MEM
-        LEA    MESSAGESPACE, A4
+        LEA    TAB, A4
         JSR    WRITE2MEM
         JSR         EA_MOVEM
         RTS
@@ -1298,7 +1299,7 @@ ISMOVEML:
 ISMOVEMW:
     LEA         MESSAGEMOVEMW, A4
         JSR    WRITE2MEM
-        LEA    MESSAGESPACE, A4
+        LEA    TAB, A4
         JSR    WRITE2MEM
         JSR         EA_MOVEM
         RTS
@@ -1306,7 +1307,7 @@ ISMOVEMW:
 ISLEA:
         LEA         MESSAGELEA, A4
         JSR    WRITE2MEM
-        LEA    MESSAGESPACE, A4
+        LEA    TAB, A4
         JSR    WRITE2MEM
         JSR         EA_LEA
         RTS                         ; Exit subroutine
@@ -1314,7 +1315,7 @@ ISLEA:
 ISJSR:
         LEA         MESSAGEJSR, A4
         JSR    WRITE2MEM
-        LEA    MESSAGESPACE, A4
+        LEA    TAB, A4
         JSR    WRITE2MEM
         JSR         EA_JSR
         RTS                         ; Exit subroutine
@@ -1328,7 +1329,7 @@ ISRTS:
 ISCLR:
         LEA         MESSAGECLR, A4
         JSR    WRITE2MEM
-        LEA    MESSAGESPACE, A4
+        LEA    TAB, A4
         JSR    WRITE2MEM
         JSR         EA_CLR
         RTS
@@ -1342,7 +1343,7 @@ ISNOP:
 ISMOVEW:
     LEA         MESSAGEMOVEW, A4
         JSR    WRITE2MEM
-        LEA    MESSAGESPACE, A4
+        LEA    TAB, A4
         JSR    WRITE2MEM
         JSR         EA_MOVE
         RTS                         ; Exit subroutine
@@ -1350,7 +1351,7 @@ ISMOVEW:
 ISMOVEAW:
     LEA         MESSAGEMOVEAW, A4
         JSR    WRITE2MEM
-        LEA    MESSAGESPACE, A4
+        LEA    TAB, A4
         JSR    WRITE2MEM
         JSR         EA_MOVEA
         RTS                         ; Exit subroutine
@@ -1358,7 +1359,7 @@ ISMOVEAW:
 ISMOVEL:
     LEA         MESSAGEMOVEL, A4
         JSR    WRITE2MEM
-        LEA    MESSAGESPACE, A4
+        LEA    TAB, A4
         JSR    WRITE2MEM
         JSR         EA_MOVE
         RTS                         ; Exit subroutine
@@ -1366,7 +1367,7 @@ ISMOVEL:
 ISMOVEAL:
     LEA         MESSAGEMOVEAL, A4
         JSR    WRITE2MEM
-        LEA    MESSAGESPACE, A4
+        LEA    TAB, A4
         JSR    WRITE2MEM
         JSR         EA_MOVEA
         RTS                         ; Exit subroutine
@@ -1374,7 +1375,7 @@ ISMOVEAL:
 ISMOVEB:
     LEA         MESSAGEMOVEB, A4
         JSR    WRITE2MEM
-        LEA    MESSAGESPACE, A4
+        LEA    TAB, A4
         JSR    WRITE2MEM
         JSR         EA_MOVE
         RTS                         ; Exit subroutine
@@ -1382,7 +1383,7 @@ ISMOVEB:
 ISADDIW:
     LEA         MESSAGEADDIW, A4
         JSR    WRITE2MEM
-        LEA    MESSAGESPACE, A4
+        LEA    TAB, A4
         JSR    WRITE2MEM
         JSR         EA_ADDI
         RTS                         ; Exit subroutine
@@ -1390,7 +1391,7 @@ ISADDIW:
 ISADDIL:
     LEA         MESSAGEADDIL, A4
         JSR    WRITE2MEM
-        LEA    MESSAGESPACE, A4
+        LEA    TAB, A4
         JSR    WRITE2MEM
         JSR         EA_ADDI
         RTS                         ; Exit subroutine
@@ -1398,7 +1399,7 @@ ISADDIL:
 ISADDIB:
     LEA         MESSAGEADDIB, A4
         JSR    WRITE2MEM
-        LEA    MESSAGESPACE, A4
+        LEA    TAB, A4
         JSR    WRITE2MEM
         JSR         EA_ADDI
         RTS                         ; Exit subroutine

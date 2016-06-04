@@ -12,16 +12,6 @@
 *-- Generic Subroutines ------------------------------------
 *-----------------------------------------------------------
 
-*---------- Unimplemented EA -------------------------------
-* Prints error message for EA subroutines that have not been
-* implemented yet
-*-----------------------------------------------------------
-EA_UNIMPLEMENTED:
-    ADDA.L      #$00000002, A6      ; Increment past current opcode word
-    LEA         EA_MSG_UNIMP, A4
-    JSR         WRITE2MEM
-    RTS
-
 *---------- Invalid OpCode ---------------------------------
 * Prints error message for current opcode in memory
 *-----------------------------------------------------------
@@ -29,14 +19,6 @@ EA_INVALID:
     MOVEA.L     A6, A5              ; Copy global pointer
     ADDA.L      #$00000002, A5      ; Increment past current opcode word
     JSR         INVALID_DATA        ; Print data error message
-    RTS
-
-*---------- Data Print Unimplemented -----------------------
-* Message replacing printing data, for testing
-*-----------------------------------------------------------
-EA_PRINT_DATA:
-    LEA         EA_MSG_PRINT_DATA, A4
-    JSR         WRITE2MEM
     RTS
 
 
@@ -301,15 +283,21 @@ EA_PRINT_IMM:
     ADDA.L      #$00000002, A1      ; Advance temp pointer to next word
     CMP         #3, D5
     BEQ         PRINT_IMM_L         ; if L, branch
-    MOVE.W      (A1), D0            ; store value in a register (todo, register tbd)
-    JSR         EA_PRINT_DATA *print value TODO
+    MOVE.W      (A1), D6            ; store value in a register
     ADDA.L      #$00000002, A1      ; move temp pointer past word that has been read
+    CMP         #2, D5
+    BEQ         PRINT_IMM_W         ; if W, branch
+    MOVE.L      #2, D7              ; else, set size to B
+    JMP         PRINT_IMM_END
+PRINT_IMM_W:
+    MOVE.L      #4, D7              ; Set size to W
     JMP         PRINT_IMM_END
 PRINT_IMM_L:
-    MOVE.L      (A1), D0            ; store value in a register (todo, register tbd)
-    *print value TODO
+    MOVE.L      (A1), D6            ; store value in a register (todo, register tbd)
+    MOVE.L      #8, D7              ; set size to L
     ADDA.L      #$00000004, A1      ; move temp pointer past longword that has been read
 PRINT_IMM_END:
+    JSR         WRITEDATA2MEM
     MOVEA.L     A1, A5              ; store new pointer location to pass back
     RTS
 *---------- Address Register Indirect w/ Post Increment ----
@@ -431,11 +419,14 @@ EA_PRINT_PD_END:
 * back new pointer location in A5
 *-----------------------------------------------------------
 EA_PRINT_ABS_L:
+    LEA         DOLLAR, A4        ; Print '$'
+    JSR         WRITE2MEM
     MOVEA.L     A5, A1              ; copy pointer to temp
     ADDA.L      #$00000002, A1      ; Advance temp pointer to next word
-    MOVE.L      (A1), D0            ; store longword address to print TODO
-    JSR         EA_PRINT_DATA *print value TODO
-    ADDA.L      #$00000004, A1      ; move temp pointer past longword that has been read
+    MOVE.L      (A1), D6            ; store word address to print in TODO
+    MOVE.L      #8, D7              ; Set size to L
+    JSR         WRITEDATA2MEM
+    ADDA.L      #4, A1
     MOVEA.L     A1, A5              ; store new pointer location to pass back
     RTS
 *---------- Absolute Word Address --------------------------
@@ -443,10 +434,13 @@ EA_PRINT_ABS_L:
 * new pointer location in A5
 *-----------------------------------------------------------
 EA_PRINT_ABS_W:
+    LEA         DOLLAR, A4        ; Print '$'
+    JSR         WRITE2MEM
     MOVEA.L     A5, A1              ; copy pointer to temp
     ADDA.L      #$00000002, A1      ; Advance temp pointer to next word
-    MOVE.L      (A1), D0            ; store word address to print in TODO
-    JSR         EA_PRINT_DATA *print value TODO
+    MOVE.W      (A1), D6            ; store word address to print in TODO
+    MOVE.L      #4, D7              ; Set size to W
+    JSR         WRITEDATA2MEM
     ADDA.L      #$00000002, A1      ; move temp pointer past word that has been read
     MOVEA.L     A1, A5              ; store new pointer location to pass back
     RTS

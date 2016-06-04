@@ -243,6 +243,10 @@ ADDA_END:
 EA_ADDI:
     MOVEM.L     A0-A1/A3-A5/D0-D7, -(SP)  ; Save registers (except A6, global pointer to word to read)
     JSR         EA_COPY_PTR         ; Copy global pointer to A5
+    LEA         POUND, A4         ; Print '#'
+    JSR         WRITE2MEM
+    LEA         DOLLAR, A4        ; Print '$'
+    JSR         WRITE2MEM
     JSR         EA_SIZE_BITS        ; get size bits in D7
 *--- Branch based on size ----------
     CMP.B       #$00, D7            ; Test if size: byte
@@ -256,25 +260,29 @@ EA_ADDI:
 *--- Print immediate data ----------
 ADDI_B:
     ADDA.L      #$00000002, A5      ; Increment A5 past current word
-    CLR.L       D0
-    MOVE.W      (A5), D0            ; read next word in memory and save
+    CLR.L       D6
+    MOVE.W      (A5), D6            ; read next word in memory and save
     MOVE.B      #8, D2              ; Clear upper 8 bits of operand word
-    LSL.W       D2, D0              ; Perform shift (zeros shifted in)
+    LSL.W       D2, D6              ; Perform shift (zeros shifted in)
     MOVE.B      #8, D2             ; 'Right-align' bits 0-7 to get value
-    LSR.W       D2, D0              ; Perform shift (zeros shifted in)
-    *print data
+    LSR.W       D2, D6              ; Perform shift (zeros shifted in)
+    MOVE.L      #2, D7              ; set size to B
+    JSR         WRITEDATA2MEM
     ADDA.L      #$00000002, A5      ; Increment A5 past operand word
     JMP         ADDI_GET_DEST
 ADDI_W:
     ADDA.L      #$00000002, A5      ; Increment A5 past current word
     CLR.L       D0
-    MOVE.W      (A5), D0            ; read next word in memory and save
-    *print data
+    MOVE.W      (A5), D6            ; read next word in memory and save
+    MOVE.L      #4, D7              ; set size to B
+    JSR         WRITEDATA2MEM
     ADDA.L      #$00000002, A5      ; Increment A5 past operand word
     JMP         ADDI_GET_DEST
 ADDI_L:
     ADDA.L      #$00000002, A5      ; Increment A5 past current word
-    MOVE.L      (A5), D0            ; read next two words in memory and save
+    MOVE.L      (A5), D6            ; read next two words in memory and save
+    MOVE.L      #8, D7              ; set size to B
+    JSR         WRITEDATA2MEM
     ADDA.L      #$00000004, A5      ; Increment A5 past operand longword
 *--- Get destination operand -------
 ADDI_GET_DEST:
@@ -345,18 +353,21 @@ EA_ADDQ:
     MOVEM.L     A0-A1/A3-A5/D0-D7, -(SP)  ; Save registers (except A6, global pointer to word to read)
     JSR         EA_COPY_PTR         ; Copy global pointer to A5
 *--- Parse data --------------------
-    MOVE.W      (A6), D1            ; Load opcode to data register 1
+    MOVE.W      (A6), D6            ; Load opcode to data register 6
     MOVE.B      #4, D2              ; Clear upper 4 bits of opcode word
-    LSL.W       D2, D1              ; Perform shift (zeros shifted in)
+    LSL.W       D2, D6              ; Perform shift (zeros shifted in)
     MOVE.B      #13, D2             ; 'Right-align' bits 9-11 to determine mode bits
-    LSR.W       D2, D1              ; Perform shift (zeros shifted in)
-    CMP.B       #$00, D1            ; Check for special case (if imm. data is 0, value is actually 8)
+    LSR.W       D2, D6             ; Perform shift (zeros shifted in)
+    CMP.B       #$00, D6            ; Check for special case (if imm. data is 0, value is actually 8)
     BNE         ADDQ_PRINT_IMM      ; If any value other than 0, print the data
-    MOVE.B      #$08, D1            ; Else, the value is 0 and therefore symbolic of the value 8, so replace with the value 8
+    MOVE.B      #$08, D6            ; Else, the value is 0 and therefore symbolic of the value 8, so replace with the value 8
 ADDQ_PRINT_IMM:
     LEA         POUND, A4         ; Print '#'
     JSR         WRITE2MEM
-    JSR         EA_PRINT_DATA
+    LEA         DOLLAR, A4        ; Print '$'
+    JSR         WRITE2MEM
+    MOVE.L      #2, D7              ; Set size to B
+    JSR         WRITEDATA2MEM
     LEA         COMMA, A4        ; Print comma
     JSR         WRITE2MEM
 *-----------------------------------
@@ -594,7 +605,10 @@ ASd_REG_REG:                        ; Else, count/register field contains regist
 ASd_REG_COUNT:
     LEA         POUND, A4        ; Print '#'
     JSR         WRITE2MEM
-    JSR         EA_PRINT_DATA *print hex value in D7 as byte todo, continue on to ASd_REG_END
+    LEA         DOLLAR, A4        ; Print '$'
+    JSR         WRITE2MEM
+    MOVE.L      #2, D7              ; Set size to B
+    JSR         WRITEDATA2MEM       *print hex value in D7 as byte todo, continue on to ASd_REG_END
 ASd_REG_END:
     LEA         COMMA, A4        ; Print comma
     JSR         WRITE2MEM
@@ -720,7 +734,11 @@ BCC_L:
 *-----------------------------------
 BCC_DISPLAY:
     ADDA.L      D1, A4              ; add displacement to current addressing
-    *print address in A4
+    MOVE.L      A4, D6              ; load address for printing
+    LEA         TAB, A4             ; Load tab for printing
+    JSR         WRITE2MEM
+    MOVE.L      #8, D7              ; set size to L
+    JSR         WRITEDATA2MEM
     JSR         EA_UPDATE_POINTER   ; Updates global pointer
     MOVEM.L     (SP)+, A0-A1/A3-A5/D0-D7  ; Restore registers (except A6, global pointer to word to read)
     RTS
@@ -1091,12 +1109,12 @@ EA_LSd:
 *--- Register Shift ----------------
 LSd_REG:
 * In preparation, isolate count/register field
-    MOVE.W      (A6), D7            ; read opcode word in memory and save,
+    MOVE.W      (A6), D6            ; read opcode word in memory and save,
                                     ; (using D7 because EA_PRINT_DN uses D7)
     MOVE.B      #4, D2              ; Clear upper 4 bits of operand word
-    LSL.W       D2, D7              ; Perform shift (zeros shifted in)
+    LSL.W       D2, D6              ; Perform shift (zeros shifted in)
     MOVE.B      #13, D2             ; 'Right-align' bits 9-11 to get count/register field
-    LSR.W       D2, D7              ; Perform shift (zeros shifted in)
+    LSR.W       D2, D6              ; Perform shift (zeros shifted in)
 * Isolate i/r field
     MOVE.W      (A6), D0            ; read opcode word in memory and save
     MOVE.B      #10, D2             ; Clear upper 10 bits of operand word
@@ -1111,7 +1129,10 @@ LSd_REG_REG:                        ; Else, count/register field contains regist
 LSd_REG_COUNT:
     LEA         POUND, A4         ; Print '#'
     JSR         WRITE2MEM
-    JSR         EA_PRINT_DATA  *print hex value in D7 as byte todo, continue on to LSd_REG_END
+    LEA         DOLLAR, A4        ; Print '$'
+    JSR         WRITE2MEM
+    MOVE.L      #2, D7            ; Set size to B
+    JSR         WRITEDATA2MEM     ; Print hex value in D6 as byte, continue on to end
 LSd_REG_END:
     LEA         COMMA, A4        ; Print comma
     JSR         WRITE2MEM
@@ -1430,9 +1451,12 @@ MOVEA_END:
 * Parses and prints the effective addressing information for
 * the MOVEM opcode
 *-----------------------------------------------------------
-EA_MOVEM:
-    *seems complicated, todo
-    JSR         EA_UNIMPLEMENTED
+EA_MOVEM: *todo
+    MOVEM.L     A0-A1/A3-A5/D0-D7, -(SP)  ; Save registers (except A6, global pointer to word to read)
+    JSR         EA_COPY_PTR         ; Copy global pointer to A5
+    JSR         EA_INVALID
+    JSR         EA_UPDATE_POINTER   ; Updates global pointer
+    MOVEM.L     (SP)+, A0-A1/A3-A5/D0-D7  ; Restore registers (except A6, global pointer to word to read)
     RTS
 *---------- MOVEQ Effective Addresses ----------------------
 * Parses and prints the effective addressing information for
@@ -1442,11 +1466,11 @@ EA_MOVEQ:
     MOVEM.L     A0-A1/A3-A5/D0-D7, -(SP)  ; Save registers (except A6, global pointer to word to read)
     JSR         EA_COPY_PTR         ; Copy global pointer to A5
 *isolate data
-    MOVE.W      (A6), D1            ; Load opcode to data register 1
+    MOVE.W      (A6), D6            ; Load opcode to data register 6
     MOVE.B      #8, D2              ; Clear upper 8 bits of opcode word
-    LSL.W       D2, D1              ; Perform shift (zeros shifted in)
+    LSL.W       D2, D6              ; Perform shift (zeros shifted in)
     MOVE.B      #8, D2              ; 'Right-align' bits 0-7 to determine data bits
-    LSR.W       D2, D1              ; Perform shift (zeros shifted in)
+    LSR.W       D2, D6              ; Perform shift (zeros shifted in)
 *Isolate MSB to do sign extension
     MOVE.W      (A6), D3            ; load opcode word
     MOVE.B      #8, D2              ; Clear upper 8 bits of opcode word
@@ -1455,11 +1479,14 @@ EA_MOVEQ:
     LSR.W       D2, D3              ; Perform shift (zeros shifted in)
     CMP.B       #$00, D3            ; If 0, sign extend with 0 (already done by isolation code)
     BEQ         MOVEQ_PRINT_DATA
-    ADD.L       #$FFFFFF00, D1      ; Else, sign extend data with F
+    ADD.L       #$FFFFFF00, D6      ; Else, sign extend data with F
 MOVEQ_PRINT_DATA:
     LEA         POUND, A4         ; Print '#'
     JSR         WRITE2MEM
-    JSR         EA_PRINT_DATA *print data todo
+    LEA         DOLLAR, A4        ; Print '$'
+    JSR         WRITE2MEM
+    MOVE.B      #2, D7              ; Set size to B
+    JSR         WRITEDATA2MEM       ; Write value in d6 to buffer
     LEA         COMMA, A4        ; Print comma
     JSR         WRITE2MEM
     JSR         EA_OPMODE_COMBO     ; Get register bits in D7, mode bits not used
@@ -1709,12 +1736,12 @@ EA_ROd:
 *--- Register Shift ----------------
 ROd_REG:
 * In preparation, isolate count/register field
-    MOVE.W      (A6), D7            ; read opcode word in memory and save,
+    MOVE.W      (A6), D6            ; read opcode word in memory and save,
                                     ; (using D7 because EA_PRINT_DN uses D7)
     MOVE.B      #4, D2              ; Clear upper 4 bits of operand word
-    LSL.W       D2, D7              ; Perform shift (zeros shifted in)
+    LSL.W       D2, D6              ; Perform shift (zeros shifted in)
     MOVE.B      #13, D2             ; 'Right-align' bits 9-11 to get count/register field
-    LSR.W       D2, D7              ; Perform shift (zeros shifted in)
+    LSR.W       D2, D6              ; Perform shift (zeros shifted in)
 * Isolate i/r field
     MOVE.W      (A6), D0            ; read opcode word in memory and save
     MOVE.B      #10, D2             ; Clear upper 10 bits of operand word
@@ -1729,7 +1756,10 @@ ROd_REG_REG:                        ; Else, count/register field contains regist
 ROd_REG_COUNT:
     LEA         POUND, A4         ; Print '#'''
     JSR         WRITE2MEM
-    JSR         EA_PRINT_DATA       *print hex value in D7 as byte todo, continue on to ROd_REG_END
+    LEA         DOLLAR, A4        ; Print '$'
+    JSR         WRITE2MEM
+    MOVE.B      #2,D7               ; Set size to B
+    JSR         WRITEDATA2MEM     *print hex value in D6 as byte todo, continue on to ROd_REG_END
 ROd_REG_END:
     LEA         COMMA, A4        ; Print comma
     JSR         WRITE2MEM
@@ -1945,6 +1975,7 @@ SUB_END:
     JSR         EA_UPDATE_POINTER   ; Updates global pointer
     MOVEM.L     (SP)+, A0-A1/A3-A5/D0-D7  ; Restore registers (except A6, global pointer to word to read)
     RTS
+
 
 
 
