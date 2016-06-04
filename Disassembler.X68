@@ -109,7 +109,7 @@ LOOP_CHECK
     ; else, end
 
 END_LOOP
-    JSR         KEEP_RUNNING        * Does the user want to run program again
+    JSR         RERUN               * Does the user want to run program again
     CMPI.B      #1,(RUNAGAIN)       * Does RUNAGAIN = TRUE?
     BEQ         START               * If yes, rerun program
     STOP        #$3000              * Else, end program
