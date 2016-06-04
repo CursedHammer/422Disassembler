@@ -469,13 +469,13 @@ BUFFDONE
     RTS                             * Return to main
 
 NEW_PAGE
-    CLR.L       D3                  * Clear counter
     LEA         ENTER,A1            * Load enter message into A1
     MOVE.B      #14,D0              * Moves the Task 14 into D0
     TRAP        #15                 * Displays contents of A1
     MOVE.B      #5,D0               * Read single character from
     TRAP        #15                 * The keyboard into D1.B
-    BRA.W       CLEARSCRN           * Clear the screen.
+    JSR         CLEARSCRN           * Clear the screen.
+    RTS
 
 *********** END - BUFFER SUBROUTINES *****************************************
 

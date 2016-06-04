@@ -59,6 +59,8 @@ ENDADDR   EQU   $5010               * Variable to hold ending address value
 
 RUNAGAIN  EQU   $6000               * Value equivalent to 'true'
 
+RCOUNT    EQU   30                  * Row counter
+
 START     ORG   $1000               * Program begins at address 1000
 
 *********** END DEFINITIONS **************************************************
@@ -74,34 +76,25 @@ START     ORG   $1000               * Program begins at address 1000
     LEA         STACK,SP            * SP is stored in A7
     JSR         GET_ADDRESSES       * Runs GET_ADDRESSES and IO_WELCOME
     MOVEA.L     BEGINADDR,A6        * Assign beginning address to A6 for use
+* Set up I/O
     LEA         BUFFER, A2
     JSR         CLEAN_BUFF
+    MOVE.B      #RCOUNT, D3         * Row counter
 LOOP
     LEA         BUFFER, A2
     JSR         OC_PARSE            * Determine if there is an initial opcode match
     JSR         WRITE_ENDL
     JSR         PRINTLN
     JSR         CLEAN_BUFF
-
-    * decrement row count
-    * if at 0, prompt for next page
-    * else, continue
-
-    *JSR         INVALID_DATA
-    *ADDA.L      #$00000002,A6            * Advance address to test LOOP (test only)
-
+    SUBI.B      #1, D3              * Decrement row counter
+    CMPI.B      #0, D3
+    BNE         LOOP_CHECK          * If counter != 0, continue with normal loop check
+    JSR         NEW_PAGE            * Else (counter == 0), prompt for new page
+    MOVE.B      #RCOUNT, D3         * Reset row counter
 LOOP_CHECK
     CMPA.L      ENDADDR,A6          * Is pointer at end of address range?
-
-    BGT         END_LOOP            * If yes, END_LOOP
-    ; in case this resets status register, do another compare TODO
-
     BNE         LOOP                * If not, continue processing addresses
-    ; If at end of address range, check if user wants to continue
-    ; if user wants to continue, restart
-    ; else, end
-
-END_LOOP
+END_LOOP                            * Else, end loop
     JSR         RERUN               * Does the user want to run program again
     CMPI.B      #1,(RUNAGAIN)       * Does RUNAGAIN = TRUE?
     BEQ         START               * If yes, rerun program
@@ -139,6 +132,7 @@ END_LOOP
 
 *---------- End --------------------------------------------
                END  START          * Last line of source
+
 
 
 
