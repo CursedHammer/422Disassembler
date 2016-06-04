@@ -120,209 +120,201 @@ START:                  ; first instruction of program
     ASR.W       D1,D2
     ASR.L       D1,D2
     DIVU.W      D3,D4
-    OR.B        D3,D4
-    OR.B        D3,D4
-    OR.W        D3,D4
-    OR.W        D3,D4
-    OR.L        D3,D4
-    OR.L        D3,D4
-    BCC         $0001234
-    BGT         $0001234
-    BCC         $0004321
-    SIMHALT             ; halt simulator
-    * Put variables and constants here
-    END    START        ; last line of source
+    OR.B        #20,D4
+    OR.B        D3,$7080
+    OR.W        #20,D4
+    OR.W        D3,$7080
+    OR.L        #20,D4
+    OR.L        D3,$8FFF7080
+    BCC         $7080
+    BGT         $7080
+    BCC         $7080
+    ;SIMHALT             ; halt simulator
+    ;* Put variables and constants here
+    ;END    START        ; last line of source
 
 *-----------------------------------------------------------
 *--- Testing with all ea combinations started below --------
 *-----------------------------------------------------------
 
-;*Addressing Modes
-;*
-;*  Data Register Direct
-;*  Address Register Direct
-;*  Address Register Indirect
-;*  Address Register Indirect with Post Increment
-;*  Address Register Indirect with Pre Decremet
-;*  Immediate Data
-;*  Absolute Long Address
-;*  Absolute Word Address
-;
-;*-------Instructions----------------------------------------
-;*--NOP------------------------------------------------------
-;NOP     NOP
-;*--MOVE-----------------------------------------------------
-;MOVEB   MOVE.B      D0, D1
-;        MOVE.B      D0, (A0)
-;        MOVE.B      D0, (A0)+
-;        MOVE.B      D0, -(A0)
-;        MOVE.B      D0, $2000
-;        MOVE.B      D0, $FFFC2000
-;        MOVE.B      A0, D1
-;        MOVE.B      A0, (A0)
-;        MOVE.B      A0, (A0)+
-;        MOVE.B      A0, -(A0)
-;        MOVE.B      A0, $2000
-;        MOVE.B      A0, $FFFC2000
-;        MOVE.B      (A0), D1
-;        MOVE.B      (A0), (A0)
-;        MOVE.B      (A0), (A0)+
-;        MOVE.B      (A0), -(A0)
-;        MOVE.B      (A0), $2000
-;        MOVE.B      (A0), $FFFC2000
-;        MOVE.B      (A0)+, D1
-;        MOVE.B      (A0)+, (A0)
-;        MOVE.B      (A0)+, (A0)+
-;        MOVE.B      (A0)+, -(A0)
-;        MOVE.B      (A0)+, $2000
-;        MOVE.B      (A0)+, $FFFC2000
-;        MOVE.B      -(A0), D1
-;        MOVE.B      -(A0), (A0)
-;        MOVE.B      -(A0), (A0)+
-;        MOVE.B      -(A0), -(A0)
-;        MOVE.B      -(A0), $2000
-;        MOVE.B      -(A0), $FFFC2000
-;        MOVE.B      #$AB, D1
-;        MOVE.B      #$AB, (A0)
-;        MOVE.B      #$AB, (A0)+
-;        MOVE.B      #$AB, -(A0)
-;        MOVE.B      #$AB, $2000
-;        MOVE.B      #$AB, $FFFC2000
-;        MOVE.B      $2000, D1
-;        MOVE.B      $2000, (A0)
-;        MOVE.B      $2000, (A0)+
-;        MOVE.B      $2000, -(A0)
-;        MOVE.B      $2000, $2000
-;        MOVE.B      $2000, $FFFC2000
-;        MOVE.B      $FFFC2000, D1
-;        MOVE.B      $FFFC2000, (A0)
-;        MOVE.B      $FFFC2000, (A0)+
-;        MOVE.B      $FFFC2000, -(A0)
-;        MOVE.B      $FFFC2000, $2000
-;        MOVE.B      $FFFC2000, $FFFC2000
-;MOVEW   MOVE.W      D0, D1
-;        MOVE.W      D0, (A0)
-;        MOVE.W      D0, (A0)+
-;        MOVE.W      D0, -(A0)
-;        MOVE.W      D0, $2000
-;        MOVE.W      D0, $FFFC2000
-;        MOVE.W      A0, D1
-;        MOVE.W      A0, (A0)
-;        MOVE.W      A0, (A0)+
-;        MOVE.W      A0, -(A0)
-;        MOVE.W      A0, $2000
-;        MOVE.W      A0, $FFFC2000
-;        MOVE.W      (A0), D1
-;        MOVE.W      (A0), (A0)
-;        MOVE.W      (A0), (A0)+
-;        MOVE.W      (A0), -(A0)
-;        MOVE.W      (A0), $2000
-;        MOVE.W      (A0), $FFFC2000
-;        MOVE.W      (A0)+, D1
-;        MOVE.W      (A0)+, (A0)
-;        MOVE.W      (A0)+, (A0)+
-;        MOVE.W      (A0)+, -(A0)
-;        MOVE.W      (A0)+, $2000
-;        MOVE.W      (A0)+, $FFFC2000
-;        MOVE.W      -(A0), D1
-;        MOVE.W      -(A0), (A0)
-;        MOVE.W      -(A0), (A0)+
-;        MOVE.W      -(A0), -(A0)
-;        MOVE.W      -(A0), $2000
-;        MOVE.W      -(A0), $FFFC2000
-;        MOVE.W      #$ABCD, D1
-;        MOVE.W      #$ABCD, (A0)
-;        MOVE.W      #$ABCD, (A0)+
-;        MOVE.W      #$ABCD, -(A0)
-;        MOVE.W      #$ABCD, $2000
-;        MOVE.W      #$ABCD, $FFFC2000
-;        MOVE.W      $2000, D1
-;        MOVE.W      $2000, (A0)
-;        MOVE.W      $2000, (A0)+
-;        MOVE.W      $2000, -(A0)
-;        MOVE.W      $2000, $2000
-;        MOVE.W      $2000, $FFFC2000
-;        MOVE.W      $FFFC2000, D1
-;        MOVE.W      $FFFC2000, (A0)
-;        MOVE.W      $FFFC2000, (A0)+
-;        MOVE.W      $FFFC2000, -(A0)
-;        MOVE.W      $FFFC2000, $2000
-;        MOVE.W      $FFFC2000, $FFFC2000
-;MOVEL   MOVE.L      D0, D1
-;        MOVE.L      D0, (A0)
-;        MOVE.L      D0, (A0)+
-;        MOVE.L      D0, -(A0)
-;        MOVE.L      D0, $2000
-;        MOVE.L      D0, $FFFC2000
-;        MOVE.L      A0, D1
-;        MOVE.L      A0, (A0)
-;        MOVE.L      A0, (A0)+
-;        MOVE.L      A0, -(A0)
-;        MOVE.L      A0, $2000
-;        MOVE.L      A0, $FFFC2000
-;        MOVE.L      (A0), D1
-;        MOVE.L      (A0), (A0)
-;        MOVE.L      (A0), (A0)+
-;        MOVE.L      (A0), -(A0)
-;        MOVE.L      (A0), $2000
-;        MOVE.L      (A0), $FFFC2000
-;        MOVE.L      (A0)+, D1
-;        MOVE.L      (A0)+, (A0)
-;        MOVE.L      (A0)+, (A0)+
-;        MOVE.L      (A0)+, -(A0)
-;        MOVE.L      (A0)+, $2000
-;        MOVE.L      (A0)+, $FFFC2000
-;        MOVE.L      -(A0), D1
-;        MOVE.L      -(A0), (A0)
-;        MOVE.L      -(A0), (A0)+
-;        MOVE.L      -(A0), -(A0)
-;        MOVE.L      -(A0), $2000
-;        MOVE.L      -(A0), $FFFC2000
-;        MOVE.L      #$ABCD1234, D1
-;        MOVE.L      #$ABCD1234, (A0)
-;        MOVE.L      #$ABCD1234, (A0)+
-;        MOVE.L      #$ABCD1234, -(A0)
-;        MOVE.L      #$ABCD1234, $2000
-;        MOVE.L      #$ABCD1234, $FFFC2000
-;        MOVE.L      $2000, D1
-;        MOVE.L      $2000, (A0)
-;        MOVE.L      $2000, (A0)+
-;        MOVE.L      $2000, -(A0)
-;        MOVE.L      $2000, $2000
-;        MOVE.L      $2000, $FFFC2000
-;        MOVE.L      $FFFC2000, D1
-;        MOVE.L      $FFFC2000, (A0)
-;        MOVE.L      $FFFC2000, (A0)+
-;        MOVE.L      $FFFC2000, -(A0)
-;        MOVE.L      $FFFC2000, $2000
-;        MOVE.L      $FFFC2000, $FFFC2000
-;*--MOVEA----------------------------------------------------
-;MOVEAB  MOVEA.B     D0, A0
-;        MOVEA.B     A1, A0
-;        MOVEA.B     (A1), A0
-;        MOVEA.B     (A1)+, A0
-;        MOVEA.B     -(A1), A0
-;        MOVEA.B     #$AB, A0
-;        MOVEA.B     $2000, A0
-;        MOVEA.B     $FFFC2000, A0
-;MOVEAW  MOVEA.W     D0, A0
-;        MOVEA.W     A1, A0
-;        MOVEA.W     (A1), A0
-;        MOVEA.W     (A1)+, A0
-;        MOVEA.W     -(A1), A0
-;        MOVEA.W     #$ABCD, A0
-;        MOVEA.W     $2000, A0
-;        MOVEA.W     $FFFC2000, A0
-;MOVEAL  MOVEA.L     D0, A0
-;        MOVEA.L     A1, A0
-;        MOVEA.L     (A1), A0
-;        MOVEA.L     (A1)+, A0
-;        MOVEA.L     -(A1), A0
-;        MOVEA.L     #$ABCD1234, A0
-;        MOVEA.L     $2000, A0
-;        MOVEA.L     $FFFC2000, A0
-;*--MOVEQ----------------------------------------------------
-;MOVEQ   MOVEQ       #-3, D0
+*Addressing Modes
+*
+*  Data Register Direct
+*  Address Register Direct
+*  Address Register Indirect
+*  Address Register Indirect with Post Increment
+*  Address Register Indirect with Pre Decremet
+*  Immediate Data
+*  Absolute Long Address
+*  Absolute Word Address
+
+*-------Instructions----------------------------------------
+*--NOP------------------------------------------------------
+NOP     NOP
+*--MOVE-----------------------------------------------------
+        MOVE.B      D0, D1
+        MOVE.B      D0, (A0)
+        MOVE.B      D0, (A0)+
+        MOVE.B      D0, -(A0)
+        MOVE.B      D0, $2000
+        MOVE.B      D0, $FFFC2000
+        *MOVE.B      A0, D1 ; not allowed
+        *MOVE.B      A0, (A0)
+        *MOVE.B      A0, (A0)+
+        *MOVE.B      A0, -(A0)
+        *MOVE.B      A0, $2000
+        *MOVE.B      A0, $FFFC2000
+        MOVE.B      (A0), D1
+        MOVE.B      (A0), (A0)
+        MOVE.B      (A0), (A0)+
+        MOVE.B      (A0), -(A0)
+        MOVE.B      (A0), $2000
+        MOVE.B      (A0), $FFFC2000
+        MOVE.B      (A0)+, D1
+        MOVE.B      (A0)+, (A0)
+        MOVE.B      (A0)+, (A0)+
+        MOVE.B      (A0)+, -(A0)
+        MOVE.B      (A0)+, $2000
+        MOVE.B      (A0)+, $FFFC2000
+        MOVE.B      -(A0), D1
+        MOVE.B      -(A0), (A0)
+        MOVE.B      -(A0), (A0)+
+        MOVE.B      -(A0), -(A0)
+        MOVE.B      -(A0), $2000
+        MOVE.B      -(A0), $FFFC2000
+        MOVE.B      #$AB, D1
+        MOVE.B      #$AB, (A0)
+        MOVE.B      #$AB, (A0)+
+        MOVE.B      #$AB, -(A0)
+        MOVE.B      #$AB, $2000
+        MOVE.B      #$AB, $FFFC2000
+        MOVE.B      $2000, D1
+        MOVE.B      $2000, (A0)
+        MOVE.B      $2000, (A0)+
+        MOVE.B      $2000, -(A0)
+        MOVE.B      $2000, $2000
+        MOVE.B      $2000, $FFFC2000
+        MOVE.B      $FFFC2000, D1
+        MOVE.B      $FFFC2000, (A0)
+        MOVE.B      $FFFC2000, (A0)+
+        MOVE.B      $FFFC2000, -(A0)
+        MOVE.B      $FFFC2000, $2000
+        MOVE.B      $FFFC2000, $FFFC2000
+MOVEW   MOVE.W      D0, D1
+        MOVE.W      D0, (A0)
+        MOVE.W      D0, (A0)+
+        MOVE.W      D0, -(A0)
+        MOVE.W      D0, $2000
+        MOVE.W      D0, $FFFC2000
+        MOVE.W      A0, D1
+        MOVE.W      A0, (A0)
+        MOVE.W      A0, (A0)+
+        MOVE.W      A0, -(A0)
+        MOVE.W      A0, $2000
+        MOVE.W      A0, $FFFC2000
+        MOVE.W      (A0), D1
+        MOVE.W      (A0), (A0)
+        MOVE.W      (A0), (A0)+
+        MOVE.W      (A0), -(A0)
+        MOVE.W      (A0), $2000
+        MOVE.W      (A0), $FFFC2000
+        MOVE.W      (A0)+, D1
+        MOVE.W      (A0)+, (A0)
+        MOVE.W      (A0)+, (A0)+
+        MOVE.W      (A0)+, -(A0)
+        MOVE.W      (A0)+, $2000
+        MOVE.W      (A0)+, $FFFC2000
+        MOVE.W      -(A0), D1
+        MOVE.W      -(A0), (A0)
+        MOVE.W      -(A0), (A0)+
+        MOVE.W      -(A0), -(A0)
+        MOVE.W      -(A0), $2000
+        MOVE.W      -(A0), $FFFC2000
+        MOVE.W      #$ABCD, D1
+        MOVE.W      #$ABCD, (A0)
+        MOVE.W      #$ABCD, (A0)+
+        MOVE.W      #$ABCD, -(A0)
+        MOVE.W      #$ABCD, $2000
+        MOVE.W      #$ABCD, $FFFC2000
+        MOVE.W      $2000, D1
+        MOVE.W      $2000, (A0)
+        MOVE.W      $2000, (A0)+
+        MOVE.W      $2000, -(A0)
+        MOVE.W      $2000, $2000
+        MOVE.W      $2000, $FFFC2000
+        MOVE.W      $FFFC2000, D1
+        MOVE.W      $FFFC2000, (A0)
+        MOVE.W      $FFFC2000, (A0)+
+        MOVE.W      $FFFC2000, -(A0)
+        MOVE.W      $FFFC2000, $2000
+        MOVE.W      $FFFC2000, $FFFC2000
+MOVEL   MOVE.L      D0, D1
+        MOVE.L      D0, (A0)
+        MOVE.L      D0, (A0)+
+        MOVE.L      D0, -(A0)
+        MOVE.L      D0, $2000
+        MOVE.L      D0, $FFFC2000
+        MOVE.L      A0, D1
+        MOVE.L      A0, (A0)
+        MOVE.L      A0, (A0)+
+        MOVE.L      A0, -(A0)
+        MOVE.L      A0, $2000
+        MOVE.L      A0, $FFFC2000
+        MOVE.L      (A0), D1
+        MOVE.L      (A0), (A0)
+        MOVE.L      (A0), (A0)+
+        MOVE.L      (A0), -(A0)
+        MOVE.L      (A0), $2000
+        MOVE.L      (A0), $FFFC2000
+        MOVE.L      (A0)+, D1
+        MOVE.L      (A0)+, (A0)
+        MOVE.L      (A0)+, (A0)+
+        MOVE.L      (A0)+, -(A0)
+        MOVE.L      (A0)+, $2000
+        MOVE.L      (A0)+, $FFFC2000
+        MOVE.L      -(A0), D1
+        MOVE.L      -(A0), (A0)
+        MOVE.L      -(A0), (A0)+
+        MOVE.L      -(A0), -(A0)
+        MOVE.L      -(A0), $2000
+        MOVE.L      -(A0), $FFFC2000
+        MOVE.L      #$ABCD1234, D1
+        MOVE.L      #$ABCD1234, (A0)
+        MOVE.L      #$ABCD1234, (A0)+
+        MOVE.L      #$ABCD1234, -(A0)
+        MOVE.L      #$ABCD1234, $2000
+        MOVE.L      #$ABCD1234, $FFFC2000
+        MOVE.L      $2000, D1
+        MOVE.L      $2000, (A0)
+        MOVE.L      $2000, (A0)+
+        MOVE.L      $2000, -(A0)
+        MOVE.L      $2000, $2000
+        MOVE.L      $2000, $FFFC2000
+        MOVE.L      $FFFC2000, D1
+        MOVE.L      $FFFC2000, (A0)
+        MOVE.L      $FFFC2000, (A0)+
+        MOVE.L      $FFFC2000, -(A0)
+        MOVE.L      $FFFC2000, $2000
+        MOVE.L      $FFFC2000, $FFFC2000
+*--MOVEA----------------------------------------------------
+MOVEAW  MOVEA.W     D0, A0
+        MOVEA.W     A1, A0
+        MOVEA.W     (A1), A0
+        MOVEA.W     (A1)+, A0
+        MOVEA.W     -(A1), A0
+        MOVEA.W     #$ABCD, A0
+        MOVEA.W     $2000, A0
+        MOVEA.W     $FFFC2000, A0
+MOVEAL  MOVEA.L     D0, A0
+        MOVEA.L     A1, A0
+        MOVEA.L     (A1), A0
+        MOVEA.L     (A1)+, A0
+        MOVEA.L     -(A1), A0
+        MOVEA.L     #$ABCD1234, A0
+        MOVEA.L     $2000, A0
+        MOVEA.L     $FFFC2000, A0
+*--MOVEQ----------------------------------------------------
+MOVEQ   MOVEQ       #3, D0
 ;*--MOVEM----------------------------------------------------
 ;TESTSTACK EQU       $7000           ; printed out as errors in output
 ;        LEA         TESTSTACK, SP   ; SP is stored in A7
@@ -366,11 +358,13 @@ START:                  ; first instruction of program
 ;*   JSR
 ;*   RTS
 ;
-;    SIMHALT             ; halt simulator
-;
-;* Put variables and constants here
-;
-;    END    START        ; last line of source
+    SIMHALT             ; halt simulator
+
+* Put variables and constants here
+
+    END    START        ; last line of source
+
+
 
 
 

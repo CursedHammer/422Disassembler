@@ -1,6 +1,6 @@
 00007000 Starting Address
 Assembler used: EASy68K Editor/Assembler v5.15.04
-Created On: 6/4/2016 1:41:52 AM
+Created On: 6/4/2016 3:24:42 AM
 
 00000000                             1  *-----------------------------------------------------------
 00000000                             2  * Title      : Testing Code
@@ -124,18 +124,249 @@ Created On: 6/4/2016 1:41:52 AM
 0000707E  E262                     120      ASR.W       D1,D2
 00007080  E2A2                     121      ASR.L       D1,D2
 00007082  88C3                     122      DIVU.W      D3,D4
-00007084  8803                     123      OR.B        D3,D4
-00007086  8803                     124      OR.B        D3,D4
-00007088  8843                     125      OR.W        D3,D4
-0000708A  8843                     126      OR.W        D3,D4
-0000708C  8883                     127      OR.L        D3,D4
-0000708E  8883                     128      OR.L        D3,D4
-00007090  6400 A1A2                129      BCC         $0001234
-00007094  6E00 A19E                130      BGT         $0001234
-00007098  6400 D287                131      BCC         $0004321
-0000709C  FFFF FFFF                132      SIMHALT             ; halt simulator
-000070A0                           133      * Put variables and constants here
-000070A0                           134      END    START        ; last line of source
+00007084  883C 0014                123      OR.B        #20,D4
+00007088  8738 7080                124      OR.B        D3,$7080
+0000708C  887C 0014                125      OR.W        #20,D4
+00007090  8778 7080                126      OR.W        D3,$7080
+00007094  88BC 00000014            127      OR.L        #20,D4
+0000709A  87B9 8FFF7080            128      OR.L        D3,$8FFF7080
+000070A0  64DE                     129      BCC         $7080
+000070A2  6EDC                     130      BGT         $7080
+000070A4  64DA                     131      BCC         $7080
+000070A6                           132      ;SIMHALT             ; halt simulator
+000070A6                           133      ;* Put variables and constants here
+000070A6                           134      ;END    START        ; last line of source
+000070A6                           135  
+000070A6                           136  *-----------------------------------------------------------
+000070A6                           137  *--- Testing with all ea combinations started below --------
+000070A6                           138  *-----------------------------------------------------------
+000070A6                           139  
+000070A6                           140  *Addressing Modes
+000070A6                           141  *
+000070A6                           142  *  Data Register Direct
+000070A6                           143  *  Address Register Direct
+000070A6                           144  *  Address Register Indirect
+000070A6                           145  *  Address Register Indirect with Post Increment
+000070A6                           146  *  Address Register Indirect with Pre Decremet
+000070A6                           147  *  Immediate Data
+000070A6                           148  *  Absolute Long Address
+000070A6                           149  *  Absolute Word Address
+000070A6                           150  
+000070A6                           151  *-------Instructions----------------------------------------
+000070A6                           152  *--NOP------------------------------------------------------
+000070A6  4E71                     153  NOP     NOP
+000070A8                           154  *--MOVE-----------------------------------------------------
+000070A8  1200                     155          MOVE.B      D0, D1
+000070AA  1080                     156          MOVE.B      D0, (A0)
+000070AC  10C0                     157          MOVE.B      D0, (A0)+
+000070AE  1100                     158          MOVE.B      D0, -(A0)
+000070B0  11C0 2000                159          MOVE.B      D0, $2000
+000070B4  13C0 FFFC2000            160          MOVE.B      D0, $FFFC2000
+000070BA                           161          *MOVE.B      A0, D1 ; not allowed
+000070BA                           162          *MOVE.B      A0, (A0)
+000070BA                           163          *MOVE.B      A0, (A0)+
+000070BA                           164          *MOVE.B      A0, -(A0)
+000070BA                           165          *MOVE.B      A0, $2000
+000070BA                           166          *MOVE.B      A0, $FFFC2000
+000070BA  1210                     167          MOVE.B      (A0), D1
+000070BC  1090                     168          MOVE.B      (A0), (A0)
+000070BE  10D0                     169          MOVE.B      (A0), (A0)+
+000070C0  1110                     170          MOVE.B      (A0), -(A0)
+000070C2  11D0 2000                171          MOVE.B      (A0), $2000
+000070C6  13D0 FFFC2000            172          MOVE.B      (A0), $FFFC2000
+000070CC  1218                     173          MOVE.B      (A0)+, D1
+000070CE  1098                     174          MOVE.B      (A0)+, (A0)
+000070D0  10D8                     175          MOVE.B      (A0)+, (A0)+
+000070D2  1118                     176          MOVE.B      (A0)+, -(A0)
+000070D4  11D8 2000                177          MOVE.B      (A0)+, $2000
+000070D8  13D8 FFFC2000            178          MOVE.B      (A0)+, $FFFC2000
+000070DE  1220                     179          MOVE.B      -(A0), D1
+000070E0  10A0                     180          MOVE.B      -(A0), (A0)
+000070E2  10E0                     181          MOVE.B      -(A0), (A0)+
+000070E4  1120                     182          MOVE.B      -(A0), -(A0)
+000070E6  11E0 2000                183          MOVE.B      -(A0), $2000
+000070EA  13E0 FFFC2000            184          MOVE.B      -(A0), $FFFC2000
+000070F0  123C 00AB                185          MOVE.B      #$AB, D1
+000070F4  10BC 00AB                186          MOVE.B      #$AB, (A0)
+000070F8  10FC 00AB                187          MOVE.B      #$AB, (A0)+
+000070FC  113C 00AB                188          MOVE.B      #$AB, -(A0)
+00007100  11FC 00AB 2000           189          MOVE.B      #$AB, $2000
+00007106  13FC 00AB FFFC2000       190          MOVE.B      #$AB, $FFFC2000
+0000710E  1238 2000                191          MOVE.B      $2000, D1
+00007112  10B8 2000                192          MOVE.B      $2000, (A0)
+00007116  10F8 2000                193          MOVE.B      $2000, (A0)+
+0000711A  1138 2000                194          MOVE.B      $2000, -(A0)
+0000711E  11F8 2000 2000           195          MOVE.B      $2000, $2000
+00007124  13F8 2000 FFFC2000       196          MOVE.B      $2000, $FFFC2000
+0000712C  1239 FFFC2000            197          MOVE.B      $FFFC2000, D1
+00007132  10B9 FFFC2000            198          MOVE.B      $FFFC2000, (A0)
+00007138  10F9 FFFC2000            199          MOVE.B      $FFFC2000, (A0)+
+0000713E  1139 FFFC2000            200          MOVE.B      $FFFC2000, -(A0)
+00007144  11F9 FFFC2000 2000       201          MOVE.B      $FFFC2000, $2000
+0000714C  13F9 FFFC2000 FFFC2000   202          MOVE.B      $FFFC2000, $FFFC2000
+00007156  3200                     203  MOVEW   MOVE.W      D0, D1
+00007158  3080                     204          MOVE.W      D0, (A0)
+0000715A  30C0                     205          MOVE.W      D0, (A0)+
+0000715C  3100                     206          MOVE.W      D0, -(A0)
+0000715E  31C0 2000                207          MOVE.W      D0, $2000
+00007162  33C0 FFFC2000            208          MOVE.W      D0, $FFFC2000
+00007168  3208                     209          MOVE.W      A0, D1
+0000716A  3088                     210          MOVE.W      A0, (A0)
+0000716C  30C8                     211          MOVE.W      A0, (A0)+
+0000716E  3108                     212          MOVE.W      A0, -(A0)
+00007170  31C8 2000                213          MOVE.W      A0, $2000
+00007174  33C8 FFFC2000            214          MOVE.W      A0, $FFFC2000
+0000717A  3210                     215          MOVE.W      (A0), D1
+0000717C  3090                     216          MOVE.W      (A0), (A0)
+0000717E  30D0                     217          MOVE.W      (A0), (A0)+
+00007180  3110                     218          MOVE.W      (A0), -(A0)
+00007182  31D0 2000                219          MOVE.W      (A0), $2000
+00007186  33D0 FFFC2000            220          MOVE.W      (A0), $FFFC2000
+0000718C  3218                     221          MOVE.W      (A0)+, D1
+0000718E  3098                     222          MOVE.W      (A0)+, (A0)
+00007190  30D8                     223          MOVE.W      (A0)+, (A0)+
+00007192  3118                     224          MOVE.W      (A0)+, -(A0)
+00007194  31D8 2000                225          MOVE.W      (A0)+, $2000
+00007198  33D8 FFFC2000            226          MOVE.W      (A0)+, $FFFC2000
+0000719E  3220                     227          MOVE.W      -(A0), D1
+000071A0  30A0                     228          MOVE.W      -(A0), (A0)
+000071A2  30E0                     229          MOVE.W      -(A0), (A0)+
+000071A4  3120                     230          MOVE.W      -(A0), -(A0)
+000071A6  31E0 2000                231          MOVE.W      -(A0), $2000
+000071AA  33E0 FFFC2000            232          MOVE.W      -(A0), $FFFC2000
+000071B0  323C ABCD                233          MOVE.W      #$ABCD, D1
+000071B4  30BC ABCD                234          MOVE.W      #$ABCD, (A0)
+000071B8  30FC ABCD                235          MOVE.W      #$ABCD, (A0)+
+000071BC  313C ABCD                236          MOVE.W      #$ABCD, -(A0)
+000071C0  31FC ABCD 2000           237          MOVE.W      #$ABCD, $2000
+000071C6  33FC ABCD FFFC2000       238          MOVE.W      #$ABCD, $FFFC2000
+000071CE  3238 2000                239          MOVE.W      $2000, D1
+000071D2  30B8 2000                240          MOVE.W      $2000, (A0)
+000071D6  30F8 2000                241          MOVE.W      $2000, (A0)+
+000071DA  3138 2000                242          MOVE.W      $2000, -(A0)
+000071DE  31F8 2000 2000           243          MOVE.W      $2000, $2000
+000071E4  33F8 2000 FFFC2000       244          MOVE.W      $2000, $FFFC2000
+000071EC  3239 FFFC2000            245          MOVE.W      $FFFC2000, D1
+000071F2  30B9 FFFC2000            246          MOVE.W      $FFFC2000, (A0)
+000071F8  30F9 FFFC2000            247          MOVE.W      $FFFC2000, (A0)+
+000071FE  3139 FFFC2000            248          MOVE.W      $FFFC2000, -(A0)
+00007204  31F9 FFFC2000 2000       249          MOVE.W      $FFFC2000, $2000
+0000720C  33F9 FFFC2000 FFFC2000   250          MOVE.W      $FFFC2000, $FFFC2000
+00007216  2200                     251  MOVEL   MOVE.L      D0, D1
+00007218  2080                     252          MOVE.L      D0, (A0)
+0000721A  20C0                     253          MOVE.L      D0, (A0)+
+0000721C  2100                     254          MOVE.L      D0, -(A0)
+0000721E  21C0 2000                255          MOVE.L      D0, $2000
+00007222  23C0 FFFC2000            256          MOVE.L      D0, $FFFC2000
+00007228  2208                     257          MOVE.L      A0, D1
+0000722A  2088                     258          MOVE.L      A0, (A0)
+0000722C  20C8                     259          MOVE.L      A0, (A0)+
+0000722E  2108                     260          MOVE.L      A0, -(A0)
+00007230  21C8 2000                261          MOVE.L      A0, $2000
+00007234  23C8 FFFC2000            262          MOVE.L      A0, $FFFC2000
+0000723A  2210                     263          MOVE.L      (A0), D1
+0000723C  2090                     264          MOVE.L      (A0), (A0)
+0000723E  20D0                     265          MOVE.L      (A0), (A0)+
+00007240  2110                     266          MOVE.L      (A0), -(A0)
+00007242  21D0 2000                267          MOVE.L      (A0), $2000
+00007246  23D0 FFFC2000            268          MOVE.L      (A0), $FFFC2000
+0000724C  2218                     269          MOVE.L      (A0)+, D1
+0000724E  2098                     270          MOVE.L      (A0)+, (A0)
+00007250  20D8                     271          MOVE.L      (A0)+, (A0)+
+00007252  2118                     272          MOVE.L      (A0)+, -(A0)
+00007254  21D8 2000                273          MOVE.L      (A0)+, $2000
+00007258  23D8 FFFC2000            274          MOVE.L      (A0)+, $FFFC2000
+0000725E  2220                     275          MOVE.L      -(A0), D1
+00007260  20A0                     276          MOVE.L      -(A0), (A0)
+00007262  20E0                     277          MOVE.L      -(A0), (A0)+
+00007264  2120                     278          MOVE.L      -(A0), -(A0)
+00007266  21E0 2000                279          MOVE.L      -(A0), $2000
+0000726A  23E0 FFFC2000            280          MOVE.L      -(A0), $FFFC2000
+00007270  223C ABCD1234            281          MOVE.L      #$ABCD1234, D1
+00007276  20BC ABCD1234            282          MOVE.L      #$ABCD1234, (A0)
+0000727C  20FC ABCD1234            283          MOVE.L      #$ABCD1234, (A0)+
+00007282  213C ABCD1234            284          MOVE.L      #$ABCD1234, -(A0)
+00007288  21FC ABCD1234 2000       285          MOVE.L      #$ABCD1234, $2000
+00007290  23FC ABCD1234 FFFC2000   286          MOVE.L      #$ABCD1234, $FFFC2000
+0000729A  2238 2000                287          MOVE.L      $2000, D1
+0000729E  20B8 2000                288          MOVE.L      $2000, (A0)
+000072A2  20F8 2000                289          MOVE.L      $2000, (A0)+
+000072A6  2138 2000                290          MOVE.L      $2000, -(A0)
+000072AA  21F8 2000 2000           291          MOVE.L      $2000, $2000
+000072B0  23F8 2000 FFFC2000       292          MOVE.L      $2000, $FFFC2000
+000072B8  2239 FFFC2000            293          MOVE.L      $FFFC2000, D1
+000072BE  20B9 FFFC2000            294          MOVE.L      $FFFC2000, (A0)
+000072C4  20F9 FFFC2000            295          MOVE.L      $FFFC2000, (A0)+
+000072CA  2139 FFFC2000            296          MOVE.L      $FFFC2000, -(A0)
+000072D0  21F9 FFFC2000 2000       297          MOVE.L      $FFFC2000, $2000
+000072D8  23F9 FFFC2000 FFFC2000   298          MOVE.L      $FFFC2000, $FFFC2000
+000072E2                           299  *--MOVEA----------------------------------------------------
+000072E2  3040                     300  MOVEAW  MOVEA.W     D0, A0
+000072E4  3049                     301          MOVEA.W     A1, A0
+000072E6  3051                     302          MOVEA.W     (A1), A0
+000072E8  3059                     303          MOVEA.W     (A1)+, A0
+000072EA  3061                     304          MOVEA.W     -(A1), A0
+000072EC  307C ABCD                305          MOVEA.W     #$ABCD, A0
+000072F0  3078 2000                306          MOVEA.W     $2000, A0
+000072F4  3079 FFFC2000            307          MOVEA.W     $FFFC2000, A0
+000072FA  2040                     308  MOVEAL  MOVEA.L     D0, A0
+000072FC  2049                     309          MOVEA.L     A1, A0
+000072FE  2051                     310          MOVEA.L     (A1), A0
+00007300  2059                     311          MOVEA.L     (A1)+, A0
+00007302  2061                     312          MOVEA.L     -(A1), A0
+00007304  207C ABCD1234            313          MOVEA.L     #$ABCD1234, A0
+0000730A  2078 2000                314          MOVEA.L     $2000, A0
+0000730E  2079 FFFC2000            315          MOVEA.L     $FFFC2000, A0
+00007314                           316  *--MOVEQ----------------------------------------------------
+00007314  7003                     317  MOVEQ   MOVEQ       #3, D0
+00007316                           318  ;*--MOVEM----------------------------------------------------
+00007316                           319  ;TESTSTACK EQU       $7000           ; printed out as errors in output
+00007316                           320  ;        LEA         TESTSTACK, SP   ; SP is stored in A7
+00007316                           321  ;MOVEMW  MOVEM.W     A0-A6/D0-D7, (SP)
+00007316                           322  ;        MOVEM.W     A0-A6/D0-D7, -(SP)
+00007316                           323  ;        MOVEM.W     A1-A5/D3        ; test different registers...add more here?
+00007316                           324  ;        MOVEM.W     A0-A6/D0-D7, $2000
+00007316                           325  ;        MOVEM.W     A0-A6/D0-D7, $FFFC2000
+00007316                           326  ;        MOVEM.W     (SP) , A0-A6/D0-D7
+00007316                           327  ;        MOVEM.W     (SP)+, A0-A6/D0-D7
+00007316                           328  ;        MOVEM.W     $2000, A0-A6/D0-D7
+00007316                           329  ;        MOVEM.W     $FFFC2000, A0-A6/D0-D7
+00007316                           330  ;MOVEML  MOVEM.L     A0-A6/D0-D7, (SP)
+00007316                           331  ;        MOVEM.L     A0-A6/D0-D7, -(SP)
+00007316                           332  ;        MOVEM.L     A1-A5/D3        ; test different registers...add more here?
+00007316                           333  ;        MOVEM.L     A0-A6/D0-D7, $2000
+00007316                           334  ;        MOVEM.L     A0-A6/D0-D7, $FFFC2000
+00007316                           335  ;        MOVEM.L     (SP) , A0-A6/D0-D7
+00007316                           336  ;        MOVEM.L     (SP)+, A0-A6/D0-D7
+00007316                           337  ;        MOVEM.L     $2000, A0-A6/D0-D7
+00007316                           338  ;        MOVEM.L     $FFFC2000, A0-A6/D0-D7
+00007316                           339  ;*--ADD------------------------------------------------------
+00007316                           340  ;*   ADDA
+00007316                           341  ;*   ADDI
+00007316                           342  ;*   ADDQ
+00007316                           343  ;*   SUB
+00007316                           344  ;*   MULS
+00007316                           345  ;*   DIVU
+00007316                           346  ;*   LEA
+00007316                           347  ;*   CLR
+00007316                           348  ;*   AND
+00007316                           349  ;*   OR
+00007316                           350  ;*   LSL
+00007316                           351  ;*   LSR
+00007316                           352  ;*   ASR
+00007316                           353  ;*   ASL
+00007316                           354  ;*   ROL
+00007316                           355  ;*   ROR
+00007316                           356  ;*   CMP
+00007316                           357  ;*   Bcc (BCC, BGT, BLE)
+00007316                           358  ;*   JSR
+00007316                           359  ;*   RTS
+00007316                           360  ;
+00007316  FFFF FFFF                361      SIMHALT             ; halt simulator
+0000731A                           362  
+0000731A                           363  * Put variables and constants here
+0000731A                           364  
+0000731A                           365      END    START        ; last line of source
 
 No errors detected
 No warnings generated
@@ -144,4 +375,10 @@ No warnings generated
 SYMBOL TABLE INFORMATION
 Symbol-name         Value
 -------------------------
+MOVEAL              72FA
+MOVEAW              72E2
+MOVEL               7216
+MOVEQ               7314
+MOVEW               7156
+NOP                 70A6
 START               7000
