@@ -863,6 +863,8 @@ CMP_MODE_111: ; The rest (not all valid, validated by register number)
     BEQ         CMP_ABS_W
     CMP.B       #$01, D7            ; Test for absolute long address
     BEQ         CMP_ABS_L
+    CMP.B       #$04, D7            ; Test for immediate data
+    BEQ         CMP_IMM
     JSR         EA_INVALID          ; Opcode word is Invalid
     JMP         CMP_END
 *-----------------------------------
@@ -872,6 +874,12 @@ CMP_ABS_W:
     JMP         CMP_MODE_END
 CMP_ABS_L:
     JSR         EA_PRINT_ABS_L      ; Print absolute long address operand
+    JMP         CMP_MODE_END
+CMP_IMM:
+    JSR         EA_OPMODE_COMBO     ; get opmode bits in D6, register bits not used
+    MOVE.B      D6, D5              ; Set (size - 1)
+    ADD.B       #1, D5              ; Set size
+    JSR         EA_PRINT_IMM        ; Print immediate data
     JMP         CMP_MODE_END
 *-----------------------------------
 *--- Evaluate and print register ---
