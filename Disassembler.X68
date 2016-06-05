@@ -94,7 +94,7 @@ LOOP
     MOVE.B      #RCOUNT, D2         * Reset row counter
 LOOP_CHECK
     CMPA.L      ENDADDR,A6          * Is pointer at end of address range?
-    BNE         LOOP                * If not, continue processing addresses
+    BLT         LOOP                * If not, continue processing addresses
 END_LOOP                            * Else, end loop
     JSR         RERUN               * Does the user want to run program again
     CMPI.B      #1,(RUNAGAIN)       * Does RUNAGAIN = TRUE?
