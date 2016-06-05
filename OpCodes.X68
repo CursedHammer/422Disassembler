@@ -80,7 +80,7 @@ BCCorBGTorBLE       LEA     tableBCCorBGTorBLE, A0            ; Index into the t
                     CLR.L   D0                  ; Zero it
                     MOVE.W  (A6),D0         ; We'll play with it here
                     MOVE.B  #6,D1           ; Shift 6 bits left
-                    ASL.W   D1,D0
+                    LSL.W   D1,D0
                     MOVE.B  #14,D1           ; Shift 14 bits to the right
                     LSR.W   D1,D0               ; Move the bits (moves highest 4 bits to lowest 4 positions,
                                     ; and the rest are zeroed out)
@@ -111,7 +111,7 @@ OR_BorOR_WorOR_LorDIVU:
         CLR.L       D0              ; Zero it
         MOVE.W      (A6),D0     ; We'll play with it here
         MOVE.B      #7,D1           ; Shift 7 bits left
-        ASL.W       D1,D0
+        LSL.W       D1,D0
         MOVE.B      #13,D1          ; Shift 13 bits to the right
         LSR.W       D1,D0           ; Move the bits (moves highest 4 bits to lowest 4 positions,
                                     ; and the rest are zeroed out)
@@ -154,7 +154,7 @@ someASR:
         CLR.L       D0              ; Zero it
         MOVE.W      (A6),D0         ; We'll play with it here
         MOVE.B      #8,D1           ; Shift 8 bits left
-        ASL.W       D1,D0
+        LSL.W       D1,D0
         MOVE.B      #14,D1          ; Shift 14 bits to the right
         LSR.W       D1,D0           ; Move the bits (moves highest 4 bits to lowest 4 positions,
                                     ; and the rest are zeroed out)
@@ -183,7 +183,7 @@ someASL:
         CLR.L       D0              ; Zero it
         MOVE.W      (A6),D0     ; We'll play with it here
         MOVE.B      #8,D1           ; Shift 8 bits left
-        ASL.W       D1,D0
+        LSL.W       D1,D0
         MOVE.B      #14,D1          ; Shift 14 bits to the right
         LSR.W       D1,D0           ; Move the bits (moves highest 4 bits to lowest 4 positions,
                                     ; and the rest are zeroed out)
@@ -212,7 +212,7 @@ someLSR:
         CLR.L       D0              ; Zero it
         MOVE.W      (A6),D0     ; We'll play with it here
         MOVE.B      #8,D1           ; Shift 8 bits left
-        ASL.W       D1,D0
+        LSL.W       D1,D0
         MOVE.B      #14,D1          ; Shift 14 bits to the right
         LSR.W       D1,D0           ; Move the bits (moves highest 4 bits to lowest 4 positions,
                                     ; and the rest are zeroed out)
@@ -240,7 +240,7 @@ someLSL:
         CLR.L       D0              ; Zero it
         MOVE.W      (A6),D0     ; We'll play with it here
         MOVE.B      #8,D1           ; Shift 8 bits left
-        ASL.W       D1,D0
+        LSL.W       D1,D0
         MOVE.B      #14,D1          ; Shift 14 bits to the right
         LSR.W       D1,D0           ; Move the bits (moves highest 4 bits to lowest 4 positions,
                                     ; and the rest are zeroed out)
@@ -269,7 +269,7 @@ someROL:
         CLR.L       D0              ; Zero it
         MOVE.W      (A6),D0     ; We'll play with it here
         MOVE.B      #8,D1           ; Shift 8 bits left
-        ASL.W       D1,D0
+        LSL.W       D1,D0
         MOVE.B      #14,D1          ; Shift 14 bits to the right
         LSR.W       D1,D0           ; Move the bits (moves highest 4 bits to lowest 4 positions,
                                     ; and the rest are zeroed out)
@@ -299,7 +299,7 @@ someROR:
         CLR.L       D0              ; Zero it
         MOVE.W      (A6),D0     ; We'll play with it here
         MOVE.B      #8,D1           ; Shift 8 bits left
-        ASL.W       D1,D0
+        LSL.W       D1,D0
         MOVE.B      #14,D1          ; Shift 14 bits to the right
         LSR.W       D1,D0           ; Move the bits (moves highest 4 bits to lowest 4 positions,
                                     ; and the rest are zeroed out)
@@ -328,7 +328,7 @@ ROL_ROR:
         CLR.L       D0              ; Zero it
         MOVE.W      (A6),D0     ; We'll play with it here
         MOVE.B      #7,D1           ; Shift 7 bits left
-        ASL.W       D1,D0
+        LSL.W       D1,D0
         MOVE.B      #15,D1          ; Shift 15 bits to the right
         LSR.W       D1,D0           ; Move the bits (moves highest 4 bits to lowest 4 positions,
                                     ; and the rest are zeroed out)
@@ -351,7 +351,7 @@ LSL_LSR:
         CLR.L       D0              ; Zero it
         MOVE.W      (A6),D0     ; We'll play with it here
         MOVE.B      #7,D1           ; Shift 7 bits left
-        ASL.W       D1,D0
+        LSL.W       D1,D0
         MOVE.B      #15,D1          ; Shift 15 bits to the right
         LSR.W       D1,D0           ; Move the bits (moves highest 4 bits to lowest 4 positions,
                                     ; and the rest are zeroed out)
@@ -374,7 +374,7 @@ ASL_ASR:
         CLR.L       D0              ; Zero it
         MOVE.W      (A6),D0     ; We'll play with it here
         MOVE.B      #7,D1           ; Shift 7 bits left
-        ASL.W       D1,D0
+        LSL.W       D1,D0
         MOVE.B      #15,D1          ; Shift 15 bits to the right
         LSR.W       D1,D0           ; Move the bits (moves highest 4 bits to lowest 4 positions,
                                     ; and the rest are zeroed out)
@@ -397,7 +397,7 @@ ROd_LSd_ASd:
         CLR.L       D0              ; Zero it
         MOVE.W      (A6),D0     ; We'll play with it here
         MOVE.B      #11,D1          ; Shift 11 bits left
-        ASL.W       D1,D0
+        LSL.W       D1,D0
         MOVE.B      #15,D1          ; Shift 12 bits to the right
         LSR.W       D1,D0           ; Move the bits (moves highest 4 bits to lowest 4 positions,
                                     ; and the rest are zeroed out)
@@ -426,7 +426,7 @@ AND_BorAND_WorAND_LorMULS_W:
         CLR.L       D0                  ; Zero it
         MOVE.W      (A6),D0         ; We'll play with it here
         MOVE.B      #7,D1           ; Shift 7 bits left
-        ASL.W       D1,D0
+        LSL.W       D1,D0
         MOVE.B      #13,D1              ; Shift 13 bits to the right
         LSR.W       D1,D0               ; Move the bits (moves highest 4 bits to lowest 4 positions,
                                 ; and the rest are zeroed out)
@@ -467,7 +467,7 @@ ADD_BorADD_WorADD_L:
         CLR.L       D0              ; Zero it
         MOVE.W      (A6),D0     ; We'll play with it here
         MOVE.B      #7,D1           ; Shift 7 bits left
-        ASL.W       D1,D0
+        LSL.W       D1,D0
         MOVE.B      #13,D1          ; Shift 13 bits to the right
         LSR.W       D1,D0           ; Move the bits (moves highest 4 bits to lowest 4 positions,
                                     ; and the rest are zeroed out)
@@ -508,7 +508,7 @@ SUB_BorSUB_WorSUB_L:
         CLR.L       D0              ; Zero it
         MOVE.W      (A6),D0     ; We'll play with it here
         MOVE.B      #7,D1           ; Shift 7 bits left
-        ASL.W       D1,D0
+        LSL.W       D1,D0
         MOVE.B      #13,D1          ; Shift 13 bits to the right
         LSR.W       D1,D0           ; Move the bits (moves highest 4 bits to lowest 4 positions,
                                     ; and the rest are zeroed out)
@@ -549,7 +549,7 @@ CMP_BorCMP_WorCMP_L:
         CLR.L       D0              ; Zero it
         MOVE.W      (A6),D0     ; We'll play with it here
         MOVE.B      #8,D1           ; Shift 8 bits left
-        ASL.W       D1,D0
+        LSL.W       D1,D0
         MOVE.B      #14,D1          ; Shift 14 bits to the right
         LSR.W       D1,D0           ; Move the bits (moves highest 4 bits to lowest 4 positions,
                                     ; and the rest are zeroed out)
@@ -578,7 +578,7 @@ ADDQ_BorADDQ_WorADDQ_L:
         CLR.L       D0              ; Zero it
         MOVE.W      (A6),D0     ; We'll play with it here
         MOVE.B      #8,D1           ; Shift 8 bits left
-        ASL.W       D1,D0
+        LSL.W       D1,D0
         MOVE.B      #14,D1          ; Shift 14 bits to the right
         LSR.W       D1,D0           ; Move the bits (moves highest 4 bits to lowest 4 positions,
                                     ; and the rest are zeroed out)
@@ -607,7 +607,7 @@ someCLR:
         CLR.L       D0              ; Zero it
         MOVE.W      (A6),D0     ; We'll play with it here
         MOVE.B      #8,D1           ; Shift 8 bits left
-        ASL.W       D1,D0
+        LSL.W       D1,D0
         MOVE.B      #14,D1       ; Shift 12 bits to the right
         LSR.W       D1,D0           ; Move the bits (moves highest 4 bits to lowest 4 positions,
                                     ; and the rest are zeroed out)
@@ -645,7 +645,7 @@ NOPorCLRorRTSorJSR:
         BEQ         RTScommand
 
         MOVE.B      #4,D1           ; Shift 4 bits left
-        ASL.W       D1,D0
+        LSL.W       D1,D0
         MOVE.B      #12,D1          ; Shift 12 bits to the right
         LSR.W       D1,D0           ; Move the bits (moves highest 4 bits to lowest 4 positions,
                                     ; and the rest are zeroed out)
@@ -714,7 +714,7 @@ someMOVEM:
         CLR.L       D0              ; Zero it
         MOVE.W      (A6),D0     ; We'll play with it here
         MOVE.B      #9,D1           ; Shift 9 bits left
-        ASL.W       D1,D0
+        LSL.W       D1,D0
         MOVE.B      #15,D1       ; Shift 12 bits to the right
         LSR.W       D1,D0           ; Move the bits (moves highest 4 bits to lowest 4 positions,
                                     ; and the rest are zeroed out)
@@ -737,9 +737,9 @@ NOP_MOVEM_LEA_JSR_CLR_RTS:
         CLR.L       D0              ; Zero it
         MOVE.W      (A6),D0     ; We'll play with it here
         MOVE.B      #7,D1           ; Shift 7 bits right
-        ASR.W       D1,D0
+        LSR.W       D1,D0
         MOVE.B      #13,D1          ; Shift 13 bits left
-        ASL.W       D1,D0
+        LSL.W       D1,D0
         MOVE.B      #12,D1          ; Shift 12 bits to the right
         LSR.W       D1,D0           ; Move the bits (moves highest 4 bits to lowest 4 positions,
                                     ; and the rest are zeroed out)
@@ -804,9 +804,9 @@ ADDI_BorADDI_WorADDI_L:
         CLR.L       D0              ; Zero it
         MOVE.W      (A6),D0     ; We'll play with it here
         MOVE.B      #7,D1           ; Shift 7 bits left
-        ASL.W       D1,D0
+        LSL.W       D1,D0
         MOVE.B      #13,D1          ; Shift 13 bits right
-        ASR.W       D1,D0
+        LSR.W       D1,D0
         MULU        #6,D0           ; Form offset (move 6 bytes in memory for every 'JMP' command)
         JMP         0(A0,D0)        ; Jump indirect with index, i.e. jump to 'table' + displacement
 
@@ -832,9 +832,9 @@ MOVEA_LorMOVE_L:
         CLR.L       D0              ; Zero it
         MOVE.W      (A6),D0         ; We'll play with it here
         MOVE.B      #7,D1           ; Shift 7 bits left
-        ASL.W       D1,D0           ; 0011 1010 0100 0100 to 0010 0000 0000 0000
+        LSL.W       D1,D0           ; 0011 1010 0100 0100 to 0010 0000 0000 0000
         MOVE.B      #13,D1          ; Shift 13 bits right
-        ASR.W       D1,D0           ; 0010 0000 0000 0000 to 0000 0000 0000 0001
+        LSR.W       D1,D0           ; 0010 0000 0000 0000 to 0000 0000 0000 0001
         MULU        #6,D0           ; Form offset (move 6 bytes in memory for every 'JMP' command)
         JMP         0(A0,D0)        ; Jump indirect with index, i.e. jump to 'table' + displacement
 
@@ -872,9 +872,9 @@ MOVEA_WorMOVE_W:
         CLR.L       D0              ; Zero it
         MOVE.W      (A6),D0     ; We'll play with it here
         MOVE.B      #7,D1           ; Shift 7 bits left
-        ASL.W       D1,D0           ; 0011 1010 0100 0100 to 0010 0000 0000 0000
+        LSL.W       D1,D0           ; 0011 1010 0100 0100 to 0010 0000 0000 0000
         MOVE.B      #13,D1          ; Shift 13 bits right
-        ASR.W       D1,D0           ; 0010 0000 0000 0000 to 0000 0000 0000 0001
+        LSR.W       D1,D0           ; 0010 0000 0000 0000 to 0000 0000 0000 0001
         MULU        #6,D0           ; Form offset (move 6 bytes in memory for every 'JMP' command)
         JMP         0(A0,D0)        ; Jump indirect with index, i.e. jump to 'table' + displacement
 
