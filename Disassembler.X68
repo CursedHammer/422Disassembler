@@ -93,7 +93,7 @@ LOOP
     JSR         NEW_PAGE            * Else (counter == 0), prompt for new page
     MOVE.B      #RCOUNT, D2         * Reset row counter
 LOOP_CHECK
-    CMPA.L      ENDADDR,A6          * Is pointer at end of address range?
+    CMPA.L      ENDADDR,A6          * Is pointer less than the end address?
     BLT         LOOP                * If not, continue processing addresses
 END_LOOP                            * Else, end loop
     JSR         RERUN               * Does the user want to run program again
