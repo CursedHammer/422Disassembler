@@ -493,8 +493,19 @@ RERUN
 
 NOTDONE
     MOVE.B      #1,(RUNAGAIN)       * 1 for true to rerun program
+    BSR.W       CLEAN_ADDRESSES     * Clean the loaded memory values
     BSR.W       CLEAR               * Clear all values
     BSR.W       CLEARSCRN           * Clear screen and return from subroutine
+    RTS
+    
+CLEAN_ADDRESSES
+    MOVEA.L     BEGINADDR,A2        * Asigning pointer to A2
+CLEAN_LOOP
+    CMPA.L      ENDADDR,A2          * Is it below the end address
+    BGT         ADDRSDONE           * Addresses have been cleaned
+    MOVE.L      #$FFFFFFFF,(A2)+    * Fill with F's
+    BRA         CLEAN_LOOP          * Continue cleaning buffer
+ADDRSDONE
     RTS
 
 *********** END - END PROGRAM SUBROUTINES ************************************
