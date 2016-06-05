@@ -220,6 +220,13 @@ ADDA_ABS_L:
     JMP         ADDA_MODE_END
 ADDA_IMM:
     JSR         EA_OPMODE_COMBO     ; Get opmode bits in
+    CMP.B       #7, D6              ; Test if longword operation
+    BEQ         ADDA_IMM_L          ; If longword, set size to longword
+    MOVE.L      #2, D5              ; Else, set size to word
+    JMP         ADDA_IMM_END
+ADDA_IMM_L:
+    MOVE.L      #3, D5              ; Set size to longword
+ADDA_IMM_END:
     JSR         EA_PRINT_IMM        ; Print immediate data
     JMP         ADDA_MODE_END
 *-----------------------------------
