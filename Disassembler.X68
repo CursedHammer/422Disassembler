@@ -82,7 +82,7 @@ START     ORG   $1000               * Program begins at address 1000
     MOVE.B      #RCOUNT, D3         * Row counter
 LOOP
     LEA         BUFFER, A2          * Create a pointer to BUFFER
-    BSR.W       WRITE_BEGINL        * Write address to BUFFER
+    JSR         WRITE_BEGINL        * Write address to BUFFER
     JSR         OC_PARSE            * Determine if there is an initial opcode match
     JSR         WRITE_ENDL          * Write an endline for A1 to BUFFER
     JSR         PRINTLN             * Print the BUFFER to user
