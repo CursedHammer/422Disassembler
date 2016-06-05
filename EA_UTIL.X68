@@ -279,8 +279,15 @@ EA_PRINT_IND_END:
 * pointer location in A5
 *-----------------------------------------------------------
 EA_PRINT_IMM:
+    LEA         POUND, A4         ; Print '#'
+    JSR         WRITE2MEM
+    LEA         DOLLAR, A4        ; Print '$'
+    JSR         WRITE2MEM
     MOVEA.L     A5, A1              ; copy pointer to temp
-    ADDA.L      #$00000002, A1      ; Advance temp pointer to next word
+    CMPA.L      A1, A6              ; Check if any operands have been read
+    BNE         PRINT_IMM_CONT      ; If operand has been read, do not account for opcode word
+    ADDA.L      #$00000002, A1      ; Else, advance temp pointer to next word
+PRINT_IMM_CONT:
     CMP         #3, D5
     BEQ         PRINT_IMM_L         ; if L, branch
     MOVE.W      (A1), D6            ; store value in a register
@@ -293,7 +300,7 @@ PRINT_IMM_W:
     MOVE.L      #4, D7              ; Set size to W
     JMP         PRINT_IMM_END
 PRINT_IMM_L:
-    MOVE.L      (A1), D6            ; store value in a register (todo, register tbd)
+    MOVE.L      (A1), D6            ; store value in a register 
     MOVE.L      #8, D7              ; set size to L
     ADDA.L      #$00000004, A1      ; move temp pointer past longword that has been read
 PRINT_IMM_END:
@@ -422,11 +429,14 @@ EA_PRINT_ABS_L:
     LEA         DOLLAR, A4        ; Print '$'
     JSR         WRITE2MEM
     MOVEA.L     A5, A1              ; copy pointer to temp
-    ADDA.L      #$00000002, A1      ; Advance temp pointer to next word
+    CMPA.L      A1, A6              ; Check if any operands have been read
+    BNE         PRINT_ABS_L_CONT    ; If operand has been read, do not account for opcode word
+    ADDA.L      #$00000002, A1      ; Else, advance temp pointer to next word
+PRINT_ABS_L_CONT:
     MOVE.L      (A1), D6            ; store word address to print in TODO
     MOVE.L      #8, D7              ; Set size to L
     JSR         WRITEDATA2MEM
-    ADDA.L      #4, A1
+    ADDA.L      #$00000004, A1      ; Advance temp pointer past read longword
     MOVEA.L     A1, A5              ; store new pointer location to pass back
     RTS
 *---------- Absolute Word Address --------------------------
@@ -437,7 +447,10 @@ EA_PRINT_ABS_W:
     LEA         DOLLAR, A4        ; Print '$'
     JSR         WRITE2MEM
     MOVEA.L     A5, A1              ; copy pointer to temp
-    ADDA.L      #$00000002, A1      ; Advance temp pointer to next word
+    CMPA.L      A1, A6              ; Check if any operands have been read
+    BNE         PRINT_ABS_W_CONT    ; If operand has been read, do not account for opcode word
+    ADDA.L      #$00000002, A1      ; Else, advance temp pointer to next word
+PRINT_ABS_W_CONT:
     MOVE.W      (A1), D6            ; store word address to print in TODO
     MOVE.L      #4, D7              ; Set size to W
     JSR         WRITEDATA2MEM
