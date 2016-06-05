@@ -79,7 +79,7 @@ START     ORG   $1000               * Program begins at address 1000
 * Set up I/O
     LEA         BUFFER, A2
     JSR         CLEAN_BUFF
-    MOVE.B      #RCOUNT, D3         * Row counter
+    MOVE.B      #RCOUNT, D2         * Row counter
 LOOP
     LEA         BUFFER, A2          * Create a pointer to BUFFER
     JSR         WRITE_BEGINL        * Write address to BUFFER
@@ -87,11 +87,11 @@ LOOP
     JSR         WRITE_ENDL          * Write an endline for A1 to BUFFER
     JSR         PRINTLN             * Print the BUFFER to user
     JSR         CLEAN_BUFF          * Clean the BUFFER for reuse
-    SUBI.B      #1, D3              * Decrement row counter
-    CMPI.B      #0, D3              * Is D3 = 0?
+    SUBI.B      #1, D2              * Decrement row counter
+    CMPI.B      #0, D2              * Is D2 = 0?
     BNE         LOOP_CHECK          * If counter != 0, continue with normal loop check
     JSR         NEW_PAGE            * Else (counter == 0), prompt for new page
-    MOVE.B      #RCOUNT, D3         * Reset row counter
+    MOVE.B      #RCOUNT, D2         * Reset row counter
 LOOP_CHECK
     CMPA.L      ENDADDR,A6          * Is pointer at end of address range?
     BNE         LOOP                * If not, continue processing addresses
@@ -129,6 +129,7 @@ END_LOOP                            * Else, end loop
 
 *---------- End --------------------------------------------
                END  START          * Last line of source
+
 
 
 
