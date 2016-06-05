@@ -133,6 +133,7 @@ CLEAR
 * Read in the ASCII string address and verify length is <= 8.
 *-----------------------------------------------------------------------------
 GET_HEXSTRING
+    CLR.L       D1                  * Clear register to hold STR_LEN
     MOVE.B      #14,D0              * Moves the Task 14 into D0
     MOVE.W      #(PS2-PS1),D1       * The prompt string length
     TRAP        #15                 * Displays contents of A1
@@ -506,6 +507,8 @@ CLEAN_LOOP
     MOVE.L      #$FFFFFFFF,(A2)+    * Fill with F's
     BRA         CLEAN_LOOP          * Continue cleaning buffer
 ADDRSDONE
+    MOVE.L      #$FFFFFFFF,BEGINADDR *
+    MOVE.L      #$FFFFFFFF,ENDADDR   *
     RTS
 
 *********** END - END PROGRAM SUBROUTINES ************************************
