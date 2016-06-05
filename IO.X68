@@ -392,12 +392,7 @@ ADDRESS_ERR
 INVALID_DATA
     JSR         CLEAN_BUFF          * Clean buffer
     LEA         BUFFER, A2          * Reset buffer pointer
-    MOVE.L      A6,D6               * Move the address location to D6
-    MOVE.L      #8,D7               * Set size to L
-    JSR         WRITEDATA2MEM       * Write address to buffer
-
-    LEA         TAB,A4              * Load TAB to A4
-    JSR         WRITE2MEM           * Write tab to buffer
+    BSR.W       WRITE_BEGINL        * Write address to BUFFER
 
     LEA         DATA,A4             * Load DATA to A4
     JSR         WRITE2MEM           * Write 'DATA' to buffer
@@ -437,14 +432,13 @@ WRITE_ENDL
     RTS
     
 WRITE_BEGINL
-    MOVE.B      #'$',(A2)+          * Write a '$' to BUFFER 
+    LEA         DOLLAR,A4           * Load TAB to A4
+    BSR.W       WRITE2MEM           * Write tab to buffer
     MOVE.L      A6,D6               * Copy address to D6
     MOVE.B      #8,D7               * Set LONG for WRITEDATA2MEM
     BSR.W       WRITEDATA2MEM       * Write address to BUFFER
-    MOVE.B      #' ',(A2)+          * Write a ' ' to BUFFER
-    MOVE.B      #' ',(A2)+          * Write a ' ' to BUFFER
-    MOVE.B      #' ',(A2)+          * Write a ' ' to BUFFER
-    MOVE.B      #' ',(A2)+          * Write a ' ' to BUFFER
+    LEA         TAB,A4              * Load TAB to A4
+    BSR.W       WRITE2MEM           * Write tab to buffer
     RTS                             * Return program control
 
 PRINTLN
@@ -709,6 +703,7 @@ BYTE_MASK
 *---------- END - BYTE_MASK --------------------------------------------------
 
 *********** END - END PROGRAM SUBROUTINES ************************************
+
 
 
 
