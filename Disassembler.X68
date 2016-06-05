@@ -81,13 +81,14 @@ START     ORG   $1000               * Program begins at address 1000
     JSR         CLEAN_BUFF
     MOVE.B      #RCOUNT, D3         * Row counter
 LOOP
-    LEA         BUFFER, A2
+    LEA         BUFFER, A2          * Create a pointer to BUFFER
+    BSR.W       WRITE_BEGINL        * Write address to BUFFER
     JSR         OC_PARSE            * Determine if there is an initial opcode match
-    JSR         WRITE_ENDL
-    JSR         PRINTLN
-    JSR         CLEAN_BUFF
+    JSR         WRITE_ENDL          * Write an endline for A1 to BUFFER
+    JSR         PRINTLN             * Print the BUFFER to user
+    JSR         CLEAN_BUFF          * Clean the BUFFER for reuse
     SUBI.B      #1, D3              * Decrement row counter
-    CMPI.B      #0, D3
+    CMPI.B      #0, D3              * Is D3 = 0?
     BNE         LOOP_CHECK          * If counter != 0, continue with normal loop check
     JSR         NEW_PAGE            * Else (counter == 0), prompt for new page
     MOVE.B      #RCOUNT, D3         * Reset row counter
@@ -128,6 +129,7 @@ END_LOOP                            * Else, end loop
 
 *---------- End --------------------------------------------
                END  START          * Last line of source
+
 
 
 

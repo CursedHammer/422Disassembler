@@ -435,9 +435,20 @@ WRITE_ENDL
     MOVE.B      #LF,(A2)+           * Move line feed into memory
     MOVE.B      #$00,(A2)+          * Move string terminator into memory
     RTS
+    
+WRITE_BEGINL
+    MOVE.B      #'$',(A2)+          * Write a '$' to BUFFER 
+    MOVE.L      A6,D6               * Copy address to D6
+    MOVE.B      #8,D7               * Set LONG for WRITEDATA2MEM
+    BSR.W       WRITEDATA2MEM       * Write address to BUFFER
+    MOVE.B      #' ',(A2)+          * Write a ' ' to BUFFER
+    MOVE.B      #' ',(A2)+          * Write a ' ' to BUFFER
+    MOVE.B      #' ',(A2)+          * Write a ' ' to BUFFER
+    MOVE.B      #' ',(A2)+          * Write a ' ' to BUFFER
+    RTS                             * Return program control
 
 PRINTLN
-    LEA         BUFFER,A1               * Load BUFFER address into A1
+    LEA         BUFFER,A1           * Load BUFFER address into A1
     MOVE.B      #14,D0              * Task 14, no CR or LF
     TRAP        #15                 * Display string held in BUFFER
     RTS                             * Return to main
@@ -445,7 +456,7 @@ PRINTLN
 CLEAN_BUFF
     LEA         BUFFER, A2          * Reset buffer pointer
 CLEAN_BUFF_LOOP:
-    CMPI.L      #$FFFFFFFF,(A2)     *
+    CMPI.L      #$FFFFFFFF,(A2)     * Is it default value?
     BEQ         BUFFDONE            * Buffer has been cleaned
     MOVE.L      #$FFFFFFFF,(A2)+    * Fill with F's
     BRA         CLEAN_BUFF_LOOP     * Continue cleaning buffer
@@ -698,6 +709,7 @@ BYTE_MASK
 *---------- END - BYTE_MASK --------------------------------------------------
 
 *********** END - END PROGRAM SUBROUTINES ************************************
+
 
 
 
